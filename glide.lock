@@ -1,0 +1,38 @@
+hash: f6bbdd354fffd8e3e0995b1c7ae224a220d39131b1bd59b97e304aec8d1f7206
+updated: 2016-06-02T17:18:12.197708358+09:00
+imports:
+- name: github.com/asaskevich/govalidator
+  version: df81827fdd59d8b4fb93d8910b286ab7a3919520
+- name: github.com/cheggaaa/pb
+  version: c1f48d5ce4f292dfb775ef52aaedd15be323510d
+- name: github.com/jinzhu/gorm
+  version: bf0e23607840019d62e32e87e9af48e881d74b1e
+- name: github.com/jinzhu/inflection
+  version: 3272df6c21d04180007eb3349844c89a3856bc25
+- name: github.com/k0kubun/pp
+  version: 36d5366f4ec038f9a76dd85c7b29074089bb9b9e
+- name: github.com/mattn/go-colorable
+  version: 6cea104aa68c848b93be9d9c4be622350c132d61
+- name: github.com/mattn/go-isatty
+  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+- name: github.com/mattn/go-sqlite3
+  version: 38ee283dabf11c9cbdb968eebd79b1fa7acbabe6
+- name: github.com/moul/http2curl
+  version: b1479103caacaa39319f75e7f57fc545287fca0d
+- name: github.com/parnurzeal/gorequest
+  version: f17fef20c518e688f4edb3eb2af148462ecab3ef
+- name: github.com/prometheus/common
+  version: a3a8fe85f2579bcfec713dbfacbdd0797a792f3a
+  subpackages:
+  - log
+- name: github.com/Sirupsen/logrus
+  version: f3cfb454f4c209e6668c95216c4744b8fddb2356
+- name: golang.org/x/net
+  version: c4c3ea71919de159c9e246d7be66deb7f0a39a58
+  subpackages:
+  - publicsuffix
+- name: golang.org/x/sys
+  version: 076b546753157f758b316e59bcb51e6807c04057
+  subpackages:
+  - unix
+devImports: []

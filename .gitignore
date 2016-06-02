@@ -1,0 +1,5 @@
+.vscode
+coverage.out
+vendor/
+go-cpe-dictionary
+*.sqlite3
