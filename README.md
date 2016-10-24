@@ -19,7 +19,7 @@ go-cpe-dictionary requires the following packages.
 - sqlite
 - git
 - gcc
-- go v1.6
+- go v1.7 or later
     - https://golang.org/doc/install
 
 ```bash
@@ -43,15 +43,14 @@ $ source /etc/profile.d/goenv.sh
 
 ## Deploy go-cpe-dictionary
 
-To install, use `go get`:
-
-go get
+To install:
 
 ```bash
-$ sudo mkdir /var/log/vuls
-$ sudo chown ec2-user /var/log/vuls
-$ sudo chmod 700 /var/log/vuls
-$ go get github.com/kotakanbe/go-cpe-dictionary
+$ mkdir -p $GOPATH/src/github.com/kotakanbe
+$ cd $GOPATH/src/github.com/kotakanbe
+$ git https://github.com/kotakanbe/go-cpe-dictionary.git
+$ cd go-cpe-dictionary
+$ make install
 ```
 
 Fetch CPE data from NVD. It takes about 1 minutes.  

@@ -16,11 +16,22 @@ SRCS = $(shell git ls-files '*.go')
   #  PKGS = ./. ./testing
 PKGS =  ./config ./db ./models
 
-all: test
+glide:
+	go get github.com/Masterminds/glide
 
-vendor:
-	@ go get -v github.com/mjibson/party
-	party -d external -c -u
+deps: glide
+	glide install
+
+update: glide
+	glide update
+
+build: main.go deps
+	go build -ldflags "$(LDFLAGS)" -o go-cpe-dictionary $<
+
+install: main.go deps
+	go install -ldflags "$(LDFLAGS)"
+
+all: test
 
 lint:
 	@ go get -v github.com/golang/lint/golint
@@ -36,22 +47,13 @@ fmt:
 fmtcheck:
 	$(foreach file,$(SRCS),gofmt -d $(file);)
 
-prepare_docker:
-	sudo stop docker
-	sudo rm -rf /var/lib/docker
-	sudo rm -f `which docker`
-	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-	echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" | sudo tee /etc/apt/sources.list.d/docker.list
-	sudo apt-get update
-	sudo apt-get install docker-engine=$(DOCKER_VERSION)-0~$(shell lsb_release -cs) -y --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-
 pretest: lint vet fmtcheck
 
 test: pretest
 	$(foreach pkg,$(PKGS),go test -v $(pkg) || exit;)
 
-integration:
-	go test -tags docker_integration -run TestIntegration -v
+unused :
+	$(foreach pkg,$(PKGS),unused $(pkg);)
 
 cov:
 	@ go get -v github.com/axw/gocov/gocov
