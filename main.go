@@ -11,8 +11,6 @@ import (
 	"github.com/kotakanbe/go-cpe-dictionary/cpe"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 //  var debug bool

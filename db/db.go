@@ -10,6 +10,9 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
+
+	// Required SQLite3.  See http://jinzhu.me/gorm/database.html#connecting-to-a-database
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 var db *gorm.DB
