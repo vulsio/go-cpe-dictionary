@@ -3,3 +3,6 @@ coverage.out
 vendor/
 go-cpe-dictionary
 *.sqlite3
+
+cpe.db
+cpe.json

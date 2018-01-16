@@ -6,13 +6,11 @@ import (
 	"io/ioutil"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
 	config "github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/cpe"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
-
-	_ "github.com/mattn/go-sqlite3"
+	log "github.com/sirupsen/logrus"
 )
 
 //  var debug bool
@@ -26,7 +24,10 @@ func main() {
 	pwd := os.Getenv("PWD")
 	flag.StringVar(&conf.DumpPath, "dump-path", pwd+"/cpe.json", "/path/to/dump.json")
 	flag.BoolVar(&conf.Fetch, "fetch", false, "Fetch CPE data from NVD")
-	flag.StringVar(&conf.DBPath, "dbpath", pwd+"/cpe.db", "/path/to/sqlite3/datafile")
+	flag.StringVar(&conf.DBType, "dbtype", "sqlite3",
+		"Database type to store data in (sqlite3,  mysql, postgres or redis supported)")
+	flag.StringVar(&conf.DBPath, "dbpath", pwd+"/cpe.sqlite3",
+		"/path/to/sqlite3 or SQL connection string")
 	flag.BoolVar(&conf.Load, "load", false, "load CPE data from dumpfile")
 	flag.StringVar(&conf.HTTPProxy, "http-proxy", "", "HTTP Proxy URL (http://proxy-server:8080)")
 
@@ -58,14 +59,17 @@ func main() {
 		}
 		cpes := models.ConvertToModel(cpeList)
 
-		log.Infof("Inserting into DB... dbpath: %s", conf.DBPath)
-		if err := db.Init(conf); err != nil {
-			log.Errorf("Failed to Init DB. err: %s", err)
+		var driver db.DB
+		var err error
+		if driver, err = db.NewDB(conf.DBType, conf.DBPath, conf.DebugSQL); err != nil {
+			log.Errorf("Failed to new db. err : %s", err)
 			os.Exit(1)
 		}
+		defer driver.CloseDB()
 
-		if err := db.InsertCpes(cpes, conf); err != nil {
-			log.Errorf("Failed to inserting DB. err: %s", err)
+		log.Infof("Inserting into DB (%s)", driver.Name())
+		if err := driver.InsertCpes(cpes); err != nil {
+			log.Fatalf("Failed to insert. dbpath: %s, err: %s", conf.DBPath, err)
 			os.Exit(1)
 		}
 	}
@@ -78,23 +82,25 @@ func main() {
 			os.Exit(1)
 		}
 
-		cpeList := cpe.CpeList{}
+		cpeList := cpe.List{}
 		if err := json.Unmarshal(raw, &cpeList); err != nil {
 			log.Fatalf("Failed to unmarshall JSON. pash: %s, err: %s", conf.DumpPath, err)
 			os.Exit(1)
 		}
-		log.Infof("Success. %d items", len(cpeList.CpeItems))
+		log.Infof("Success. %d items", len(cpeList.Items))
 
 		cpes := models.ConvertToModel(cpeList)
 
-		log.Infof("Inserting into DB... dbpath: %s", conf.DBPath)
-		if err := db.Init(conf); err != nil {
-			log.Errorf("Failed to Init DB. err: %s", err)
+		var driver db.DB
+		if driver, err = db.NewDB(conf.DBType, conf.DBPath, conf.DebugSQL); err != nil {
+			log.Errorf("Failed to new db. err : %s", err)
 			os.Exit(1)
 		}
+		defer driver.CloseDB()
 
-		if err := db.InsertCpes(cpes, conf); err != nil {
-			log.Errorf("Failed to insert. err: %s", err)
+		log.Infof("Inserting into DB (%s)", driver.Name())
+		if err := driver.InsertCpes(cpes); err != nil {
+			log.Fatalf("Failed to insert. dbpath: %s, err: %s", conf.DBPath, err)
 			os.Exit(1)
 		}
 	}
