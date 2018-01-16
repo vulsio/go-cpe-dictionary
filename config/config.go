@@ -16,6 +16,7 @@ type Config struct {
 	Fetch    bool
 	DumpPath string
 	DBPath   string
+	DBType   string
 
 	Server bool
 	Bind   string `valid:"ipv4"`
@@ -35,9 +36,11 @@ func (c *Config) Validate() bool {
 		}
 	}
 
-	if ok, _ := valid.IsFilePath(c.DBPath); !ok {
-		log.Fatalf("--dbpath : %s is not valid *Absolute* file path", c.DBPath)
-		os.Exit(1)
+	if c.DBType == "sqlite3" {
+		if ok, _ := valid.IsFilePath(c.DBPath); !ok {
+			log.Fatalf("--dbpath : %s is not valid *Absolute* file path", c.DBPath)
+			os.Exit(1)
+		}
 	}
 
 	if !(c.Load || c.Fetch) {
