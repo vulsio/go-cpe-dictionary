@@ -48,7 +48,7 @@ To install:
 ```bash
 $ mkdir -p $GOPATH/src/github.com/kotakanbe
 $ cd $GOPATH/src/github.com/kotakanbe
-$ git https://github.com/kotakanbe/go-cpe-dictionary.git
+$ git clone https://github.com/kotakanbe/go-cpe-dictionary.git
 $ cd go-cpe-dictionary
 $ make install
 ```
