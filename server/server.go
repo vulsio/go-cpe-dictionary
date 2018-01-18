@@ -10,6 +10,7 @@ import (
 	"github.com/labstack/echo/middleware"
 	"github.com/sadayuki-matsuno/go-cpe-dictionary/config"
 	"github.com/sadayuki-matsuno/go-cpe-dictionary/db"
+	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -58,9 +59,13 @@ func health() echo.HandlerFunc {
 
 // Handler
 func getCpe(driver db.DB) echo.HandlerFunc {
+	var err error
 	return func(c echo.Context) error {
 		cpeName := c.Param("cpename")
-		cpeDetail := driver.GetCpe(cpeName)
-		return c.JSON(http.StatusOK, &cpeDetail)
+		var cpe models.CategorizedCpe
+		if cpe, err = driver.GetCpeFromCpe23(cpeName); err != nil {
+			return c.JSON(http.StatusBadRequest, nil)
+		}
+		return c.JSON(http.StatusOK, &cpe)
 	}
 }

@@ -63,11 +63,6 @@ func (r *RedisDriver) CloseDB() (err error) {
 	return
 }
 
-// GetCpe Select Cve information from DB.
-func (r *RedisDriver) GetCpe(cpeName string) models.CategorizedCpe {
-	return models.CategorizedCpe{}
-}
-
 // InsertCpes Select Cve information from DB.
 func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 	bar := pb.New(len(cpes))
@@ -88,6 +83,9 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 			}
 			if result := pipe.HSet(hashKeyPrefix+"Cpe23", c.Cpe23URI, string(cpeJSON)); result.Err() != nil {
 				return fmt.Errorf("Failed to HSet CPE23. err: %s", result.Err())
+			}
+			if result := pipe.HSet(hashKeyPrefix+"VendorProduct"+hashKeySeparator+c.Vendor+hashKeySeparator+c.Product, c.Cpe23URI, string(cpeJSON)); result.Err() != nil {
+				return fmt.Errorf("Failed to HSet Vendor Product. err: %s", result.Err())
 			}
 
 			if result := pipe.ZAdd(
@@ -125,4 +123,106 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 	bar.Finish()
 	log.Infof("Refreshed %d CPEs.", len(cpes))
 	return nil
+}
+
+// GetCpeFromCpe22 Select Cve information from DB.
+func (r *RedisDriver) GetCpeFromCpe22(cpeName string) (cpe models.CategorizedCpe, err error) {
+	var result *redis.StringCmd
+	if result = r.conn.HGet(hashKeyPrefix+"Cpe22", cpeName); result.Err() != nil {
+		return cpe, fmt.Errorf("Failed to get cpe. err : %s", result.Err())
+	}
+	if err = json.Unmarshal([]byte(result.Val()), &cpe); err != nil {
+		return cpe, fmt.Errorf("Failed to Unmarshal json. err : %s", err)
+	}
+	return cpe, nil
+}
+
+// GetCpeFromCpe23 Select Cve information from DB.
+func (r *RedisDriver) GetCpeFromCpe23(cpeName string) (cpe models.CategorizedCpe, err error) {
+	var result *redis.StringCmd
+	if result = r.conn.HGet(hashKeyPrefix+"Cpe23", cpeName); result.Err() != nil {
+		return cpe, fmt.Errorf("Failed to get cpe. err : %s", result.Err())
+	}
+	if err = json.Unmarshal([]byte(result.Val()), &cpe); err != nil {
+		return cpe, fmt.Errorf("Failed to Unmarshal json. err : %s", err)
+	}
+	return cpe, nil
+}
+
+// GetCategories : GetCategories
+func (r *RedisDriver) GetCategories() (cpe models.FilterableCategories, err error) {
+	vendorProducts := map[string][]string{}
+	var vendors, targetSoftware, targetHardware *redis.StringSliceCmd
+	if vendors = r.conn.ZRange(hashKeyPrefix+"Vendor", 0, -1); vendors.Err() != nil {
+		return cpe, vendors.Err()
+	}
+	if targetSoftware = r.conn.ZRange(hashKeyPrefix+"TargetSoftware", 0, -1); targetSoftware.Err() != nil {
+		return cpe, targetSoftware.Err()
+	}
+	if targetHardware = r.conn.ZRange(hashKeyPrefix+"TargetHardware", 0, -1); targetHardware.Err() != nil {
+		return cpe, targetHardware.Err()
+	}
+
+	for _, vendor := range vendors.Val() {
+		var products *redis.StringSliceCmd
+		if products = r.conn.ZRange(hashKeyPrefix+"VendorProduct"+hashKeySeparator+vendor, 0, -1); products.Err() != nil {
+			return cpe, products.Err()
+		}
+		vendorProducts[vendor] = products.Val()
+	}
+
+	return models.FilterableCategories{
+		Part:           []string{"a", "o", "h"},
+		VendorProduct:  vendorProducts,
+		TargetSoftware: targetSoftware.Val(),
+		TargetHardware: targetHardware.Val(),
+	}, nil
+}
+
+// GetFilteredCpe :
+func (r *RedisDriver) GetFilteredCpe(filters models.FilterableCategories) (cpes []models.CategorizedCpe, err error) {
+	if len(filters.VendorProduct) == 0 {
+		return cpes, fmt.Errorf("At least one Vendor and Product must be specified")
+	}
+
+	for vendor, products := range filters.VendorProduct {
+		for _, product := range products {
+			var result *redis.StringStringMapCmd
+			var cpe models.CategorizedCpe
+			if result = r.conn.HGetAll(hashKeyPrefix + "VendorProduct" + hashKeySeparator + vendor + hashKeySeparator + product); result.Err() != nil {
+				return cpes, fmt.Errorf("Failed to get cpe. err : %s", result.Err())
+			}
+			for _, v := range result.Val() {
+				if err = json.Unmarshal([]byte(v), &cpe); err != nil {
+					return cpes, fmt.Errorf("Failed to Unmarshal json. err : %s", err)
+				}
+				if 0 < len(filters.Part) {
+					if !contains(filters.Part, cpe.Part) {
+						continue
+					}
+				}
+				if 0 < len(filters.TargetSoftware) {
+					if !contains(filters.TargetSoftware, cpe.TargetSoftware) {
+						continue
+					}
+				}
+				if 0 < len(filters.TargetHardware) {
+					if !contains(filters.TargetHardware, cpe.TargetHardware) {
+						continue
+					}
+				}
+				cpes = append(cpes, cpe)
+			}
+		}
+	}
+	return cpes, nil
+}
+
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
+	}
+	return false
 }

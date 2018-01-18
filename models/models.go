@@ -22,3 +22,11 @@ type CategorizedCpe struct {
 	TargetHardware  string
 	Other           string
 }
+
+// FilterableCategories :
+type FilterableCategories struct {
+	Part           []string
+	VendorProduct  map[string][]string
+	TargetSoftware []string
+	TargetHardware []string
+}

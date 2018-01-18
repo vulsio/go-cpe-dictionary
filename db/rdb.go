@@ -81,23 +81,6 @@ func (r *RDBDriver) MigrateDB() error {
 	return nil
 }
 
-// GetCpe Select Cpe information from DB.
-func (r *RDBDriver) GetCpe(name string) models.CategorizedCpe {
-	c := models.CategorizedCpe{}
-	//TODO parameter
-	r.conn.Where(&models.CategorizedCpe{Cpe22URI: name}).First(&c)
-	return c
-}
-
-// CloseDB close Database
-func (r *RDBDriver) CloseDB() (err error) {
-	if err = r.conn.Close(); err != nil {
-		log.Errorf("Failed to close DB. Type: %s. err: %s", r.name, err)
-		return
-	}
-	return
-}
-
 // InsertCpes inserts Cpe Information into DB
 func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 	insertedCpes := []string{}
@@ -129,4 +112,41 @@ func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 	log.Infof("Inserted %d CPEs", len(insertedCpes))
 	//  log.Debugf("%v", refreshedNvds)
 	return nil
+}
+
+// GetCpeFromCpe22 Select Cpe information from DB.
+func (r *RDBDriver) GetCpeFromCpe22(name string) (cpe models.CategorizedCpe, err error) {
+	c := models.CategorizedCpe{}
+	//TODO parameter
+	r.conn.Where(&models.CategorizedCpe{Cpe22URI: name}).First(&c)
+	return c, nil
+}
+
+// GetCpeFromCpe23 Select Cpe information from DB.
+func (r *RDBDriver) GetCpeFromCpe23(name string) (cpe models.CategorizedCpe, err error) {
+	c := models.CategorizedCpe{}
+	//TODO parameter
+	r.conn.Where(&models.CategorizedCpe{Cpe23URI: name}).First(&c)
+	return c, nil
+}
+
+// GetCategories : GetCategories
+func (r *RDBDriver) GetCategories() (cpe models.FilterableCategories, err error) {
+	// TODO
+	return models.FilterableCategories{}, nil
+}
+
+// GetFilteredCpe : GetFilteredCpe
+func (r *RDBDriver) GetFilteredCpe(filters models.FilterableCategories) (cpes []models.CategorizedCpe, err error) {
+	// TODO
+	return cpes, nil
+}
+
+// CloseDB close Database
+func (r *RDBDriver) CloseDB() (err error) {
+	if err = r.conn.Close(); err != nil {
+		log.Errorf("Failed to close DB. Type: %s. err: %s", r.name, err)
+		return
+	}
+	return
 }

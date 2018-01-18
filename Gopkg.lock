@@ -2,6 +2,15 @@
 
 
 [[projects]]
+  name = "github.com/alicebob/miniredis"
+  packages = [
+    ".",
+    "server"
+  ]
+  revision = "70cb3fab2cf658a95f2ccae5bfb2f0ccbba0c548"
+  version = "2.2.1"
+
+[[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
   revision = "4918b99a7cb949bb295f3c7bbaf24b577d806e35"
@@ -245,6 +254,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f43fb55cf5ba42a8404f80da6527fc0ea8bc6e2fe1e88f50ee310b66d8745683"
+  inputs-digest = "031c94bc22b899ec41d8af4e759fadaadcf4ac02c548763049e7064696908b95"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -10,7 +10,10 @@ import (
 type DB interface {
 	Name() string
 	CloseDB() error
-	GetCpe(string) models.CategorizedCpe
+	GetCpeFromCpe22(string) (models.CategorizedCpe, error)
+	GetCpeFromCpe23(string) (models.CategorizedCpe, error)
+	GetCategories() (models.FilterableCategories, error)
+	GetFilteredCpe(models.FilterableCategories) ([]models.CategorizedCpe, error)
 	InsertCpes([]models.CategorizedCpe) error
 }
 
