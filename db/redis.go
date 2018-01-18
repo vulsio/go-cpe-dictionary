@@ -6,7 +6,7 @@ import (
 
 	"github.com/cheggaaa/pb"
 	"github.com/go-redis/redis"
-	"github.com/kotakanbe/go-cpe-dictionary/models"
+	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
 	log "github.com/sirupsen/logrus"
 )
 

@@ -2,12 +2,6 @@
 
 
 [[projects]]
-  name = "github.com/BurntSushi/toml"
-  packages = ["."]
-  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
-  version = "v0.3.0"
-
-[[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
   revision = "4918b99a7cb949bb295f3c7bbaf24b577d806e35"
@@ -24,15 +18,6 @@
   packages = ["."]
   revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
   version = "v3.1.0"
-
-[[projects]]
-  name = "github.com/future-architect/vuls"
-  packages = [
-    "config",
-    "contrib/owasp-dependency-check/parser"
-  ]
-  revision = "e788e6a5ad6cf91c5c092b24374d514502881d1c"
-  version = "v0.4.2"
 
 [[projects]]
   name = "github.com/go-redis/redis"
@@ -81,12 +66,6 @@
   name = "github.com/k0kubun/pp"
   packages = ["."]
   revision = "e057ee7a28277be4d2af303443b6da377768181f"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/kotakanbe/logrus-prefixed-formatter"
-  packages = ["."]
-  revision = "75edb2e85a38873f0318be05a458446681d1022f"
 
 [[projects]]
   name = "github.com/labstack/echo"
@@ -138,12 +117,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/mgutz/ansi"
-  packages = ["."]
-  revision = "9520e82c474b0a04dd04f8a40959027271bab992"
-
-[[projects]]
-  branch = "master"
   name = "github.com/moul/http2curl"
   packages = ["."]
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
@@ -161,22 +134,16 @@
   version = "v0.8.0"
 
 [[projects]]
-  name = "github.com/rifflock/lfshook"
+  branch = "master"
+  name = "github.com/sadayuki-matsuno/go-cpe"
   packages = ["."]
-  revision = "6844c808343cb8fa357d7f141b1b990e05d24e41"
-  version = "v1.7"
+  revision = "b17eb57097eeb042314f5b54f65fe1efe7a2864a"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   revision = "d682213848ed68c0a260ca37d6dd5ace8423f5ba"
   version = "v1.0.4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/umisama/go-cpe"
-  packages = ["."]
-  revision = "a60334db86c866bf5fcd2e01f357ecf63e5b7315"
 
 [[projects]]
   branch = "master"
@@ -189,12 +156,6 @@
   name = "github.com/valyala/fasttemplate"
   packages = ["."]
   revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
-
-[[projects]]
-  name = "github.com/vuls-saas/vuls"
-  packages = ["util"]
-  revision = "efa59484d2bdc29abb1ed3366db7e1f43565f1e4"
-  version = "v0.5.0-r0"
 
 [[projects]]
   branch = "master"
@@ -284,6 +245,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "5839e6e1c4420be085e2851428d7e446767d2de61f2a73099bf3674df5176097"
+  inputs-digest = "f43fb55cf5ba42a8404f80da6527fc0ea8bc6e2fe1e88f50ee310b66d8745683"
   solver-name = "gps-cdcl"
   solver-version = 1

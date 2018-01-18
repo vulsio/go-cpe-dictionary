@@ -13,13 +13,13 @@ import (
 	"time"
 
 	"github.com/cheggaaa/pb"
-	c "github.com/kotakanbe/go-cpe-dictionary/config"
-	"github.com/kotakanbe/go-cpe-dictionary/db"
-	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/labstack/gommon/log"
 	"github.com/parnurzeal/gorequest"
 	gocpe "github.com/sadayuki-matsuno/go-cpe"
-	"github.com/vuls-saas/vuls/util"
+	c "github.com/sadayuki-matsuno/go-cpe-dictionary/config"
+	"github.com/sadayuki-matsuno/go-cpe-dictionary/db"
+	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
+	"github.com/sadayuki-matsuno/go-cpe-dictionary/util"
 )
 
 // CpeDictionary has cpe-item list
