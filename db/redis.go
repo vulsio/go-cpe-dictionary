@@ -3,7 +3,6 @@ package db
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/cheggaaa/pb"
 	"github.com/go-redis/redis"
@@ -65,15 +64,15 @@ func (r *RedisDriver) CloseDB() (err error) {
 }
 
 // GetCpe Select Cve information from DB.
-func (r *RedisDriver) GetCpe(cpeName string) models.Cpe {
-	return models.Cpe{}
+func (r *RedisDriver) GetCpe(cpeName string) models.CategorizedCpe {
+	return models.CategorizedCpe{}
 }
 
 // InsertCpes Select Cve information from DB.
-func (r *RedisDriver) InsertCpes(cpes []models.Cpe) (err error) {
+func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 	bar := pb.New(len(cpes))
 	bar.Start()
-	var uniqueVendor, uniqueProduct = map[string]bool{}, map[string]bool{}
+	//	var uniqueVendor, uniqueProduct = map[string]bool{}, map[string]bool{}
 	for chunked := range chunkSlice(cpes, 10) {
 		var pipe redis.Pipeliner
 		pipe = r.conn.Pipeline()
@@ -83,65 +82,40 @@ func (r *RedisDriver) InsertCpes(cpes []models.Cpe) (err error) {
 			if cpeJSON, err = json.Marshal(c); err != nil {
 				return fmt.Errorf("Failed to marshal json. err: %s", err)
 			}
-			var cpeParts = strings.Split(c.Name, ":")
-			var part, vendor, product = cpeParts[1], cpeParts[2], cpeParts[3]
-			if result := pipe.HSet(hashKeyPrefix+"CPE", c.Name, string(cpeJSON)); result.Err() != nil {
-				return fmt.Errorf("Failed to HSet CPE. err: %s", result.Err())
+
+			if result := pipe.HSet(hashKeyPrefix+"Cpe22", c.Cpe22URI, string(cpeJSON)); result.Err() != nil {
+				return fmt.Errorf("Failed to HSet CPE22. err: %s", result.Err())
+			}
+			if result := pipe.HSet(hashKeyPrefix+"Cpe23", c.Cpe23URI, string(cpeJSON)); result.Err() != nil {
+				return fmt.Errorf("Failed to HSet CPE23. err: %s", result.Err())
 			}
 
-			if !uniqueVendor[vendor] {
+			if result := pipe.ZAdd(
+				hashKeyPrefix+"VendorProduct"+hashKeySeparator+c.Vendor,
+				redis.Z{Score: 0, Member: c.Product},
+			); result.Err() != nil {
+				return fmt.Errorf("Failed to ZAdd VendorProduct. err: %s", result.Err())
+			}
+			categories := map[string]string{
+				"Vendor":         c.Vendor,
+				"Product":        c.Product,
+				"TargetSoftware": c.TargetSoftware,
+				"TargetHardware": c.TargetHardware,
+			}
+			for key, value := range categories {
 				if result := pipe.ZAdd(
-					hashKeyPrefix+"VENDOR",
-					redis.Z{Score: 0, Member: vendor},
+					hashKeyPrefix+key,
+					redis.Z{Score: 0, Member: c.Vendor},
 				); result.Err() != nil {
-					return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
+					return fmt.Errorf("Failed to ZAdd %s. err: %s", key, result.Err())
 				}
-				uniqueVendor[vendor] = true
-			}
 
-			if result := pipe.ZAdd(
-				hashKeyPrefix+"VENDOR"+hashKeySeparator+vendor,
-				redis.Z{Score: 0, Member: product},
-			); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
-			}
-
-			if !uniqueProduct[product] {
 				if result := pipe.ZAdd(
-					hashKeyPrefix+"PRODUCT",
-					redis.Z{Score: 0, Member: product},
+					hashKeyPrefix+key+hashKeySeparator+value,
+					redis.Z{Score: 0, Member: c.Cpe23URI},
 				); result.Err() != nil {
-					return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
+					return fmt.Errorf("Failed to ZAdd %s and cpe name. err: %s", key, result.Err())
 				}
-				uniqueProduct[product] = true
-			}
-
-			if result := pipe.ZAdd(
-				hashKeyPrefix+"PRODUCT"+hashKeySeparator+product,
-				redis.Z{Score: 0, Member: c.Name},
-			); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
-			}
-
-			if result := pipe.ZAdd(
-				hashKeyPrefix+"CPENAME",
-				redis.Z{Score: 0, Member: c.Name},
-			); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
-			}
-
-			if result := pipe.ZAdd(
-				hashKeyPrefix+"PART"+hashKeySeparator+part[1:]+hashKeySeparator+"VENDOR",
-				redis.Z{Score: 0, Member: vendor},
-			); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
-			}
-
-			if result := pipe.ZAdd(
-				hashKeyPrefix+"PART"+hashKeySeparator+part[1:]+hashKeySeparator+"PRODUCT",
-				redis.Z{Score: 0, Member: product},
-			); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd cpe name. err: %s", result.Err())
 			}
 		}
 		if _, err = pipe.Exec(); err != nil {

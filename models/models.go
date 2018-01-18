@@ -2,28 +2,23 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/kotakanbe/go-cpe-dictionary/cpe"
 )
 
-// Cpe has CPE information
-type Cpe struct {
-	gorm.Model `json:"-" xml:"-"`
-
-	Name      string
-	NameCpe23 string
-	Title     string
-	TitleJa   string
-}
-
-// ConvertToModel : ConvertToModel
-func ConvertToModel(cpeList cpe.List) (cpes []Cpe) {
-	for _, item := range cpeList.Items {
-		cpes = append(cpes, Cpe{
-			Name:      item.Name,
-			NameCpe23: item.Cpe23Item.Name,
-			Title:     item.GetTitleEn(),
-			TitleJa:   item.GetTitleJa(),
-		})
-	}
-	return
+// CategorizedCpe :
+// https://cpe.mitre.org/specification/CPE_2.3_for_ITSAC_Nov2011.pdf
+type CategorizedCpe struct {
+	gorm.Model      `json:"-" xml:"-"`
+	Cpe22URI        string
+	Cpe23URI        string
+	Part            string
+	Vendor          string
+	Product         string
+	Version         string
+	Update          string
+	Edition         string
+	Language        string
+	SoftwareEdition string
+	TargetSoftware  string
+	TargetHardware  string
+	Other           string
 }

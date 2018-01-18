@@ -2,31 +2,37 @@
 
 
 [[projects]]
-  branch = "master"
-  name = "github.com/alecthomas/template"
-  packages = [
-    ".",
-    "parse"
-  ]
-  revision = "a0175ee3bccc567396460bf5acd36800cb10c49c"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/alecthomas/units"
+  name = "github.com/BurntSushi/toml"
   packages = ["."]
-  revision = "2efee857e7cfd4f3d0138cc3cbb1b4966962b93a"
+  revision = "b26d9c308763d68093482582cea63d69be07a0f0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
-  revision = "521b25f4b05fd26bec69d9dedeb8f9c9a83939a8"
-  version = "v8"
+  revision = "4918b99a7cb949bb295f3c7bbaf24b577d806e35"
+  version = "v6"
 
 [[projects]]
   name = "github.com/cheggaaa/pb"
   packages = ["."]
   revision = "c112833d014c77e8bde723fd0158e3156951639f"
   version = "v2.0.6"
+
+[[projects]]
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
+  version = "v3.1.0"
+
+[[projects]]
+  name = "github.com/future-architect/vuls"
+  packages = [
+    "config",
+    "contrib/owasp-dependency-check/parser"
+  ]
+  revision = "e788e6a5ad6cf91c5c092b24374d514502881d1c"
+  version = "v0.4.2"
 
 [[projects]]
   name = "github.com/go-redis/redis"
@@ -38,14 +44,20 @@
     "internal/pool",
     "internal/proto"
   ]
-  revision = "73b70592cdaa9e6abdfcfbf97b4a90d80728c836"
-  version = "v6.8.0"
+  revision = "abb85b0fb8a7f0ef7551677888d8d674d153c991"
+  version = "v6.8.1"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
   packages = ["."]
   revision = "a0583e0143b1624142adab07e0e97fe106d99561"
   version = "v1.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/google/subcommands"
+  packages = ["."]
+  revision = "ce3d4cfc062faac7115d44e5befec8b5a08c3faa"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -69,6 +81,32 @@
   name = "github.com/k0kubun/pp"
   packages = ["."]
   revision = "e057ee7a28277be4d2af303443b6da377768181f"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/kotakanbe/logrus-prefixed-formatter"
+  packages = ["."]
+  revision = "75edb2e85a38873f0318be05a458446681d1022f"
+
+[[projects]]
+  name = "github.com/labstack/echo"
+  packages = [
+    ".",
+    "middleware"
+  ]
+  revision = "b338075a0fc6e1a0683dbf03d09b4957a289e26f"
+  version = "3.2.6"
+
+[[projects]]
+  name = "github.com/labstack/gommon"
+  packages = [
+    "bytes",
+    "color",
+    "log",
+    "random"
+  ]
+  revision = "57409ada9da0f2afad6664c49502f8c50fbd8476"
+  version = "0.2.3"
 
 [[projects]]
   branch = "master"
@@ -100,6 +138,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/mgutz/ansi"
+  packages = ["."]
+  revision = "9520e82c474b0a04dd04f8a40959027271bab992"
+
+[[projects]]
+  branch = "master"
   name = "github.com/moul/http2curl"
   packages = ["."]
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
@@ -117,10 +161,10 @@
   version = "v0.8.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/prometheus/common"
-  packages = ["log"]
-  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
+  name = "github.com/rifflock/lfshook"
+  packages = ["."]
+  revision = "6844c808343cb8fa357d7f141b1b990e05d24e41"
+  version = "v1.7"
 
 [[projects]]
   name = "github.com/sirupsen/logrus"
@@ -130,8 +174,36 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/umisama/go-cpe"
+  packages = ["."]
+  revision = "a60334db86c866bf5fcd2e01f357ecf63e5b7315"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/valyala/bytebufferpool"
+  packages = ["."]
+  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/valyala/fasttemplate"
+  packages = ["."]
+  revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
+
+[[projects]]
+  name = "github.com/vuls-saas/vuls"
+  packages = ["util"]
+  revision = "efa59484d2bdc29abb1ed3366db7e1f43565f1e4"
+  version = "v0.5.0-r0"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "acme",
+    "acme/autocert",
+    "ssh/terminal"
+  ]
   revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
 
 [[projects]]
@@ -148,9 +220,7 @@
   name = "golang.org/x/sys"
   packages = [
     "unix",
-    "windows",
-    "windows/registry",
-    "windows/svc/eventlog"
+    "windows"
   ]
   revision = "fff93fa7cd278d84afc205751523809c464168ab"
 
@@ -180,12 +250,6 @@
   packages = ["."]
   revision = "b24eb346a94c3ba12c1da1e564dbac1b498a77ce"
   version = "v1.1.1"
-
-[[projects]]
-  name = "gopkg.in/alecthomas/kingpin.v2"
-  packages = ["."]
-  revision = "947dcec5ba9c011838740e680966fd7087a71d0d"
-  version = "v2.2.6"
 
 [[projects]]
   name = "gopkg.in/cheggaaa/pb.v2"
@@ -220,6 +284,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "75cec25cebda41821cc577b695f4234914b5f2f2b013e342631605fe1fff4a19"
+  inputs-digest = "5839e6e1c4420be085e2851428d7e446767d2de61f2a73099bf3674df5176097"
   solver-name = "gps-cdcl"
   solver-version = 1
