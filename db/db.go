@@ -10,8 +10,8 @@ import (
 type DB interface {
 	Name() string
 	CloseDB() error
-	GetCpe(string) models.Cpe
-	InsertCpes([]models.Cpe) error
+	GetCpe(string) models.CategorizedCpe
+	InsertCpes([]models.CategorizedCpe) error
 }
 
 // NewDB return DB accessor.
@@ -25,8 +25,8 @@ func NewDB(dbType, dbpath string, debugSQL bool) (DB, error) {
 	return nil, fmt.Errorf("Invalid database dialect, %s", dbType)
 }
 
-func chunkSlice(l []models.Cpe, n int) chan []models.Cpe {
-	ch := make(chan []models.Cpe)
+func chunkSlice(l []models.CategorizedCpe, n int) chan []models.CategorizedCpe {
+	ch := make(chan []models.CategorizedCpe)
 	go func() {
 		for i := 0; i < len(l); i += n {
 			fromIdx := i

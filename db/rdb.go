@@ -68,24 +68,24 @@ func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (err error) {
 // MigrateDB migrates Database
 func (r *RDBDriver) MigrateDB() error {
 	if err := r.conn.AutoMigrate(
-		&models.Cpe{},
+		&models.CategorizedCpe{},
 	).Error; err != nil {
 		return fmt.Errorf("Failed to migrate. err: %s", err)
 	}
 
 	errMsg := "Failed to create index. err: %s"
-	if err := r.conn.Model(&models.Cpe{}).
-		AddUniqueIndex("idx_cpes_name", "name").Error; err != nil {
+	if err := r.conn.Model(&models.CategorizedCpe{}).
+		AddUniqueIndex("idx_cpes_name23", "cpe23_uri").Error; err != nil {
 		return fmt.Errorf(errMsg, err)
 	}
 	return nil
 }
 
 // GetCpe Select Cpe information from DB.
-func (r *RDBDriver) GetCpe(name string) models.Cpe {
-	c := models.Cpe{}
+func (r *RDBDriver) GetCpe(name string) models.CategorizedCpe {
+	c := models.CategorizedCpe{}
 	//TODO parameter
-	r.conn.Where(&models.Cpe{Name: name}).First(&c)
+	r.conn.Where(&models.CategorizedCpe{Cpe22URI: name}).First(&c)
 	return c
 }
 
@@ -99,7 +99,7 @@ func (r *RDBDriver) CloseDB() (err error) {
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(cpes []models.Cpe) error {
+func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 	insertedCpes := []string{}
 	bar := pb.StartNew(len(cpes))
 
@@ -109,8 +109,8 @@ func (r *RDBDriver) InsertCpes(cpes []models.Cpe) error {
 			bar.Increment()
 
 			// select old record.
-			old := models.Cpe{}
-			r := tx.Where(&models.Cpe{Name: c.Name}).First(&old)
+			old := models.CategorizedCpe{}
+			r := tx.Where(&models.CategorizedCpe{Cpe22URI: c.Cpe22URI}).First(&old)
 			if r.RecordNotFound() || old.ID == 0 {
 				if err := tx.Create(&c).Error; err != nil {
 					tx.Rollback()
@@ -119,7 +119,7 @@ func (r *RDBDriver) InsertCpes(cpes []models.Cpe) error {
 						err,
 					)
 				}
-				insertedCpes = append(insertedCpes, c.Name)
+				insertedCpes = append(insertedCpes, c.Cpe22URI)
 			}
 		}
 		tx.Commit()
