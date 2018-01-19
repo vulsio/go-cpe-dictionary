@@ -7,14 +7,14 @@
     ".",
     "server"
   ]
-  revision = "70cb3fab2cf658a95f2ccae5bfb2f0ccbba0c548"
-  version = "2.2.1"
+  revision = "aefbaa72e488a5bbca434ab16c56cdffecbdfd47"
+  version = "2.3.0"
 
 [[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
-  revision = "4918b99a7cb949bb295f3c7bbaf24b577d806e35"
-  version = "v6"
+  revision = "521b25f4b05fd26bec69d9dedeb8f9c9a83939a8"
+  version = "v8"
 
 [[projects]]
   name = "github.com/cheggaaa/pb"
@@ -29,6 +29,15 @@
   version = "v3.1.0"
 
 [[projects]]
+  name = "github.com/garyburd/redigo"
+  packages = [
+    "internal",
+    "redis"
+  ]
+  revision = "d1ed5c67e5794de818ea85e6b522fda02623a484"
+  version = "v1.4.0"
+
+[[projects]]
   name = "github.com/go-redis/redis"
   packages = [
     ".",
@@ -38,8 +47,8 @@
     "internal/pool",
     "internal/proto"
   ]
-  revision = "abb85b0fb8a7f0ef7551677888d8d674d153c991"
-  version = "v6.8.1"
+  revision = "4021ace05686f632ff17fd824bbed229fc474cf8"
+  version = "v6.8.2"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -104,7 +113,7 @@
     "hstore",
     "oid"
   ]
-  revision = "83612a56d3dd153a94a629cd64925371c9adad78"
+  revision = "61fe37aa2ee24fabcdbe5c4ac1d4ac566f88f345"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -168,13 +177,24 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/yuin/gopher-lua"
+  packages = [
+    ".",
+    "ast",
+    "parse",
+    "pm"
+  ]
+  revision = "7d7bc8747e3f614c5c587729a341fe7d8903cdb8"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "acme",
     "acme/autocert",
     "ssh/terminal"
   ]
-  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
+  revision = "d94f6bc902c2970500950e88ab1a54a0c26bec48"
 
 [[projects]]
   branch = "master"
@@ -192,7 +212,7 @@
     "unix",
     "windows"
   ]
-  revision = "fff93fa7cd278d84afc205751523809c464168ab"
+  revision = "af50095a40f9041b3b38960738837185c26e9419"
 
 [[projects]]
   branch = "master"
@@ -254,6 +274,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "031c94bc22b899ec41d8af4e759fadaadcf4ac02c548763049e7064696908b95"
+  inputs-digest = "96b5a195196ef6127c47086a8118a86bd168db4bc42376b9fb16f88dd14aa7c4"
   solver-name = "gps-cdcl"
   solver-version = 1

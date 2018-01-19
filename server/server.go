@@ -8,9 +8,9 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/config"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/db"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
+	"github.com/kotakanbe/go-cpe-dictionary/config"
+	"github.com/kotakanbe/go-cpe-dictionary/db"
+	"github.com/kotakanbe/go-cpe-dictionary/models"
 	log "github.com/sirupsen/logrus"
 )
 

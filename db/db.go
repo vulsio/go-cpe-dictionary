@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
+	"github.com/kotakanbe/go-cpe-dictionary/models"
 )
 
 // DB is interface for a database driver

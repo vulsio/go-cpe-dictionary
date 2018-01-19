@@ -8,14 +8,14 @@ import (
 	"strings"
 
 	"github.com/google/subcommands"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/commands"
+	"github.com/kotakanbe/go-cpe-dictionary/commands"
 )
 
 // Name ... Name
 const Name string = "go-cpe-dictionary"
 
 // Version ... Version
-var version = "0.1.0"
+var version = "0.2.0"
 
 // Revision of Git
 var revision string

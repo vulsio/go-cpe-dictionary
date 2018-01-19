@@ -6,7 +6,7 @@ import (
 	"github.com/cheggaaa/pb"
 	"github.com/jinzhu/gorm"
 	"github.com/k0kubun/pp"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
+	"github.com/kotakanbe/go-cpe-dictionary/models"
 	log "github.com/sirupsen/logrus"
 	// Required MySQL.  See http://jinzhu.me/gorm/database.html#connecting-to-a-database
 	_ "github.com/jinzhu/gorm/dialects/mysql"

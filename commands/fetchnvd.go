@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/google/subcommands"
-	c "github.com/sadayuki-matsuno/go-cpe-dictionary/config"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/db"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/nvd"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/util"
+	c "github.com/kotakanbe/go-cpe-dictionary/config"
+	"github.com/kotakanbe/go-cpe-dictionary/db"
+	"github.com/kotakanbe/go-cpe-dictionary/nvd"
+	"github.com/kotakanbe/go-cpe-dictionary/util"
 	log "github.com/sirupsen/logrus"
 )
 

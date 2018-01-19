@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/testutil"
+	"github.com/kotakanbe/go-cpe-dictionary/models"
+	"github.com/kotakanbe/go-cpe-dictionary/testutil"
 )
 
 func TestGetCpeFromCpe22(t *testing.T) {

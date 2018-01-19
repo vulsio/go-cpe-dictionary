@@ -6,7 +6,7 @@ import (
 
 	"github.com/cheggaaa/pb"
 	"github.com/go-redis/redis"
-	"github.com/sadayuki-matsuno/go-cpe-dictionary/models"
+	"github.com/kotakanbe/go-cpe-dictionary/models"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -99,11 +99,12 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 				"Product":        c.Product,
 				"TargetSoftware": c.TargetSoftware,
 				"TargetHardware": c.TargetHardware,
+				"Part":           c.Part,
 			}
 			for key, value := range categories {
 				if result := pipe.ZAdd(
 					hashKeyPrefix+key,
-					redis.Z{Score: 0, Member: c.Vendor},
+					redis.Z{Score: 0, Member: value},
 				); result.Err() != nil {
 					return fmt.Errorf("Failed to ZAdd %s. err: %s", key, result.Err())
 				}
