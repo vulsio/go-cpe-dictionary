@@ -13,13 +13,15 @@ import (
 	"time"
 
 	"github.com/cheggaaa/pb"
+	"github.com/knqyf263/go-cpe/common"
+	"github.com/knqyf263/go-cpe/naming"
 	c "github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
 	"github.com/labstack/gommon/log"
 	"github.com/parnurzeal/gorequest"
-	gocpe "github.com/sadayuki-matsuno/go-cpe"
+	"github.com/pkg/errors"
 )
 
 // CpeDictionary has cpe-item list
@@ -87,7 +89,7 @@ func FetchAndInsertCpeDictioanry(driver db.DB) (err error) {
 		return fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
 	}
 
-	var cpes []models.CategorizedCpe
+	var cpes []*models.CategorizedCpe
 	if cpes, err = ConvertNvdCpeDictionaryToModel(cpeDictionary); err != nil {
 		return err
 	}
@@ -112,7 +114,7 @@ func FetchAndInsertV3Feed(driver db.DB) (err error) {
 		if nvds, err = fetchFeedFileConcurrently(urls); err != nil {
 			return fmt.Errorf("Failed to get feeds. err : %s", err)
 		}
-		var cpes []models.CategorizedCpe
+		var cpes []*models.CategorizedCpe
 		if cpes, err = ConvertNvdV3FeedToModel(nvds); err != nil {
 			return err
 		}
@@ -245,55 +247,56 @@ func fetchFeedFile(url string) (nvd V3Feed, err error) {
 }
 
 // ConvertNvdCpeDictionaryToModel :
-func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.CategorizedCpe, err error) {
+func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []*models.CategorizedCpe, err error) {
 	for _, item := range nvd.Items {
-		var cpeItem *gocpe.Item
-		if cpeItem, err = gocpe.NewItemFromFormattedString(item.Cpe23Item.Name); err != nil {
-			return cpes, err
+		var wfn common.WellFormedName
+		if wfn, err = naming.UnbindFS(item.Cpe23Item.Name); err != nil {
+			return nil, errors.Wrapf(err, "Failed to unbind cpe fs: %s", item.Cpe23Item.Name)
 		}
-		cpes = append(cpes, models.CategorizedCpe{
-			Cpe22URI:        cpeItem.Uri(),
-			Cpe23URI:        cpeItem.Formatted(),
-			Part:            cpeItem.Part().String(),
-			Vendor:          cpeItem.Vendor().String(),
-			Product:         cpeItem.Product().String(),
-			Version:         cpeItem.Version().String(),
-			Update:          cpeItem.Update().String(),
-			Edition:         cpeItem.Edition().String(),
-			Language:        cpeItem.Language().String(),
-			SoftwareEdition: cpeItem.SwEdition().String(),
-			TargetSoftware:  cpeItem.TargetSw().String(),
-			TargetHardware:  cpeItem.TargetHw().String(),
-			Other:           cpeItem.Other().String(),
+		cpes = append(cpes, &models.CategorizedCpe{
+			CpeURI:          naming.BindToURI(wfn),
+			CpeFS:           naming.BindToFS(wfn),
+			Part:            wfn.GetString(common.AttributePart),
+			Vendor:          wfn.GetString(common.AttributeVendor),
+			Product:         wfn.GetString(common.AttributeProduct),
+			Version:         wfn.GetString(common.AttributeVersion),
+			Update:          wfn.GetString(common.AttributeUpdate),
+			Edition:         wfn.GetString(common.AttributeEdition),
+			Language:        wfn.GetString(common.AttributeLanguage),
+			SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
+			TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
+			TargetHardware:  wfn.GetString(common.AttributeTargetHw),
+			Other:           wfn.GetString(common.AttributeOther),
 		})
 	}
 	return cpes, nil
 }
 
 // ConvertNvdV3FeedToModel :
-func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []models.CategorizedCpe, err error) {
+func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []*models.CategorizedCpe, err error) {
 	for _, nvd := range nvds {
 		for _, item := range nvd.CVEItems {
 			for _, node := range item.Configurations.Nodes {
 				for _, cpe := range node.Cpe {
-					var cpeItem *gocpe.Item
-					if cpeItem, err = gocpe.NewItemFromFormattedString(cpe.Cpe23URI); err != nil {
-						return cpes, err
+					var wfn common.WellFormedName
+					if wfn, err = naming.UnbindFS(cpe.Cpe23URI); err != nil {
+						log.Warnf("Failed to unbind cpe fs: %s, err: %s", cpe.Cpe23URI, err)
+						continue
 					}
-					cpes = append(cpes, models.CategorizedCpe{
-						Cpe22URI:        cpeItem.Uri(),
-						Cpe23URI:        cpeItem.Formatted(),
-						Part:            cpeItem.Part().String(),
-						Vendor:          cpeItem.Vendor().String(),
-						Product:         cpeItem.Product().String(),
-						Version:         cpeItem.Version().String(),
-						Update:          cpeItem.Update().String(),
-						Edition:         cpeItem.Edition().String(),
-						Language:        cpeItem.Language().String(),
-						SoftwareEdition: cpeItem.SwEdition().String(),
-						TargetSoftware:  cpeItem.TargetSw().String(),
-						TargetHardware:  cpeItem.TargetHw().String(),
-						Other:           cpeItem.Other().String(),
+					cpes = append(cpes, &models.CategorizedCpe{
+						CpeURI:          naming.BindToURI(wfn),
+						CpeFS:           naming.BindToFS(wfn),
+						Part:            wfn.GetString(common.AttributePart),
+						Vendor:          wfn.GetString(common.AttributeVendor),
+						Product:         wfn.GetString(common.AttributeProduct),
+						Version:         wfn.GetString(common.AttributeVersion),
+						Update:          wfn.GetString(common.AttributeUpdate),
+						Edition:         wfn.GetString(common.AttributeEdition),
+						Language:        wfn.GetString(common.AttributeLanguage),
+						SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
+						TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
+						TargetHardware:  wfn.GetString(common.AttributeTargetHw),
+						Other:           wfn.GetString(common.AttributeOther),
 					})
 				}
 			}

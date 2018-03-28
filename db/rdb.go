@@ -82,7 +82,7 @@ func (r *RDBDriver) MigrateDB() error {
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
+func (r *RDBDriver) InsertCpes(cpes []*models.CategorizedCpe) error {
 	insertedCpes := []string{}
 	bar := pb.StartNew(len(cpes))
 
@@ -93,7 +93,7 @@ func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 
 			// select old record.
 			old := models.CategorizedCpe{}
-			r := tx.Where(&models.CategorizedCpe{Cpe22URI: c.Cpe22URI}).First(&old)
+			r := tx.Where(&models.CategorizedCpe{CpeURI: c.CpeURI}).First(&old)
 			if r.RecordNotFound() || old.ID == 0 {
 				if err := tx.Create(&c).Error; err != nil {
 					tx.Rollback()
@@ -102,7 +102,7 @@ func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 						err,
 					)
 				}
-				insertedCpes = append(insertedCpes, c.Cpe22URI)
+				insertedCpes = append(insertedCpes, c.CpeURI)
 			}
 		}
 		tx.Commit()
@@ -114,32 +114,16 @@ func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 	return nil
 }
 
-// GetCpeFromCpe22 Select Cpe information from DB.
-func (r *RDBDriver) GetCpeFromCpe22(name string) (cpe models.CategorizedCpe, err error) {
-	c := models.CategorizedCpe{}
-	//TODO parameter
-	r.conn.Where(&models.CategorizedCpe{Cpe22URI: name}).First(&c)
-	return c, nil
-}
-
-// GetCpeFromCpe23 Select Cpe information from DB.
-func (r *RDBDriver) GetCpeFromCpe23(name string) (cpe models.CategorizedCpe, err error) {
-	c := models.CategorizedCpe{}
-	//TODO parameter
-	r.conn.Where(&models.CategorizedCpe{Cpe23URI: name}).First(&c)
-	return c, nil
-}
-
-// GetCategories : GetCategories
-func (r *RDBDriver) GetCategories() (cpe models.FilterableCategories, err error) {
+// GetVendorProducts : GetVendorProducts
+func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	// TODO
-	return models.FilterableCategories{}, nil
+	return nil, nil
 }
 
-// GetFilteredCpe : GetFilteredCpe
-func (r *RDBDriver) GetFilteredCpe(filters models.FilterableCategories) (cpes []models.CategorizedCpe, err error) {
+// GetCpesByVendorProduct : GetCpesByVendorProduct
+func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs []string, err error) {
 	// TODO
-	return cpes, nil
+	return nil, nil
 }
 
 // CloseDB close Database

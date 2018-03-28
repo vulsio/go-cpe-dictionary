@@ -1,4 +1,4 @@
-GO_REPO=github.com/sadayuki-matsuno/go-cpe-dictionary
+GO_REPO=github.com/kotakanbe/go-cpe-dictionary
 
 docker run --rm \
   --name dep \

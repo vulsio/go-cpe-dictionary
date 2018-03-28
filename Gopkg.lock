@@ -2,19 +2,25 @@
 
 
 [[projects]]
+  branch = "master"
+  name = "github.com/alicebob/gopher-json"
+  packages = ["."]
+  revision = "5a6b3ba71ee69b77cf64febf8b5a7526ca5eaef0"
+
+[[projects]]
   name = "github.com/alicebob/miniredis"
   packages = [
     ".",
     "server"
   ]
-  revision = "aefbaa72e488a5bbca434ab16c56cdffecbdfd47"
-  version = "2.3.0"
+  revision = "9d52b1fc8da9c42dae29127fdc6f795ddcd4810f"
+  version = "2.3.2"
 
 [[projects]]
   name = "github.com/asaskevich/govalidator"
   packages = ["."]
-  revision = "521b25f4b05fd26bec69d9dedeb8f9c9a83939a8"
-  version = "v8"
+  revision = "ccb8e960c48f04d6935e72476ae4a51028f9e22f"
+  version = "v9"
 
 [[projects]]
   name = "github.com/cheggaaa/pb"
@@ -23,19 +29,13 @@
   version = "v2.0.6"
 
 [[projects]]
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  revision = "dbeaa9332f19a944acb5736b4456cfcc02140e29"
-  version = "v3.1.0"
-
-[[projects]]
   name = "github.com/garyburd/redigo"
   packages = [
     "internal",
     "redis"
   ]
-  revision = "d1ed5c67e5794de818ea85e6b522fda02623a484"
-  version = "v1.4.0"
+  revision = "a69d19351219b6dd56f274f96d85a7014a2ec34e"
+  version = "v1.6.0"
 
 [[projects]]
   name = "github.com/go-redis/redis"
@@ -45,10 +45,12 @@
     "internal/consistenthash",
     "internal/hashtag",
     "internal/pool",
-    "internal/proto"
+    "internal/proto",
+    "internal/singleflight",
+    "internal/util"
   ]
-  revision = "4021ace05686f632ff17fd824bbed229fc474cf8"
-  version = "v6.8.2"
+  revision = "877867d2845fbaf86798befe410b6ceb6f5c29a3"
+  version = "v6.10.2"
 
 [[projects]]
   name = "github.com/go-sql-driver/mysql"
@@ -60,7 +62,7 @@
   branch = "master"
   name = "github.com/google/subcommands"
   packages = ["."]
-  revision = "ce3d4cfc062faac7115d44e5befec8b5a08c3faa"
+  revision = "a3682377147edf596d303faabd89f81977b3f678"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -70,14 +72,14 @@
     "dialects/postgres",
     "dialects/sqlite"
   ]
-  revision = "5174cc5c242a728b435ea2be8a2f7f998e15429b"
-  version = "v1.0"
+  revision = "6ed508ec6a4ecb3531899a69cbc746ccf65a4166"
+  version = "v1.9.1"
 
 [[projects]]
   branch = "master"
   name = "github.com/jinzhu/inflection"
   packages = ["."]
-  revision = "1c35d901db3da928c72a72d8458480cc9ade058f"
+  revision = "04140366298a54a039076d798123ffa108fff46c"
 
 [[projects]]
   branch = "master"
@@ -86,24 +88,22 @@
   revision = "e057ee7a28277be4d2af303443b6da377768181f"
 
 [[projects]]
-  name = "github.com/labstack/echo"
+  branch = "master"
+  name = "github.com/knqyf263/go-cpe"
   packages = [
-    ".",
-    "middleware"
+    "common",
+    "naming"
   ]
-  revision = "b338075a0fc6e1a0683dbf03d09b4957a289e26f"
-  version = "3.2.6"
+  revision = "659663f6eca2ff32258e282557e7808115ea498a"
 
 [[projects]]
   name = "github.com/labstack/gommon"
   packages = [
-    "bytes",
     "color",
-    "log",
-    "random"
+    "log"
   ]
-  revision = "57409ada9da0f2afad6664c49502f8c50fbd8476"
-  version = "0.2.3"
+  revision = "6fe1405d73ec4bd4cd8a4ac8e2a2b2bf95d03954"
+  version = "0.2.4"
 
 [[projects]]
   branch = "master"
@@ -113,7 +113,7 @@
     "hstore",
     "oid"
   ]
-  revision = "61fe37aa2ee24fabcdbe5c4ac1d4ac566f88f345"
+  revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
   name = "github.com/mattn/go-colorable"
@@ -153,15 +153,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/sadayuki-matsuno/go-cpe"
-  packages = ["."]
-  revision = "b17eb57097eeb042314f5b54f65fe1efe7a2864a"
-
-[[projects]]
   name = "github.com/sirupsen/logrus"
   packages = ["."]
-  revision = "d682213848ed68c0a260ca37d6dd5ace8423f5ba"
-  version = "v1.0.4"
+  revision = "90150a8ed11b6ce285e77e8af2b0109559ce4777"
 
 [[projects]]
   branch = "master"
@@ -184,17 +178,13 @@
     "parse",
     "pm"
   ]
-  revision = "7d7bc8747e3f614c5c587729a341fe7d8903cdb8"
+  revision = "84ea3a3c79b3c4b3b39606cc96f255cd63635ce0"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = [
-    "acme",
-    "acme/autocert",
-    "ssh/terminal"
-  ]
-  revision = "d94f6bc902c2970500950e88ab1a54a0c26bec48"
+  packages = ["ssh/terminal"]
+  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
 
 [[projects]]
   branch = "master"
@@ -203,7 +193,7 @@
     "idna",
     "publicsuffix"
   ]
-  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+  revision = "6078986fec03a1dcc236c34816c71b0e05018fda"
 
 [[projects]]
   branch = "master"
@@ -212,10 +202,9 @@
     "unix",
     "windows"
   ]
-  revision = "af50095a40f9041b3b38960738837185c26e9419"
+  revision = "13d03a9a82fba647c21a0ef8fba44a795d0f0835"
 
 [[projects]]
-  branch = "master"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -233,7 +222,8 @@
     "unicode/norm",
     "unicode/rangetable"
   ]
-  revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "gopkg.in/VividCortex/ewma.v1"
@@ -250,8 +240,8 @@
 [[projects]]
   name = "gopkg.in/fatih/color.v1"
   packages = ["."]
-  revision = "570b54cabe6b8eb0bc2dfce68d964677d63b5260"
-  version = "v1.5.0"
+  revision = "507f6050b8568533fb3f5504de8e5205fa62a114"
+  version = "v1.6.0"
 
 [[projects]]
   name = "gopkg.in/mattn/go-colorable.v0"
@@ -274,6 +264,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "96b5a195196ef6127c47086a8118a86bd168db4bc42376b9fb16f88dd14aa7c4"
+  inputs-digest = "99ca672ec5ef7ace4b99f838c36607772553e12652bcc7d5b4dc4ef6a2292974"
   solver-name = "gps-cdcl"
   solver-version = 1
