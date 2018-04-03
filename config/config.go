@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
+
 	valid "github.com/asaskevich/govalidator"
-	log "github.com/sirupsen/logrus"
+	"github.com/inconshreveable/log15"
 )
 
 // Conf has Configuration
@@ -28,14 +30,14 @@ type Config struct {
 func (c *Config) Validate() bool {
 	if c.DBType == "sqlite3" {
 		if ok, _ := valid.IsFilePath(c.DBPath); !ok {
-			log.Fatalf("--dbpath : %s is not valid *Absolute* file path", c.DBPath)
+			log15.Crit(fmt.Sprintf("--dbpath : %s is not valid *Absolute* file path", c.DBPath))
 			return false
 		}
 	}
 
 	_, err := valid.ValidateStruct(c)
 	if err != nil {
-		log.Fatal("error: " + err.Error())
+		log15.Crit("Invalid Struct", "err", err)
 	}
 	return true
 }

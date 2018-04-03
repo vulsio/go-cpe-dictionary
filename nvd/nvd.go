@@ -13,13 +13,13 @@ import (
 	"time"
 
 	"github.com/cheggaaa/pb"
+	"github.com/inconshreveable/log15"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
 	c "github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
-	"github.com/labstack/gommon/log"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pkg/errors"
 )
@@ -179,7 +179,7 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 		tasks <- func() {
 			select {
 			case url := <-reqChan:
-				log.Infof("Fetching... %s", url)
+				log15.Info("Fetching...", "URL", url)
 				nvd, err := fetchFeedFile(url)
 				if err != nil {
 					errChan <- err
@@ -280,7 +280,7 @@ func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []*models.CategorizedCpe, err 
 				for _, cpe := range node.Cpe {
 					var wfn common.WellFormedName
 					if wfn, err = naming.UnbindFS(cpe.Cpe23URI); err != nil {
-						log.Warnf("Failed to unbind cpe fs: %s, err: %s", cpe.Cpe23URI, err)
+						log15.Warn("Failed to unbind cpe.", "CPE URI", cpe.Cpe23URI, "err", err)
 						continue
 					}
 					cpes = append(cpes, &models.CategorizedCpe{

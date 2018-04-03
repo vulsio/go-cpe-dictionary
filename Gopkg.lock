@@ -59,10 +59,22 @@
   version = "v1.3"
 
 [[projects]]
+  name = "github.com/go-stack/stack"
+  packages = ["."]
+  revision = "259ab82a6cad3992b4e21ff5cac294ccb06474bc"
+  version = "v1.7.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/google/subcommands"
   packages = ["."]
   revision = "a3682377147edf596d303faabd89f81977b3f678"
+
+[[projects]]
+  name = "github.com/inconshreveable/log15"
+  packages = ["."]
+  revision = "0decfc6c20d9ca0ad143b0e89dcaa20f810b4fb3"
+  version = "v2.13"
 
 [[projects]]
   name = "github.com/jinzhu/gorm"
@@ -95,15 +107,6 @@
     "naming"
   ]
   revision = "659663f6eca2ff32258e282557e7808115ea498a"
-
-[[projects]]
-  name = "github.com/labstack/gommon"
-  packages = [
-    "color",
-    "log"
-  ]
-  revision = "6fe1405d73ec4bd4cd8a4ac8e2a2b2bf95d03954"
-  version = "0.2.4"
 
 [[projects]]
   branch = "master"
@@ -153,24 +156,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/sirupsen/logrus"
-  packages = ["."]
-  revision = "90150a8ed11b6ce285e77e8af2b0109559ce4777"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/valyala/bytebufferpool"
-  packages = ["."]
-  revision = "e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/valyala/fasttemplate"
-  packages = ["."]
-  revision = "dcecefd839c4193db0d35b88ec65b4c12d360ab0"
-
-[[projects]]
-  branch = "master"
   name = "github.com/yuin/gopher-lua"
   packages = [
     ".",
@@ -179,12 +164,6 @@
     "pm"
   ]
   revision = "84ea3a3c79b3c4b3b39606cc96f255cd63635ce0"
-
-[[projects]]
-  branch = "master"
-  name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
-  revision = "88942b9c40a4c9d203b82b3731787b672d6e809b"
 
 [[projects]]
   branch = "master"
@@ -198,10 +177,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
+  packages = ["unix"]
   revision = "13d03a9a82fba647c21a0ef8fba44a795d0f0835"
 
 [[projects]]
@@ -264,6 +240,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "99ca672ec5ef7ace4b99f838c36607772553e12652bcc7d5b4dc4ef6a2292974"
+  inputs-digest = "eafc7ecd137d690be0585ee454a4ace31eca8cd2d390ddbd23dfbdc8a0669198"
   solver-name = "gps-cdcl"
   solver-version = 1

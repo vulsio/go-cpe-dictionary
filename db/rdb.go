@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/cheggaaa/pb"
+	"github.com/inconshreveable/log15"
 	"github.com/jinzhu/gorm"
 	"github.com/k0kubun/pp"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
-	log "github.com/sirupsen/logrus"
 	// Required MySQL.  See http://jinzhu.me/gorm/database.html#connecting-to-a-database
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -39,12 +39,12 @@ func NewRDB(dbType, dbpath string, debugSQL bool) (driver *RDBDriver, err error)
 		name: dbType,
 	}
 
-	log.Debugf("Opening DB (%s).", driver.Name())
+	log15.Debug("Opening DB", "db", driver.Name())
 	if err = driver.OpenDB(dbType, dbpath, debugSQL); err != nil {
 		return
 	}
 
-	log.Debugf("Migrating DB (%s).", driver.Name())
+	log15.Debug("Migrating DB.", "db", driver.Name())
 	if err = driver.MigrateDB(); err != nil {
 		return
 	}
@@ -75,7 +75,7 @@ func (r *RDBDriver) MigrateDB() error {
 
 	errMsg := "Failed to create index. err: %s"
 	if err := r.conn.Model(&models.CategorizedCpe{}).
-		AddUniqueIndex("idx_cpes_name23", "cpe23_uri").Error; err != nil {
+		AddUniqueIndex("idx_cpes_uri", "cpe_uri").Error; err != nil {
 		return fmt.Errorf(errMsg, err)
 	}
 	return nil
@@ -109,7 +109,7 @@ func (r *RDBDriver) InsertCpes(cpes []*models.CategorizedCpe) error {
 	}
 	bar.Finish()
 
-	log.Infof("Inserted %d CPEs", len(insertedCpes))
+	log15.Info(fmt.Sprintf("Inserted %d CPEs", len(insertedCpes)))
 	//  log.Debugf("%v", refreshedNvds)
 	return nil
 }
@@ -129,7 +129,7 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs []st
 // CloseDB close Database
 func (r *RDBDriver) CloseDB() (err error) {
 	if err = r.conn.Close(); err != nil {
-		log.Errorf("Failed to close DB. Type: %s. err: %s", r.name, err)
+		log15.Error("Failed to close DB.", "Type", r.name, "err", err)
 		return
 	}
 	return

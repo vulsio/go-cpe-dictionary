@@ -6,11 +6,11 @@ import (
 	"os"
 
 	"github.com/google/subcommands"
+	"github.com/inconshreveable/log15"
 	c "github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/nvd"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
-	log "github.com/sirupsen/logrus"
 )
 
 // FetchNvdCmd : FetchNvdCmd
@@ -79,27 +79,25 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 	c.Conf.DBType = p.dbtype
 	c.Conf.HTTPProxy = p.httpProxy
 
-	if c.Conf.Debug {
-		log.SetLevel(log.DebugLevel)
-	}
+	util.SetLogger(p.logDir, c.Conf.Debug)
 
 	if !c.Conf.Validate() {
 		return subcommands.ExitUsageError
 	}
 
-	log.Infof("Fetching from NVD...")
+	log15.Info("Fetching from NVD...")
 
 	var driver db.DB
 	var err error
 	if driver, err = db.NewDB(c.Conf.DBType, c.Conf.DBPath, c.Conf.DebugSQL); err != nil {
-		log.Errorf("Failed to new db. err : %s", err)
+		log15.Error("Failed to new db.", "err", err)
 		return subcommands.ExitFailure
 	}
 	defer driver.CloseDB()
 
-	log.Infof("Inserting into DB (%s)", driver.Name())
+	log15.Info("Inserting into DB", "db", driver.Name())
 	if err = nvd.FetchAndInsertCPE(driver); err != nil {
-		log.Fatalf("Failed to fetch. err: %s", err)
+		log15.Crit("Failed to fetch.", "err", err)
 		return subcommands.ExitFailure
 	}
 

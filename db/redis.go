@@ -5,8 +5,8 @@ import (
 
 	"github.com/cheggaaa/pb"
 	"github.com/go-redis/redis"
+	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -31,7 +31,7 @@ func NewRedis(dbType, dbpath string, debugSQL bool) (driver *RedisDriver, err er
 	driver = &RedisDriver{
 		name: dbType,
 	}
-	log.Debugf("Opening DB (%s).", driver.Name())
+	log15.Debug("Opening DB", "db", driver.Name())
 	if err = driver.OpenDB(dbType, dbpath, debugSQL); err != nil {
 		return
 	}
@@ -43,7 +43,7 @@ func NewRedis(dbType, dbpath string, debugSQL bool) (driver *RedisDriver, err er
 func (r *RedisDriver) OpenDB(dbType, dbPath string, debugSQL bool) (err error) {
 	var option *redis.Options
 	if option, err = redis.ParseURL(dbPath); err != nil {
-		log.Error(err)
+		log15.Error("Failed to parse url.", "err", err)
 		return fmt.Errorf("Failed to Parse Redis URL. dbpath: %s, err: %s", dbPath, err)
 	}
 	r.conn = redis.NewClient(option)
@@ -56,7 +56,7 @@ func (r *RedisDriver) OpenDB(dbType, dbPath string, debugSQL bool) (err error) {
 // CloseDB close Database
 func (r *RedisDriver) CloseDB() (err error) {
 	if err = r.conn.Close(); err != nil {
-		log.Errorf("Failed to close DB. Type: %s. err: %s", r.name, err)
+		log15.Error("Failed to close DB.", "Type", r.name, "err", err)
 		return
 	}
 	return
@@ -100,7 +100,7 @@ func (r *RedisDriver) InsertCpes(cpes []*models.CategorizedCpe) (err error) {
 		}
 	}
 	bar.Finish()
-	log.Infof("Refreshed %d CPEs.", len(cpes))
+	log15.Info(fmt.Sprintf("Refreshed %d CPEs.", len(cpes)))
 	return nil
 }
 
