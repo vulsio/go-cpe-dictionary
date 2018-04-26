@@ -19,6 +19,7 @@ type FetchNvdCmd struct {
 	debugSQL bool
 	quiet    bool
 	logDir   string
+	logJSON  bool
 
 	dbpath string
 	dbtype string
@@ -42,6 +43,7 @@ func (*FetchNvdCmd) Usage() string {
 		[-debug]
 		[-debug-sql]
 		[-log-dir=/path/to/log]
+		[-log-json]
 
 For the first time, run the blow command to fetch data. (It takes about 10 minutes)
    $ go-cpe-dictionary fetchnvd
@@ -55,6 +57,7 @@ func (p *FetchNvdCmd) SetFlags(f *flag.FlagSet) {
 
 	defaultLogDir := util.GetDefaultLogDir()
 	f.StringVar(&p.logDir, "log-dir", defaultLogDir, "/path/to/log")
+	f.BoolVar(&p.logJSON, "log-json", false, "output log as JSON")
 
 	pwd := os.Getenv("PWD")
 	f.StringVar(&p.dbpath, "dbpath", pwd+"/cpe.sqlite3",
@@ -79,7 +82,7 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 	c.Conf.DBType = p.dbtype
 	c.Conf.HTTPProxy = p.httpProxy
 
-	util.SetLogger(p.logDir, c.Conf.Debug)
+	util.SetLogger(p.logDir, c.Conf.Debug, p.logJSON)
 
 	if !c.Conf.Validate() {
 		return subcommands.ExitUsageError

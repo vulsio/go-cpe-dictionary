@@ -35,7 +35,7 @@ func main() {
 	}
 
 	if *v {
-		fmt.Printf("go-cve-dictionary %s %s\n", version, revision)
+		fmt.Printf("%s %s %s\n", Name, version, revision)
 		os.Exit(int(subcommands.ExitSuccess))
 	}
 
