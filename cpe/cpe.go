@@ -65,7 +65,7 @@ func FetchCPE(httpProxy string) (cpeList CpeList, err error) {
 	var body string
 	var errs []error
 	var resp *http.Response
-	url := "http://static.nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
+	url := "http://nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
 	resp, body, errs = gorequest.New().Proxy(httpProxy).Get(url).End()
 	if len(errs) > 0 || resp.StatusCode != 200 {
 		return cpeList, fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
