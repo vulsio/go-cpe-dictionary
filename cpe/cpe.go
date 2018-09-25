@@ -11,14 +11,14 @@ import (
 	"github.com/parnurzeal/gorequest"
 )
 
-// CpeList has cpe-item list
+// List has cpe-item list
 // https://nvd.nist.gov/cpe.cfm
-type CpeList struct {
-	CpeItems []CpeItem `xml:"cpe-item"`
+type List struct {
+	Items []Item `xml:"cpe-item"`
 }
 
-// CpeItem has CPE information
-type CpeItem struct {
+// Item has CPE information
+type Item struct {
 	Name      string    `xml:"name,attr"`
 	Cpe23Item Cpe23Item `xml:"cpe23-item"`
 	Titles    []Title   `xml:"title"`
@@ -33,7 +33,8 @@ type CpeItem struct {
 	//  Language string
 }
 
-func (item CpeItem) GetTitleEn() string {
+// GetTitleEn : GetTitleEn
+func (item Item) GetTitleEn() string {
 	for _, t := range item.Titles {
 		if t.Lang == "en-US" {
 			return t.Value
@@ -42,7 +43,8 @@ func (item CpeItem) GetTitleEn() string {
 	return ""
 }
 
-func (item CpeItem) GetTitleJa() string {
+// GetTitleJa : GetTitleJa
+func (item Item) GetTitleJa() string {
 	for _, t := range item.Titles {
 		if t.Lang == "ja-JP" {
 			return t.Value
@@ -51,6 +53,7 @@ func (item CpeItem) GetTitleJa() string {
 	return ""
 }
 
+// Cpe23Item : Cpe23Item
 type Cpe23Item struct {
 	Name string `xml:"name,attr"`
 }
@@ -61,7 +64,8 @@ type Title struct {
 	Value string `xml:",chardata"`
 }
 
-func FetchCPE(httpProxy string) (cpeList CpeList, err error) {
+// FetchCPE : FetchCPE
+func FetchCPE(httpProxy string) (cpeList List, err error) {
 	var body string
 	var errs []error
 	var resp *http.Response

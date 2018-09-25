@@ -1,4 +1,8 @@
 .PHONY: \
+	dep \
+	depup \
+	build \
+	install \
 	all \
 	vendor \
 	lint \
@@ -11,24 +15,30 @@
 	cov \
 	clean
 
-#  SRCS = $(shell git ls-files '*.go' | grep -v '^external/')
 SRCS = $(shell git ls-files '*.go')
-  #  PKGS = ./. ./testing
 PKGS =  ./config ./db ./models
+VERSION := $(shell git describe --tags --abbrev=0)
+REVISION := $(shell git rev-parse --short HEAD)
+LDFLAGS := -X 'main.version=$(VERSION)' \
+	-X 'main.revision=$(REVISION)'
 
-glide:
-	go get github.com/Masterminds/glide
+all: dep build test
+
+dep:
+	go get -u github.com/golang/dep/...
+	dep ensure
+
+depup:
+	go get -u github.com/golang/dep/...
+	dep ensure -update
+
+build: main.go dep
+	go build -ldflags "$(LDFLAGS)" -o goval-dictionary $<
 
 deps: glide
 	glide install
 
-update: glide
-	glide update
-
-build: main.go deps
-	go build -ldflags "$(LDFLAGS)" -o go-cpe-dictionary $<
-
-install: main.go deps
+install: main.go dep
 	go install -ldflags "$(LDFLAGS)"
 
 all: test
@@ -38,7 +48,6 @@ lint:
 	$(foreach file,$(SRCS),golint $(file) || exit;)
 
 vet:
-	@-go get -v golang.org/x/tools/cmd/vet
 	$(foreach pkg,$(PKGS),go vet $(pkg);)
 
 fmt:
@@ -52,8 +61,8 @@ pretest: lint vet fmtcheck
 test: pretest
 	$(foreach pkg,$(PKGS),go test -v $(pkg) || exit;)
 
-unused :
-	$(foreach pkg,$(PKGS),unused $(pkg);)
+integration:
+	go test -tags docker_integration -run TestIntegration -v
 
 cov:
 	@ go get -v github.com/axw/gocov/gocov
@@ -62,4 +71,3 @@ cov:
 
 clean:
 	$(foreach pkg,$(PKGS),go clean $(pkg) || exit;)
-
