@@ -69,7 +69,7 @@ func FetchAndInsertCpeDictioanry(driver db.DB) (err error) {
 	var body string
 	var errs []error
 	var resp *http.Response
-	url := "http://static.nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
+	url := "http://nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
 	resp, body, errs = gorequest.New().Proxy(c.Conf.HTTPProxy).Get(url).End()
 	if len(errs) > 0 || resp.StatusCode != 200 {
 		return fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
@@ -140,8 +140,8 @@ func GetYearsUntilThisYear(startYear int) (years []int, err error) {
 
 // MakeFeedURLBlocks : MakeFeedURLBlocks
 func MakeFeedURLBlocks(years []int, n int) (urlBlocks [][]string) {
-	//  http://static.nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2016.xml.gz
-	formatTemplate := "https://static.nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-%d.json.gz"
+	//  http://nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2016.xml.gz
+	formatTemplate := "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-%d.json.gz"
 	blockNum := int(math.Ceil(float64(len(years)) / float64(n)))
 	urlBlocks = make([][]string, blockNum, blockNum)
 	var i int
