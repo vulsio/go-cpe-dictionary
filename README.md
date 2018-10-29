@@ -140,12 +140,6 @@ kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created go-cpe-dictionar
 
 ----
 
-# Change Log
-
-Please see [CHANGELOG](https://github.com/kotakanbe/go-cpe-dictionary/blob/master/CHANGELOG.md).
-
-----
-
 # Licence
 
 Please see [LICENSE](https://github.com/kotakanbe/go-cpe-dictionary/blob/master/LICENSE).
