@@ -69,9 +69,9 @@ Now we have a local copy of CPE data in sqlite3.
 This example use [Peco](https://github.com/peco/peco) for incremental search.
 
 ```
-$ ls cpe.db
+$ ls cpe.sqlite3
 cpe.db
-$ sqlite3 ./cpe.db 'select name from cpes' | peco
+$ sqlite3 ./cpe.sqlite3 'select cpe_uri from categorized_cpes' | peco
 ```
 
 [![asciicast](https://asciinema.org/a/asvc87lbpad5999shqk0xvtc0.png)](https://asciinema.org/a/asvc87lbpad5999shqk0xvtc0)
