@@ -42,9 +42,8 @@ type V3Feed struct {
 		Configurations struct {
 			Nodes []struct {
 				Cpe []struct {
-					Cpe22URI string `json:"cpe22Uri"`
 					Cpe23URI string `json:"cpe23Uri"`
-				} `json:"cpe"`
+				} `json:"cpe_match"`
 			} `json:"nodes"`
 		} `json:"configurations"`
 	} `json:"CVE_Items"`
