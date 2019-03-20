@@ -33,7 +33,7 @@ depup:
 	dep ensure -update
 
 build: main.go dep
-	go build -ldflags "$(LDFLAGS)" -o goval-dictionary $<
+	go build -ldflags "$(LDFLAGS)" -o go-cpe-dictionary $<
 
 deps: glide
 	glide install
