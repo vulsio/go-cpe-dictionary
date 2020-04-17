@@ -6,3 +6,4 @@ go-cpe-dictionary
 
 cpe.db
 cpe.json
+cpe.sqlite3*

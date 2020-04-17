@@ -1,6 +1,4 @@
 .PHONY: \
-	dep \
-	depup \
 	build \
 	install \
 	all \
@@ -22,23 +20,12 @@ REVISION := $(shell git rev-parse --short HEAD)
 LDFLAGS := -X 'main.version=$(VERSION)' \
 	-X 'main.revision=$(REVISION)'
 
-all: dep build test
+all: build test
 
-dep:
-	go get -u github.com/golang/dep/...
-	dep ensure
-
-depup:
-	go get -u github.com/golang/dep/...
-	dep ensure -update
-
-build: main.go dep
+build: main.go
 	go build -ldflags "$(LDFLAGS)" -o go-cpe-dictionary $<
 
-deps: glide
-	glide install
-
-install: main.go dep
+install: main.go
 	go install -ldflags "$(LDFLAGS)"
 
 all: test
