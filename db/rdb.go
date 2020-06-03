@@ -116,14 +116,41 @@ func (r *RDBDriver) InsertCpes(cpes []*models.CategorizedCpe) error {
 
 // GetVendorProducts : GetVendorProducts
 func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
-	// TODO
-	return nil, nil
+	var results []struct {
+		Vendor  string
+		Product string
+	}
+
+	// TODO Is there a better way to use distinct with GORM? Needing
+	// explicit column names seems like an antipattern for an orm.
+	if err = r.conn.Select("DISTINCT vendor, product").Find(&models.CategorizedCpe{}).Scan(&results).Error; err != nil {
+		log15.Error("Failed to select results", "err", err)
+		return
+	}
+
+	for _, vp := range results {
+		vendorProducts = append(vendorProducts, fmt.Sprintf("%s::%s", vp.Vendor, vp.Product))
+	}
+
+	return
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
 func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs []string, err error) {
-	// TODO
-	return nil, nil
+
+	results := []models.CategorizedCpe{}
+
+	if err = r.conn.Select("DISTINCT cpe_uri").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error; err != nil {
+		log15.Error("Failed to select results", "err", err)
+		return
+	}
+
+	cpeURIs = make([]string, len(results))
+	for i, r := range results {
+		cpeURIs[i] = r.CpeURI
+	}
+
+	return
 }
 
 // CloseDB close Database
