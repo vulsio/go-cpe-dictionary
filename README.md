@@ -24,8 +24,8 @@ go-cpe-dictionary requires the following packages.
 
 ```bash
 $ sudo yum -y install sqlite git gcc
-$ wget https://storage.googleapis.com/golang/go1.6.linux-amd64.tar.gz
-$ sudo tar -C /usr/local -xzf go1.6.linux-amd64.tar.gz
+$ wget https://storage.googleapis.com/golang/go1.14.2.linux-amd64.tar.gz
+$ sudo tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
 $ mkdir $HOME/go
 ```
 Put these lines into /etc/profile.d/goenv.sh
