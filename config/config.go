@@ -18,8 +18,8 @@ type Config struct {
 	DBPath string
 	DBType string
 
-	Bind string `valid:"ipv4"`
-	Port string `valid:"port"`
+	Bind string
+	Port string
 
 	//TODO Validator
 	HTTPProxy string
@@ -33,11 +33,6 @@ func (c *Config) Validate() bool {
 			log15.Crit(fmt.Sprintf("--dbpath : %s is not valid *Absolute* file path", c.DBPath))
 			return false
 		}
-	}
-
-	_, err := valid.ValidateStruct(c)
-	if err != nil {
-		log15.Crit("Invalid Struct", "err", err)
 	}
 	return true
 }
