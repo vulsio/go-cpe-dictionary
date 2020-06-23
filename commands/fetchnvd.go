@@ -88,8 +88,6 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 		return subcommands.ExitUsageError
 	}
 
-	log15.Info("Fetching from NVD...")
-
 	var driver db.DB
 	var err error
 	if driver, err = db.NewDB(c.Conf.DBType, c.Conf.DBPath, c.Conf.DebugSQL); err != nil {
@@ -98,7 +96,7 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 	}
 	defer driver.CloseDB()
 
-	log15.Info("Inserting into DB", "db", driver.Name())
+	log15.Info("Fetch and insert from NVD...")
 	if err = nvd.FetchAndInsertCPE(driver); err != nil {
 		log15.Crit("Failed to fetch.", "err", err)
 		return subcommands.ExitFailure

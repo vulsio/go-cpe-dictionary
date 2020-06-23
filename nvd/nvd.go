@@ -107,7 +107,7 @@ func FetchAndInsertV3Feed(driver db.DB) (err error) {
 		return err
 	}
 
-	urlBlocks := MakeFeedURLBlocks(years, 3)
+	urlBlocks := MakeFeedURLBlocks(years, 2)
 	for _, urls := range urlBlocks {
 		var nvds []V3Feed
 		if nvds, err = fetchFeedFileConcurrently(urls); err != nil {
