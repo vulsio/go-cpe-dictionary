@@ -15,7 +15,7 @@ import (
 const Name string = "go-cpe-dictionary"
 
 // Version ... Version
-var version = "0.2.0"
+var version = "0.2.1"
 
 // Revision of Git
 var revision string
