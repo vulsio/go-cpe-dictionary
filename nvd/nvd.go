@@ -76,7 +76,9 @@ func FetchAndInsertCpeDictioanry(driver db.DB) (err error) {
 
 	b := bytes.NewBufferString(body)
 	reader, err := gzip.NewReader(b)
-	defer reader.Close()
+	defer func() {
+		_ = reader.Close()
+	}()
 	if err != nil {
 		return fmt.Errorf("Failed to decompress NVD feedfile. url: %s, err: %s", url, err)
 	}
@@ -226,7 +228,9 @@ func fetchFeedFile(url string) (nvd V3Feed, err error) {
 
 	b := bytes.NewBufferString(body)
 	reader, err := gzip.NewReader(b)
-	defer reader.Close()
+	defer func() {
+		_ = reader.Close()
+	}()
 	if err != nil {
 		return nvd, fmt.Errorf(
 			"Failed to decompress NVD feedfile. url: %s, err: %s", url, err)

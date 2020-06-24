@@ -77,7 +77,9 @@ func FetchCPE(httpProxy string) (cpeList List, err error) {
 
 	b := bytes.NewBufferString(body)
 	reader, err := gzip.NewReader(b)
-	defer reader.Close()
+	defer func() {
+		_ = reader.Close()
+	}()
 	if err != nil {
 		return cpeList,
 			fmt.Errorf("Failed to decompress NVD feedfile. url: %s, err: %s", url, err)

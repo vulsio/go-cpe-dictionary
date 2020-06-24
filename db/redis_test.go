@@ -19,10 +19,10 @@ func TestGetVendorProductsRedis(t *testing.T) {
 	if err != nil {
 		t.Errorf("newdb: %s", err)
 	}
-	defer driver.CloseDB()
-
+	defer func() {
+		_ = driver.CloseDB()
+	}()
 	testGetVendorProducts(t, driver)
-
 }
 
 func TestGetCpesByVendorProductRedis(t *testing.T) {
@@ -38,7 +38,9 @@ func TestGetCpesByVendorProductRedis(t *testing.T) {
 	if err != nil {
 		t.Errorf("newdb: %s", err)
 	}
-	defer driver.CloseDB()
+	defer func() {
+		_ = driver.CloseDB()
+	}()
 
 	testGetCpesByVendorProduct(t, driver)
 }
