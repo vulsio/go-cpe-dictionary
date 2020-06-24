@@ -31,7 +31,7 @@ install: main.go
 all: test
 
 lint:
-	@ go get -v github.com/golang/lint/golint
+	@ go get -u golang.org/x/lint/golint
 	$(foreach file,$(SRCS),golint $(file) || exit;)
 
 vet:
