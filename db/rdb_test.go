@@ -16,8 +16,9 @@ func TestGetVendorProductsSqlite(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer driver.CloseDB()
-
+	defer func() {
+		_ = driver.CloseDB()
+	}()
 	testGetVendorProducts(t, driver)
 }
 
@@ -26,7 +27,9 @@ func TestGetCpesByVendorProductSqlite(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer driver.CloseDB()
+	defer func() {
+		_ = driver.CloseDB()
+	}()
 
 	testGetCpesByVendorProduct(t, driver)
 }
@@ -38,7 +41,9 @@ func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	defer driver.CloseDB()
+	defer func() {
+		_ = driver.CloseDB()
+	}()
 
 	if err := prepareTestDB(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)

@@ -94,7 +94,9 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 		log15.Error("Failed to new db.", "err", err)
 		return subcommands.ExitFailure
 	}
-	defer driver.CloseDB()
+	defer func() {
+		_ = driver.CloseDB()
+	}()
 
 	log15.Info("Fetch and insert from NVD...")
 	if err = nvd.FetchAndInsertCPE(driver); err != nil {

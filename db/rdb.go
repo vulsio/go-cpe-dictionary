@@ -8,9 +8,11 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/k0kubun/pp"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
+
 	// Required MySQL.  See http://jinzhu.me/gorm/database.html#connecting-to-a-database
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+
 	// Required SQLite3.
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
