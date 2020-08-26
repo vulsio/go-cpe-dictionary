@@ -56,7 +56,7 @@ $ make install
 Fetch CPE data from NVD. It takes about 1 minutes.  
 
 ```bash
-$ go-cpe-dictionary fetch
+$ go-cpe-dictionary fetchnvd
 ... snip ...
 $ ls -alh cpe.sqlite3
 -rw-r--r-- 1 ec2-user ec2-user 7.0M Mar 24 13:20 cpe.sqlite3
@@ -86,7 +86,7 @@ Usage of ./go-cpe-dictionary:
         /path/to/sqlite3/datafile (default "/Users/kotakanbe/go/src/github.com/kotakanbe/go-cpe-dictionary/cpe.db")
   -dump-path string
         /path/to/dump.json (default "/Users/kotakanbe/go/src/github.com/kotakanbe/go-cpe-dictionary/cpe.json")
-  -fetch
+  -fetchnvd
         Fetch CPE data from NVD
   -http-proxy string
         HTTP Proxy URL (http://proxy-server:8080)
