@@ -70,7 +70,7 @@ This example use [Peco](https://github.com/peco/peco) for incremental search.
 
 ```
 $ ls cpe.sqlite3
-cpe.db
+cpe.sqlite3
 $ sqlite3 ./cpe.sqlite3 'select cpe_uri from categorized_cpes' | peco
 ```
 
