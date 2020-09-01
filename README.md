@@ -56,7 +56,7 @@ $ make install
 Fetch CPE data from NVD. It takes about 1 minutes.  
 
 ```bash
-$ go-cpe-dictionary fetch
+$ go-cpe-dictionary fetchnvd
 ... snip ...
 $ ls -alh cpe.sqlite3
 -rw-r--r-- 1 ec2-user ec2-user 7.0M Mar 24 13:20 cpe.sqlite3
@@ -70,7 +70,7 @@ This example use [Peco](https://github.com/peco/peco) for incremental search.
 
 ```
 $ ls cpe.sqlite3
-cpe.db
+cpe.sqlite3
 $ sqlite3 ./cpe.sqlite3 'select cpe_uri from categorized_cpes' | peco
 ```
 
@@ -81,20 +81,47 @@ $ sqlite3 ./cpe.sqlite3 'select cpe_uri from categorized_cpes' | peco
 
 ```
 $ go-cpe-dictionary -help
-Usage of ./go-cpe-dictionary:
+Usage: go-cpe-dictionary <flags> <subcommand> <subcommand args>
+
+Subcommands:
+	commands         list all command names
+	flags            describe all known top-level flags
+	help             describe subcommands and their syntax
+
+Subcommands for fetchnvd:
+	fetchnvd         Fetch CPE from NVD
+
+
+Use "go-cpe-dictionary flags" for a list of top-level flags
+
+$ go-cpe-dictionary fetchnvd -help
+fetchnvd:
+	fetchnvd
+		[-dbtype=mysql|postgres|sqlite3|redis]
+		[-dbpath=$PWD/cve.sqlite3 or connection string]
+		[-http-proxy=http://192.168.0.1:8080]
+		[-debug]
+		[-debug-sql]
+		[-log-dir=/path/to/log]
+		[-log-json]
+
+For the first time, run the blow command to fetch data. (It takes about 10 minutes)
+   $ go-cpe-dictionary fetchnvd
   -dbpath string
-        /path/to/sqlite3/datafile (default "/Users/kotakanbe/go/src/github.com/kotakanbe/go-cpe-dictionary/cpe.db")
-  -dump-path string
-        /path/to/dump.json (default "/Users/kotakanbe/go/src/github.com/kotakanbe/go-cpe-dictionary/cpe.json")
-  -fetch
-        Fetch CPE data from NVD
+    	/path/to/sqlite3 or SQL connection string (default "$PWD/cpe.sqlite3")
+  -dbtype string
+    	Database type to store data in (sqlite3, mysql, postgres or redis supported) (default "sqlite3")
+  -debug
+    	debug mode
+  -debug-sql
+    	SQL debug mode
   -http-proxy string
-        HTTP Proxy URL (http://proxy-server:8080)
-  -load
-        load CPE data from dumpfile
-  -v    Debug mode
-  -vv
-        SQL debug mode
+    	http://proxy-url:port (default: empty)
+  -log-dir string
+    	/path/to/log (default "/var/log/vuls")
+  -log-json
+    	output log as JSON
+
 ```
 
 ----
