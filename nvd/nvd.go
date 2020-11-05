@@ -142,7 +142,7 @@ func GetYearsUntilThisYear(startYear int) (years []int, err error) {
 // MakeFeedURLBlocks : MakeFeedURLBlocks
 func MakeFeedURLBlocks(years []int, n int) (urlBlocks [][]string) {
 	//  http://nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2016.xml.gz
-	formatTemplate := "https://nvd.nist.gov/feeds/json/cve/1.0/nvdcve-1.0-%d.json.gz"
+	formatTemplate := "https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-%d.json.gz"
 	blockNum := int(math.Ceil(float64(len(years)) / float64(n)))
 	urlBlocks = make([][]string, blockNum, blockNum)
 	var i int
