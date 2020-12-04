@@ -3,7 +3,7 @@ package db
 import (
 	"testing"
 
-	"github.com/alicebob/miniredis"
+	"github.com/alicebob/miniredis/v2"
 )
 
 func TestGetVendorProductsRedis(t *testing.T) {
