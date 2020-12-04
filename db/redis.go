@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cheggaaa/pb"
+	"github.com/cheggaaa/pb/v3"
 	"github.com/go-redis/redis/v8"
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
