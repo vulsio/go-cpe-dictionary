@@ -3,14 +3,12 @@ module github.com/kotakanbe/go-cpe-dictionary
 go 1.14
 
 require (
-	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
-	github.com/alicebob/miniredis v2.5.0+incompatible
+	github.com/alicebob/miniredis/v2 v2.14.1
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
 	github.com/cheggaaa/pb v2.0.7+incompatible
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/gomodule/redigo v1.8.2 // indirect
 	github.com/google/subcommands v1.2.0
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1
 	github.com/jinzhu/gorm v1.9.14
