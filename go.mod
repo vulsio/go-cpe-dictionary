@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/alicebob/miniredis/v2 v2.14.1
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535
-	github.com/cheggaaa/pb v2.0.7+incompatible
+	github.com/cheggaaa/pb/v3 v3.0.5
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/go-redis/redis/v8 v8.4.0
 	github.com/go-stack/stack v1.8.0 // indirect
@@ -20,11 +20,5 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20200603152657-dc2b0ca8b37e // indirect
-	gopkg.in/VividCortex/ewma.v1 v1.1.1 // indirect
-	gopkg.in/cheggaaa/pb.v2 v2.0.7 // indirect
-	gopkg.in/fatih/color.v1 v1.7.0 // indirect
-	gopkg.in/mattn/go-colorable.v0 v0.1.0 // indirect
-	gopkg.in/mattn/go-isatty.v0 v0.0.4 // indirect
-	gopkg.in/mattn/go-runewidth.v0 v0.0.4 // indirect
 	moul.io/http2curl v1.0.0 // indirect
 )
