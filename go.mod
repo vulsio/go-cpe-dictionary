@@ -1,6 +1,6 @@
 module github.com/kotakanbe/go-cpe-dictionary
 
-go 1.14
+go 1.16
 
 require (
 	github.com/alicebob/miniredis/v2 v2.14.1

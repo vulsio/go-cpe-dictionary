@@ -51,7 +51,7 @@ type V3Feed struct {
 
 // FetchAndInsertCPE : FetchAndInsertCPE
 func FetchAndInsertCPE(driver db.DB) (err error) {
-	if err = FetchAndInsertCpeDictioanry(driver); err != nil {
+	if err = FetchAndInsertCpeDictionary(driver); err != nil {
 		return fmt.Errorf("Failed to fetch cpe dictionary. err : %s", err)
 	}
 
@@ -62,8 +62,8 @@ func FetchAndInsertCPE(driver db.DB) (err error) {
 	return nil
 }
 
-// FetchAndInsertCpeDictioanry : FetchCPE
-func FetchAndInsertCpeDictioanry(driver db.DB) (err error) {
+// FetchAndInsertCpeDictionary : FetchCPE
+func FetchAndInsertCpeDictionary(driver db.DB) (err error) {
 	var cpeDictionary CpeDictionary
 	var body string
 	var errs []error
