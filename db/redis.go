@@ -75,10 +75,6 @@ func (r *RedisDriver) InsertCpes(cpes []*models.CategorizedCpe) (err error) {
 		pipe = r.conn.Pipeline()
 		for _, c := range chunked {
 			bar.Increment()
-			if c.Version == "ANY" {
-				continue
-			}
-
 			if result := pipe.ZAdd(
 				ctx,
 				hashKeyPrefix+"CpeURI",
