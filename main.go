@@ -25,6 +25,7 @@ func main() {
 	subcommands.Register(subcommands.FlagsCommand(), "")
 	subcommands.Register(subcommands.CommandsCommand(), "")
 	subcommands.Register(&commands.FetchNvdCmd{}, "fetchnvd")
+	subcommands.Register(&commands.FetchJvnCmd{}, "fetchjvn")
 
 	var v = flag.Bool("v", false, "Show version")
 

@@ -8,20 +8,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
-	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/inconshreveable/log15"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
-	c "github.com/kotakanbe/go-cpe-dictionary/config"
+	"github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
 	"github.com/parnurzeal/gorequest"
-	"github.com/pkg/errors"
 )
 
 // CpeDictionary has cpe-item list
@@ -50,28 +47,35 @@ type V3Feed struct {
 }
 
 // FetchAndInsertCPE : FetchAndInsertCPE
-func FetchAndInsertCPE(driver db.DB) (err error) {
-	if err = FetchAndInsertCpeDictionary(driver); err != nil {
-		return fmt.Errorf("Failed to fetch cpe dictionary. err : %s", err)
+func FetchAndInsertCPE() ([]models.CategorizedCpe, error) {
+	driver, err := db.NewDB(config.Conf.DBType, config.Conf.DBPath, config.Conf.DebugSQL)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to new DB. err : %s", err)
+	}
+	defer func() {
+		_ = driver.CloseDB()
+	}()
+
+	cpes, err := FetchAndInsertCpeDictionary(driver)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to fetch cpe dictionary. err : %s", err)
 	}
 
-	if err = FetchAndInsertV3Feed(driver); err != nil {
-		return fmt.Errorf("Failed to fetch nvd v3 feed. err : %s", err)
+	jsonCpes, err := FetchAndInsertJSONFeed(driver)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to fetch nvd JSON feed. err : %s", err)
 	}
-
-	return nil
+	cpes = append(cpes, jsonCpes...)
+	return cpes, nil
 }
 
 // FetchAndInsertCpeDictionary : FetchCPE
-func FetchAndInsertCpeDictionary(driver db.DB) (err error) {
-	var cpeDictionary CpeDictionary
-	var body string
-	var errs []error
-	var resp *http.Response
+func FetchAndInsertCpeDictionary(driver db.DB) ([]models.CategorizedCpe, error) {
 	url := "http://nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
-	resp, body, errs = gorequest.New().Proxy(c.Conf.HTTPProxy).Get(url).End()
+	log15.Info("Fetching...", "URL", url)
+	resp, body, errs := gorequest.New().Proxy(config.Conf.HTTPProxy).Get(url).End()
 	if len(errs) > 0 || resp.StatusCode != 200 {
-		return fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
+		return nil, fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
 	}
 
 	b := bytes.NewBufferString(body)
@@ -80,63 +84,59 @@ func FetchAndInsertCpeDictionary(driver db.DB) (err error) {
 		_ = reader.Close()
 	}()
 	if err != nil {
-		return fmt.Errorf("Failed to decompress NVD feedfile. url: %s, err: %s", url, err)
+		return nil, fmt.Errorf("Failed to decompress NVD feedfile. url: %s, err: %s", url, err)
 	}
 	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return fmt.Errorf("Failed to Read NVD feedfile. url: %s, err: %s", url, err)
+		return nil, fmt.Errorf("Failed to Read NVD feedfile. url: %s, err: %s", url, err)
 	}
+
+	var cpeDictionary CpeDictionary
 	if err = xml.Unmarshal(bytes, &cpeDictionary); err != nil {
-		return fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
+		return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
 	}
 
-	var cpes []*models.CategorizedCpe
+	var cpes []models.CategorizedCpe
 	if cpes, err = ConvertNvdCpeDictionaryToModel(cpeDictionary); err != nil {
-		return err
+		return nil, err
 	}
 
-	if err = driver.InsertCpes(cpes); err != nil {
-		return fmt.Errorf("Failed to insert cpes. err : %s", err)
+	if !config.Conf.Stdout {
+		if err = driver.InsertCpes(cpes); err != nil {
+			return nil, fmt.Errorf("Failed to insert cpes. err : %s", err)
+		}
 	}
-	return nil
+	return cpes, nil
 }
 
-// FetchAndInsertV3Feed : FetchAndInsertV3Feed
-func FetchAndInsertV3Feed(driver db.DB) (err error) {
+// FetchAndInsertJSONFeed : FetchAndInsertJSONFeed
+func FetchAndInsertJSONFeed(driver db.DB) ([]models.CategorizedCpe, error) {
 	startYear := 2002
-	var years []int
-	if years, err = GetYearsUntilThisYear(startYear); err != nil {
-		return err
+	years, err := util.GetYearsUntilThisYear(startYear)
+	if err != nil {
+		return nil, err
 	}
 
+	allCpes := []models.CategorizedCpe{}
 	urlBlocks := MakeFeedURLBlocks(years, 2)
 	for _, urls := range urlBlocks {
-		var nvds []V3Feed
-		if nvds, err = fetchFeedFileConcurrently(urls); err != nil {
-			return fmt.Errorf("Failed to get feeds. err : %s", err)
+		nvds, err := fetchFeedFileConcurrently(urls)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
 		}
-		var cpes []*models.CategorizedCpe
-		if cpes, err = ConvertNvdV3FeedToModel(nvds); err != nil {
-			return err
+		cpes, err := ConvertNvdV3FeedToModel(nvds)
+		if err != nil {
+			return nil, err
 		}
-		if err = driver.InsertCpes(cpes); err != nil {
-			return fmt.Errorf("Failed to insert cpes. err : %s", err)
-		}
-	}
-	return nil
-}
+		allCpes = append(allCpes, cpes...)
 
-// GetYearsUntilThisYear : GetYearsUntilThisYear
-func GetYearsUntilThisYear(startYear int) (years []int, err error) {
-	var thisYear int
-	if thisYear, err = strconv.Atoi(time.Now().Format("2006")); err != nil {
-		return years, fmt.Errorf("Failed to convert this year. err : %s", err)
+		if !config.Conf.Stdout {
+			if err = driver.InsertCpes(cpes); err != nil {
+				return nil, fmt.Errorf("Failed to insert cpes. err : %s", err)
+			}
+		}
 	}
-	years = make([]int, thisYear-startYear+1)
-	for i := range years {
-		years[i] = startYear + i
-	}
-	return years, nil
+	return allCpes, nil
 }
 
 // MakeFeedURLBlocks : MakeFeedURLBlocks
@@ -180,13 +180,12 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 		tasks <- func() {
 			select {
 			case url := <-reqChan:
-				log15.Info("Fetching...", "URL", url)
 				nvd, err := fetchFeedFile(url)
 				if err != nil {
 					errChan <- err
 					return
 				}
-				resChan <- nvd
+				resChan <- *nvd
 			}
 		}
 	}
@@ -214,49 +213,27 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 	return nvds, nil
 }
 
-func fetchFeedFile(url string) (nvd V3Feed, err error) {
-	var body string
-	var errs []error
-	var resp *http.Response
-
-	resp, body, errs = gorequest.New().Proxy(c.Conf.HTTPProxy).Get(url).End()
-	//  defer resp.Body.Close()
-	if len(errs) > 0 || resp == nil || resp.StatusCode != 200 {
-		return nvd, fmt.Errorf(
-			"HTTP error. errs: %v, url: %s", errs, url)
-	}
-
-	b := bytes.NewBufferString(body)
-	reader, err := gzip.NewReader(b)
-	defer func() {
-		_ = reader.Close()
-	}()
+func fetchFeedFile(url string) (nvd *V3Feed, err error) {
+	bytes, err := util.FetchFeedFile(url, true)
 	if err != nil {
-		return nvd, fmt.Errorf(
-			"Failed to decompress NVD feedfile. url: %s, err: %s", url, err)
+		return nil, fmt.Errorf("Failed to fetch. url: %s, err: %s", url, err)
 	}
-
-	bytes, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nvd, fmt.Errorf(
-			"Failed to Read NVD feedfile. url: %s, err: %s", url, err)
-	}
-
 	if err = json.Unmarshal(bytes, &nvd); err != nil {
-		return nvd, fmt.Errorf(
-			"Failed to unmarshal. url: %s, err: %s", url, err)
+		return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
 	}
 	return nvd, nil
 }
 
 // ConvertNvdCpeDictionaryToModel :
-func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []*models.CategorizedCpe, err error) {
+func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.CategorizedCpe, err error) {
 	for _, item := range nvd.Items {
 		var wfn common.WellFormedName
 		if wfn, err = naming.UnbindFS(item.Cpe23Item.Name); err != nil {
-			return nil, errors.Wrapf(err, "Failed to unbind cpe fs: %s", item.Cpe23Item.Name)
+			// Logging only
+			log15.Warn("Failed to unbind", item.Cpe23Item.Name, err)
+			continue
 		}
-		cpes = append(cpes, &models.CategorizedCpe{
+		cpes = append(cpes, models.CategorizedCpe{
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),
@@ -276,7 +253,7 @@ func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []*models.Categoriz
 }
 
 // ConvertNvdV3FeedToModel :
-func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []*models.CategorizedCpe, err error) {
+func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []models.CategorizedCpe, err error) {
 	for _, nvd := range nvds {
 		for _, item := range nvd.CVEItems {
 			for _, node := range item.Configurations.Nodes {
@@ -286,7 +263,7 @@ func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []*models.CategorizedCpe, err 
 						log15.Warn("Failed to unbind cpe.", "CPE URI", cpe.Cpe23URI, "err", err)
 						continue
 					}
-					cpes = append(cpes, &models.CategorizedCpe{
+					cpes = append(cpes, models.CategorizedCpe{
 						CpeURI:          naming.BindToURI(wfn),
 						CpeFS:           naming.BindToFS(wfn),
 						Part:            wfn.GetString(common.AttributePart),

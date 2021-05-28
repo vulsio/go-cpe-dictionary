@@ -25,7 +25,7 @@ func prepareTestDB(driver DB) error {
 		"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*",
 	}
 
-	testCpes := make([]*models.CategorizedCpe, len(testCpeStrings))
+	testCpes := make([]models.CategorizedCpe, len(testCpeStrings))
 
 	for i, cpeString := range testCpeStrings {
 		wfn, err := naming.UnbindFS(cpeString)
@@ -33,7 +33,7 @@ func prepareTestDB(driver DB) error {
 			return err
 		}
 
-		testCpes[i] = &models.CategorizedCpe{
+		testCpes[i] = models.CategorizedCpe{
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),

@@ -84,7 +84,7 @@ func (r *RDBDriver) MigrateDB() error {
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(cpes []*models.CategorizedCpe) error {
+func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 	insertedCpes := []string{}
 	bar := pb.StartNew(len(cpes))
 
