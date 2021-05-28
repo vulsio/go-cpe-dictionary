@@ -65,7 +65,7 @@ func (r *RedisDriver) CloseDB() (err error) {
 }
 
 // InsertCpes Select Cve information from DB.
-func (r *RedisDriver) InsertCpes(cpes []*models.CategorizedCpe) (err error) {
+func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()

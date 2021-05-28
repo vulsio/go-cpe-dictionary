@@ -21,6 +21,8 @@ type Config struct {
 	Bind string
 	Port string
 
+	Stdout bool
+
 	//TODO Validator
 	HTTPProxy string
 }

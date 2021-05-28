@@ -98,7 +98,7 @@ $ go-cpe-dictionary fetchnvd -help
 fetchnvd:
 	fetchnvd
 		[-dbtype=mysql|postgres|sqlite3|redis]
-		[-dbpath=$PWD/cve.sqlite3 or connection string]
+		[-dbpath=$PWD/cpe.sqlite3 or connection string]
 		[-http-proxy=http://192.168.0.1:8080]
 		[-debug]
 		[-debug-sql]
