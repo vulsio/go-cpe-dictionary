@@ -30,6 +30,7 @@ type cpe struct {
 	Value   string `xml:",chardata"`
 }
 
+// Fetch JVN feeds
 func Fetch() (allCpes []models.CategorizedCpe, err error) {
 	years, err := util.GetYearsUntilThisYear(2002)
 	if err != nil {
@@ -58,6 +59,7 @@ func Fetch() (allCpes []models.CategorizedCpe, err error) {
 	return
 }
 
+// Insert JVN feeds to DB
 func Insert(cpes []models.CategorizedCpe) error {
 	driver, err := db.NewDB(config.Conf.DBType, config.Conf.DBPath, config.Conf.DebugSQL)
 	if err != nil {

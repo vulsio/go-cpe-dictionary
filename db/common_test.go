@@ -11,29 +11,31 @@ import (
 )
 
 func prepareTestDB(driver DB) error {
-	var testCpeStrings = []string{
-		`cpe:2.3:a:ntp:ntp:4.2.5p48:*:*:*:*:*:*:*`,
-		`cpe:2.3:a:ntp:ntp:4.2.8:p1-beta1:*:*:*:*:*:*`,
-		`cpe:2.3:a:responsive_coming_soon_page_project:responsive_coming_soon_page:1.1.18:*:*:*:*:wordpress:*:*`,
-
-		`cpe:2.3:a:vendorName1:productName1-1:1.1:*:*:*:*:targetSoftware1:targetHardware1:*`,
-		`cpe:2.3:a:vendorName1:productName1-2:1.2:*:*:*:*:targetSoftware1:targetHardware1:*`,
-		"cpe:2.3:a:vendorName2:productName2:2.0:*:*:*:*:targetSoftware2:targetHardware2:*",
-		"cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*",
-		"cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*",
-		"cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*",
-		"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*",
+	var testCpeStrings = []struct {
+		cpe        string
+		deprecated bool
+	}{
+		{`cpe:2.3:a:ntp:ntp:4.2.5p48:*:*:*:*:*:*:*`, false},
+		{`cpe:2.3:a:ntp:ntp:4.2.8:p1-beta1:*:*:*:*:*:*`, false},
+		{`cpe:2.3:a:responsive_coming_soon_page_project:responsive_coming_soon_page:1.1.18:*:*:*:*:wordpress:*:*`, false},
+		{`cpe:2.3:a:vendorName1:productName1-1:1.1:*:*:*:*:targetSoftware1:targetHardware1:*`, false},
+		{`cpe:2.3:a:vendorName1:productName1-2:1.2:*:*:*:*:targetSoftware1:targetHardware1:*`, false},
+		{"cpe:2.3:a:vendorName2:productName2:2.0:*:*:*:*:targetSoftware2:targetHardware2:*", false},
+		{"cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*", false},
+		{"cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*", false},
+		{"cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*", false},
+		{"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*", true},
 	}
 
-	testCpes := make([]models.CategorizedCpe, len(testCpeStrings))
+	testCpes := []models.CategorizedCpe{}
 
-	for i, cpeString := range testCpeStrings {
-		wfn, err := naming.UnbindFS(cpeString)
+	for _, t := range testCpeStrings {
+		wfn, err := naming.UnbindFS(t.cpe)
 		if err != nil {
 			return err
 		}
 
-		testCpes[i] = models.CategorizedCpe{
+		testCpes = append(testCpes, models.CategorizedCpe{
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),
@@ -47,7 +49,8 @@ func prepareTestDB(driver DB) error {
 			TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
 			TargetHardware:  wfn.GetString(common.AttributeTargetHw),
 			Other:           wfn.GetString(common.AttributeOther),
-		}
+			Deprecated:      t.deprecated,
+		})
 	}
 
 	return driver.InsertCpes(testCpes)
@@ -105,15 +108,14 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 }
 
 func testGetCpesByVendorProduct(t *testing.T, driver DB) {
-	var err error
-
 	if err := prepareTestDB(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 
 	type Expected struct {
-		CpeURIs   []string
-		ErrString string
+		CpeURIs    []string
+		Deprecated []string
+		ErrString  string
 	}
 
 	cases := map[string]struct {
@@ -128,6 +130,7 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 				CpeURIs: []string{
 					`cpe:/a:vendorName1:productName1-1:1.1::~~~targetSoftware1~targetHardware1~`,
 				},
+				Deprecated: []string{},
 			},
 		},
 		"OK2": {
@@ -137,6 +140,7 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 				CpeURIs: []string{
 					`cpe:/a:vendorName1:productName1-2:1.2::~~~targetSoftware1~targetHardware1~`,
 				},
+				Deprecated: []string{},
 			},
 		},
 		"OK3": {
@@ -147,13 +151,24 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 					`cpe:/a:ntp:ntp:4.2.5p48`,
 					`cpe:/a:ntp:ntp:4.2.8:p1-beta1`,
 				},
+				Deprecated: []string{},
+			},
+		},
+		"deprecated": {
+			Vendor:  "vendorName6",
+			Product: "productName6",
+			Expected: Expected{
+				CpeURIs: []string{},
+				Deprecated: []string{
+					"cpe:/a:vendorName6:productName6:6.0::~~~targetSoftware6~targetHardware6~",
+				},
 			},
 		},
 	}
 
 	for k, tc := range cases {
-		var cpeURIs []string
-		if cpeURIs, err = driver.GetCpesByVendorProduct(tc.Vendor, tc.Product); err != nil {
+		cpeURIs, deprecated, err := driver.GetCpesByVendorProduct(tc.Vendor, tc.Product)
+		if err != nil {
 			if !strings.Contains(err.Error(), tc.Expected.ErrString) {
 				t.Errorf("%s : actual %s, expected %s", k, err, tc.Expected.ErrString)
 				continue
@@ -167,6 +182,9 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 		}
 		if !reflect.DeepEqual(cpeURIs, tc.Expected.CpeURIs) {
 			t.Errorf("%s: actual %#v, expected %#v", k, cpeURIs, tc.Expected.CpeURIs)
+		}
+		if !reflect.DeepEqual(deprecated, tc.Expected.Deprecated) {
+			t.Errorf("actual %#v, expected %#v", deprecated, tc.Expected.Deprecated)
 		}
 	}
 }

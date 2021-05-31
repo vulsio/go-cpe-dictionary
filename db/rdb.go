@@ -134,11 +134,13 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
-func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs, deprecated []string, err error) {
+func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []string, error) {
 	results := []models.CategorizedCpe{}
-	if err = r.conn.Select("DISTINCT cpe_uri").Find(&results, "vendor = ? and product = ?", vendor, product).Error; err != nil {
+	err := r.conn.Select("DISTINCT cpe_uri, deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error
+	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
+	cpeURIs, deprecated := []string{}, []string{}
 	for _, r := range results {
 		if r.Deprecated {
 			deprecated = append(deprecated, r.CpeURI)
@@ -146,7 +148,7 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs, dep
 			cpeURIs = append(cpeURIs, r.CpeURI)
 		}
 	}
-	return
+	return cpeURIs, deprecated, nil
 }
 
 // CloseDB close Database

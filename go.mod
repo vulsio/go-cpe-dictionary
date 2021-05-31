@@ -27,7 +27,9 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20200603152657-dc2b0ca8b37e // indirect
+	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
 	golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea // indirect
+	golang.org/x/tools v0.1.2 // indirect
 	moul.io/http2curl v1.0.0 // indirect
 )

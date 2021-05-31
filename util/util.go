@@ -94,6 +94,7 @@ func GetYearsUntilThisYear(startYear int) (years []int, err error) {
 	return years, nil
 }
 
+// FetchFeedFile : fetch feed files specified by arg
 func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 	var body string
 	var errs []error
