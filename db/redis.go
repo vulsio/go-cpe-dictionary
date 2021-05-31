@@ -112,24 +112,36 @@ func (r *RedisDriver) GetVendorProducts() (vendorProducts []string, err error) {
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
 func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs, deprecated []string, err error) {
-	ctx := context.Background()
 	if vendor == "" || product == "" {
 		return nil, nil, nil
 	}
-	result := r.conn.ZRange(ctx, hKeyPrefix+vendor+sep+product, 0, -1)
+	result := r.conn.ZRange(context.Background(), hKeyPrefix+vendor+sep+product, 0, -1)
 	if result.Err() != nil {
 		return nil, nil, fmt.Errorf("Failed to zrange CPE. err :%s", result.Err())
 	}
 	for _, cpeURI := range result.Val() {
-		cmd := r.conn.Get(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, cpeURI))
-		if cmd.Err() == redis.Nil {
-			// the CPE is not deprecated
-			cpeURIs = append(cpeURIs, cpeURI)
-		} else if cmd.Err() != nil {
-			return nil, nil, fmt.Errorf("Failed to get deprecated CPE. err :%s", result.Err())
-		} else {
+		ok, err := r.IsDeprecated(cpeURI)
+		if err != nil {
+			return nil, nil, fmt.Errorf("Failed to get deprecated CPE. err :%s", err)
+		}
+		if ok {
 			deprecated = append(deprecated, cpeURI)
+		} else {
+			cpeURIs = append(cpeURIs, cpeURI)
 		}
 	}
 	return
+}
+
+// IsDeprecated: IsDeprecate
+func (r *RedisDriver) IsDeprecated(cpeURI string) (bool, error) {
+	cmd := r.conn.Get(context.Background(), fmt.Sprintf("%s%s", deprecatedPrefix, cpeURI))
+	if cmd.Err() == redis.Nil {
+		// key not found means the CPE is not deprecated
+		return false, nil
+	} else if cmd.Err() != nil {
+		return false, fmt.Errorf("Failed to get deprecated CPE. err :%s", cmd.Err())
+	} else {
+		return true, nil
+	}
 }
