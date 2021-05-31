@@ -25,8 +25,9 @@ import (
 // https://nvd.nist.gov/cpe.cfm
 type CpeDictionary struct {
 	Items []struct {
-		Name      string `xml:"name,attr"`
-		Cpe23Item struct {
+		Name       string `xml:"name,attr"`
+		Deprecated string `xml:"deprecated,attr"`
+		Cpe23Item  struct {
 			Name string `xml:"name,attr"`
 		} `xml:"cpe23-item"`
 	} `xml:"cpe-item"`
@@ -247,6 +248,7 @@ func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.Categorize
 			TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
 			TargetHardware:  wfn.GetString(common.AttributeTargetHw),
 			Other:           wfn.GetString(common.AttributeOther),
+			Deprecated:      item.Deprecated == "true",
 		})
 	}
 	return cpes, nil

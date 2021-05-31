@@ -8,6 +8,8 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
+	"github.com/kotakanbe/go-cpe-dictionary/config"
+	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
 )
@@ -54,6 +56,20 @@ func Fetch() (allCpes []models.CategorizedCpe, err error) {
 		}
 	}
 	return
+}
+
+func Insert(cpes []models.CategorizedCpe) error {
+	driver, err := db.NewDB(config.Conf.DBType, config.Conf.DBPath, config.Conf.DebugSQL)
+	if err != nil {
+		return fmt.Errorf("Failed to new DB. err : %s", err)
+	}
+	defer func() {
+		_ = driver.CloseDB()
+	}()
+	if err = driver.InsertCpes(cpes); err != nil {
+		return fmt.Errorf("Failed to insert cpes. err : %s", err)
+	}
+	return nil
 }
 
 // convertJvnCpeToMode:
