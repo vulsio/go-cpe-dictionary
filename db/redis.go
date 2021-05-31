@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/go-redis/redis/v8"
@@ -12,8 +13,9 @@ import (
 
 const (
 	dialectRedis     = "redis"
-	hashKeyPrefix    = "CPE#"
-	hashKeySeparator = "::"
+	hKeyPrefix       = "CPE#"
+	deprecatedPrefix = hKeyPrefix + "dep#"
+	sep              = "::"
 )
 
 // RedisDriver is Driver for Redis
@@ -75,25 +77,17 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 		pipe = r.conn.Pipeline()
 		for _, c := range chunked {
 			bar.Increment()
-			if result := pipe.ZAdd(
-				ctx,
-				hashKeyPrefix+"CpeURI",
-				&redis.Z{Score: 0, Member: c.CpeURI},
-			); result.Err() != nil {
+			// TODO
+			// if result := pipe.ZAdd(ctx, hKeyPrefix+"CpeURI", &redis.Z{Score: 0, Member: c.Deprecated}); result.Err() != nil {
+			// 	return fmt.Errorf("Failed to ZAdd CpeURI and cpe name. err: %s", result.Err())
+			// }
+			if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "", time.Duration(0)); result.Err() != nil {
 				return fmt.Errorf("Failed to ZAdd CpeURI and cpe name. err: %s", result.Err())
 			}
-			if result := pipe.ZAdd(
-				ctx,
-				hashKeyPrefix+"VendorProduct",
-				&redis.Z{Score: 0, Member: c.Vendor + hashKeySeparator + c.Product},
-			); result.Err() != nil {
+			if result := pipe.ZAdd(ctx, hKeyPrefix+"VendorProduct", &redis.Z{Score: 0, Member: c.Vendor + sep + c.Product}); result.Err() != nil {
 				return fmt.Errorf("Failed to ZAdd CpeURI and cpe name. err: %s", result.Err())
 			}
-			if result := pipe.ZAdd(
-				ctx,
-				hashKeyPrefix+c.Vendor+hashKeySeparator+c.Product,
-				&redis.Z{Score: 0, Member: c.CpeURI},
-			); result.Err() != nil {
+			if result := pipe.ZAdd(ctx, hKeyPrefix+c.Vendor+sep+c.Product, &redis.Z{Score: 0, Member: c.CpeURI}); result.Err() != nil {
 				return fmt.Errorf("Failed to ZAdd CpeURI and cpe name. err: %s", result.Err())
 			}
 		}
@@ -110,21 +104,32 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 func (r *RedisDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	ctx := context.Background()
 	var result *redis.StringSliceCmd
-	if result = r.conn.ZRange(ctx, hashKeyPrefix+"VendorProduct", 0, -1); result.Err() != nil {
+	if result = r.conn.ZRange(ctx, hKeyPrefix+"VendorProduct", 0, -1); result.Err() != nil {
 		return nil, result.Err()
 	}
 	return result.Val(), nil
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
-func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs []string, err error) {
+func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs, deprecated []string, err error) {
 	ctx := context.Background()
 	if vendor == "" || product == "" {
-		return nil, nil
+		return nil, nil, nil
 	}
-	var result *redis.StringSliceCmd
-	if result = r.conn.ZRange(ctx, hashKeyPrefix+vendor+hashKeySeparator+product, 0, -1); result.Err() != nil {
-		return nil, result.Err()
+	result := r.conn.ZRange(ctx, hKeyPrefix+vendor+sep+product, 0, -1)
+	if result.Err() != nil {
+		return nil, nil, fmt.Errorf("Failed to zrange CPE. err :%s", result.Err())
 	}
-	return result.Val(), nil
+	for _, cpeURI := range result.Val() {
+		cmd := r.conn.Get(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, cpeURI))
+		if cmd.Err() == redis.Nil {
+			// the CPE is not deprecated
+			cpeURIs = append(cpeURIs, cpeURI)
+		} else if cmd.Err() != nil {
+			return nil, nil, fmt.Errorf("Failed to get deprecated CPE. err :%s", result.Err())
+		} else {
+			deprecated = append(deprecated, cpeURI)
+		}
+	}
+	return
 }
