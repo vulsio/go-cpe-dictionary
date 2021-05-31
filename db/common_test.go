@@ -10,7 +10,7 @@ import (
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 )
 
-func prepareTestDB(driver DB) error {
+func prepareTestData(driver DB) error {
 	var testCpeStrings = []struct {
 		cpe        string
 		deprecated bool
@@ -59,7 +59,7 @@ func prepareTestDB(driver DB) error {
 func testGetVendorProducts(t *testing.T, driver DB) {
 	var err error
 
-	if err := prepareTestDB(driver); err != nil {
+	if err := prepareTestData(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 
@@ -108,7 +108,7 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 }
 
 func testGetCpesByVendorProduct(t *testing.T, driver DB) {
-	if err := prepareTestDB(driver); err != nil {
+	if err := prepareTestData(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 

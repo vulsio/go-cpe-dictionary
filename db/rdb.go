@@ -161,3 +161,9 @@ func (r *RDBDriver) CloseDB() (err error) {
 	}
 	return
 }
+
+// IsDeprecated : IsDeprecated
+func (r *RDBDriver) IsDeprecated(cpeURI string) (bool, error) {
+	// not implemented yet
+	return false, nil
+}
