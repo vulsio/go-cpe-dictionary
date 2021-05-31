@@ -100,9 +100,7 @@ func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
 				if err := tx.Create(&c).Error; err != nil {
 					tx.Rollback()
 					return fmt.Errorf("Failed to insert. cve: %s, err: %s",
-						pp.Sprintf("%v", c),
-						err,
-					)
+						pp.Sprintf("%v", c), err)
 				}
 				insertedCpes = append(insertedCpes, c.CpeURI)
 			}
@@ -126,40 +124,38 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	// TODO Is there a better way to use distinct with GORM? Needing
 	// explicit column names seems like an antipattern for an orm.
 	if err = r.conn.Select("DISTINCT vendor, product").Find(&models.CategorizedCpe{}).Scan(&results).Error; err != nil {
-		log15.Error("Failed to select results", "err", err)
-		return
+		return nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
 
 	for _, vp := range results {
 		vendorProducts = append(vendorProducts, fmt.Sprintf("%s::%s", vp.Vendor, vp.Product))
 	}
-
 	return
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
-func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs []string, err error) {
-
+func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) (cpeURIs, deprecated []string, err error) {
 	results := []models.CategorizedCpe{}
-
-	if err = r.conn.Select("DISTINCT cpe_uri").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error; err != nil {
-		log15.Error("Failed to select results", "err", err)
-		return
+	if err = r.conn.Select("DISTINCT cpe_uri").Find(&results, "vendor = ? and product = ?", vendor, product).Error; err != nil {
+		return nil, nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
-
-	cpeURIs = make([]string, len(results))
-	for i, r := range results {
-		cpeURIs[i] = r.CpeURI
+	for _, r := range results {
+		if r.Deprecated {
+			deprecated = append(deprecated, r.CpeURI)
+		} else {
+			cpeURIs = append(cpeURIs, r.CpeURI)
+		}
 	}
-
 	return
 }
 
 // CloseDB close Database
 func (r *RDBDriver) CloseDB() (err error) {
-	if err = r.conn.Close(); err != nil {
-		log15.Error("Failed to close DB.", "Type", r.name, "err", err)
+	if r.conn == nil {
 		return
+	}
+	if err = r.conn.Close(); err != nil {
+		return fmt.Errorf("Failed to close DB. err: %s", err)
 	}
 	return
 }
