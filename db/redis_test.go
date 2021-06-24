@@ -22,7 +22,7 @@ func setupRedis() (*miniredis.Miniredis, DB, error) {
 
 func teardownRedis(s *miniredis.Miniredis, driver DB) {
 	s.Close()
-	driver.CloseDB()
+	_ = driver.CloseDB()
 }
 
 func TestGetVendorProductsRedis(t *testing.T) {
