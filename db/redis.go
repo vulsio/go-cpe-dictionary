@@ -71,16 +71,11 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()
-	//	var uniqueVendor, uniqueProduct = map[string]bool{}, map[string]bool{}
 	for chunked := range chunkSlice(cpes, 10) {
 		var pipe redis.Pipeliner
 		pipe = r.conn.Pipeline()
 		for _, c := range chunked {
 			bar.Increment()
-			// TODO
-			// if result := pipe.ZAdd(ctx, hKeyPrefix+"CpeURI", &redis.Z{Score: 0, Member: c.Deprecated}); result.Err() != nil {
-			// 	return fmt.Errorf("Failed to ZAdd CpeURI and cpe name. err: %s", result.Err())
-			// }
 			if result := pipe.ZAdd(ctx, hKeyPrefix+"VendorProduct", &redis.Z{Score: 0, Member: c.Vendor + sep + c.Product}); result.Err() != nil {
 				return fmt.Errorf("Failed to ZAdd vendorProduct. err: %s", result.Err())
 			}
