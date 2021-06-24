@@ -45,7 +45,7 @@ func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 		_ = driver.CloseDB()
 	}()
 
-	if err := prepareTestDB(driver); err != nil {
+	if err := prepareTestData(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 
