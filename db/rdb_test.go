@@ -45,7 +45,7 @@ func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 		_ = driver.CloseDB()
 	}()
 
-	if err := prepareTestDB(driver); err != nil {
+	if err := prepareTestData(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 
@@ -56,11 +56,14 @@ func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 		"cpe:/a:vendorName3:productName3:3.0::~~~targetSoftware3~targetHardware3~",
 		"cpe:/a:vendorName4:productName4:4.0::~~~targetSoftware4~targetHardware4~",
 		"cpe:/a:vendorName5:productName5:5.0::~~~targetSoftware5~targetHardware5~",
+	}
+	eDeprecated := []string{
 		"cpe:/a:vendorName6:productName6:6.0::~~~targetSoftware6~targetHardware6~",
 	}
 
 	var cpeURIs []string
-	if cpeURIs, err = driver.GetCpesByVendorProduct("vendor%", "product%"); err != nil {
+	cpeURIs, deprecated, err := driver.GetCpesByVendorProduct("vendor%", "product%")
+	if err != nil {
 		t.Errorf("GetCpesByVendorProduct: %s", err)
 	}
 
@@ -72,4 +75,7 @@ func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 		t.Errorf("actual %#v, expected %#v", cpeURIs, expected)
 	}
 
+	if !reflect.DeepEqual(deprecated, eDeprecated) {
+		t.Errorf("actual %#v, expected %#v", deprecated, eDeprecated)
+	}
 }

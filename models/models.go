@@ -21,4 +21,5 @@ type CategorizedCpe struct {
 	TargetSoftware  string
 	TargetHardware  string
 	Other           string
+	Deprecated      bool
 }

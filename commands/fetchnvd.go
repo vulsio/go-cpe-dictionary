@@ -82,7 +82,7 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 	}
 	if config.Conf.Stdout {
 		for _, cpe := range cpes {
-			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%t\n",
 				cpe.CpeURI,
 				cpe.CpeFS,
 				cpe.Part,
@@ -96,6 +96,7 @@ func (p *FetchNvdCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 				cpe.TargetSoftware,
 				cpe.TargetHardware,
 				cpe.Other,
+				cpe.Deprecated,
 			)
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/google/subcommands"
 	"github.com/inconshreveable/log15"
@@ -29,6 +30,8 @@ func (*FetchJvnCmd) Synopsis() string { return "Fetch CPE from JVN" }
 func (*FetchJvnCmd) Usage() string {
 	return `fetchjvn:
 	fetchjvn
+		[-dbtype=mysql|postgres|sqlite3|redis]
+		[-dbpath=$PWD/cpe.sqlite3 or connection string]
 		[-http-proxy=http://192.168.0.1:8080]
 		[-debug]
 		[-log-to-file]
@@ -48,6 +51,14 @@ func (p *FetchJvnCmd) SetFlags(f *flag.FlagSet) {
 	f.StringVar(&p.logDir, "log-dir", defaultLogDir, "/path/to/log")
 	f.BoolVar(&p.logJSON, "log-json", false, "output log as JSON")
 	f.BoolVar(&p.logToFile, "log-to-file", false, "output log to file")
+	f.BoolVar(&config.Conf.Stdout, "stdout", false, "display all CPEs to stdout")
+
+	pwd := os.Getenv("PWD")
+	f.StringVar(&config.Conf.DBPath, "dbpath", pwd+"/cpe.sqlite3",
+		"/path/to/sqlite3 or SQL connection string")
+
+	f.StringVar(&config.Conf.DBType, "dbtype", "sqlite3",
+		"Database type to store data in (sqlite3, mysql, postgres or redis supported)")
 
 	f.StringVar(&config.Conf.HTTPProxy, "http-proxy", "", "http://proxy-url:port (default: empty)")
 }
@@ -64,22 +75,33 @@ func (p *FetchJvnCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface
 		log15.Crit("Failed to fetch.", "err", err)
 		return subcommands.ExitFailure
 	}
-	for _, cpe := range cpes {
-		fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
-			cpe.CpeURI,
-			cpe.CpeFS,
-			cpe.Part,
-			cpe.Vendor,
-			cpe.Product,
-			cpe.Version,
-			cpe.Update,
-			cpe.Edition,
-			cpe.Language,
-			cpe.SoftwareEdition,
-			cpe.TargetSoftware,
-			cpe.TargetHardware,
-			cpe.Other,
-		)
+
+	if !config.Conf.Stdout {
+		if err := jvn.Insert(cpes); err != nil {
+			log15.Crit("Failed to insert.", "err", err)
+		}
+	}
+
+	log15.Info("Fetched", "Number of CPEs", len(cpes))
+	if config.Conf.Stdout {
+		for _, cpe := range cpes {
+			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%t\n",
+				cpe.CpeURI,
+				cpe.CpeFS,
+				cpe.Part,
+				cpe.Vendor,
+				cpe.Product,
+				cpe.Version,
+				cpe.Update,
+				cpe.Edition,
+				cpe.Language,
+				cpe.SoftwareEdition,
+				cpe.TargetSoftware,
+				cpe.TargetHardware,
+				cpe.Other,
+				cpe.Deprecated,
+			)
+		}
 	}
 
 	return subcommands.ExitSuccess

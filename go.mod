@@ -10,7 +10,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.0.8
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.12.0 // indirect
-	github.com/go-redis/redis/v8 v8.9.0
+	github.com/go-redis/redis/v8 v8.10.0
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/google/subcommands v1.2.0
@@ -27,7 +27,8 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20200603152657-dc2b0ca8b37e // indirect
-	golang.org/x/net v0.0.0-20210525063256-abc453219eb5 // indirect
-	golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea // indirect
+	go.opentelemetry.io/otel/internal/metric v0.21.0 // indirect
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
+	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
 	moul.io/http2curl v1.0.0 // indirect
 )

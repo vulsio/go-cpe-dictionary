@@ -11,8 +11,9 @@ type DB interface {
 	Name() string
 	CloseDB() error
 	GetVendorProducts() ([]string, error)
-	GetCpesByVendorProduct(string, string) ([]string, error)
+	GetCpesByVendorProduct(string, string) ([]string, []string, error)
 	InsertCpes([]models.CategorizedCpe) error
+	IsDeprecated(string) (bool, error)
 }
 
 // NewDB return DB accessor.
