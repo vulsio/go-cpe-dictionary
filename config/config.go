@@ -18,8 +18,8 @@ type Config struct {
 	DBPath string
 	DBType string
 
-	Bind string
-	Port string
+	Bind string `valid:"ipv4"`
+	Port string `valid:"port"`
 
 	Stdout bool
 
