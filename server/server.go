@@ -7,16 +7,16 @@ import (
 	"path/filepath"
 
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/spf13/viper"
 )
 
 // Start starts CVE dictionary HTTP Server.
 func Start(logDir string, driver db.DB) error {
 	e := echo.New()
-	e.Debug = config.Conf.Debug
+	e.Debug = viper.GetBool("debug")
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -43,7 +43,7 @@ func Start(logDir string, driver db.DB) error {
 	e.GET("/products", getVendorProducts(driver))
 	e.GET("/cpes/:vendor/:product", getCpesByVendorProduct(driver))
 
-	bindURL := fmt.Sprintf("%s:%s", config.Conf.Bind, config.Conf.Port)
+	bindURL := fmt.Sprintf("%s:%s", viper.GetString("bind"), viper.GetString("port"))
 	log15.Info("Listening...", "URL", bindURL)
 	return e.Start(bindURL)
 }

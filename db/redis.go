@@ -29,32 +29,25 @@ func (r *RedisDriver) Name() string {
 	return r.name
 }
 
-// NewRedis return Redis driver
-func NewRedis(dbType, dbpath string, debugSQL bool) (driver *RedisDriver, err error) {
-	driver = &RedisDriver{
-		name: dbType,
+// OpenDB opens Database
+func (r *RedisDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, err error) {
+	if err = r.connectRedis(dbPath); err != nil {
+		err = fmt.Errorf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
 	}
-	log15.Debug("Opening DB", "db", driver.Name())
-	if err = driver.OpenDB(dbType, dbpath, debugSQL); err != nil {
-		return
-	}
-
 	return
 }
 
-// OpenDB opens Database
-func (r *RedisDriver) OpenDB(dbType, dbPath string, debugSQL bool) (err error) {
-	ctx := context.Background()
+func (r *RedisDriver) connectRedis(dbPath string) error {
+	var err error
 	var option *redis.Options
 	if option, err = redis.ParseURL(dbPath); err != nil {
 		log15.Error("Failed to parse url.", "err", err)
-		return fmt.Errorf("Failed to Parse Redis URL. dbpath: %s, err: %s", dbPath, err)
+		return err
 	}
+	ctx := context.Background()
 	r.conn = redis.NewClient(option)
-	if err = r.conn.Ping(ctx).Err(); err != nil {
-		return fmt.Errorf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
-	}
-	return nil
+	err = r.conn.Ping(ctx).Err()
+	return err
 }
 
 // CloseDB close Database
@@ -66,34 +59,8 @@ func (r *RedisDriver) CloseDB() (err error) {
 	return
 }
 
-// InsertCpes Select Cve information from DB.
-func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
-	ctx := context.Background()
-	bar := pb.New(len(cpes))
-	bar.Start()
-	for chunked := range chunkSlice(cpes, 10) {
-		var pipe redis.Pipeliner
-		pipe = r.conn.Pipeline()
-		for _, c := range chunked {
-			bar.Increment()
-			if result := pipe.ZAdd(ctx, hKeyPrefix+"VendorProduct", &redis.Z{Score: 0, Member: c.Vendor + sep + c.Product}); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd vendorProduct. err: %s", result.Err())
-			}
-			if result := pipe.ZAdd(ctx, hKeyPrefix+c.Vendor+sep+c.Product, &redis.Z{Score: 0, Member: c.CpeURI}); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd CpeURI. err: %s", result.Err())
-			}
-			if c.Deprecated {
-				if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "true", time.Duration(0)); result.Err() != nil {
-					return fmt.Errorf("Failed to set to deprecated CPE. err: %s", result.Err())
-				}
-			}
-		}
-		if _, err = pipe.Exec(ctx); err != nil {
-			return fmt.Errorf("Failed to exec pipeline. err: %s", err)
-		}
-	}
-	bar.Finish()
-	log15.Info(fmt.Sprintf("Refreshed %d CPEs.", len(cpes)))
+// MigrateDB migrates Database
+func (r *RedisDriver) MigrateDB() error {
 	return nil
 }
 
@@ -130,6 +97,37 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 		}
 	}
 	return cpeURIs, deprecated, nil
+}
+
+// InsertCpes Select Cve information from DB.
+func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
+	ctx := context.Background()
+	bar := pb.New(len(cpes))
+	bar.Start()
+	for chunked := range chunkSlice(cpes, 10) {
+		var pipe redis.Pipeliner
+		pipe = r.conn.Pipeline()
+		for _, c := range chunked {
+			bar.Increment()
+			if result := pipe.ZAdd(ctx, hKeyPrefix+"VendorProduct", &redis.Z{Score: 0, Member: c.Vendor + sep + c.Product}); result.Err() != nil {
+				return fmt.Errorf("Failed to ZAdd vendorProduct. err: %s", result.Err())
+			}
+			if result := pipe.ZAdd(ctx, hKeyPrefix+c.Vendor+sep+c.Product, &redis.Z{Score: 0, Member: c.CpeURI}); result.Err() != nil {
+				return fmt.Errorf("Failed to ZAdd CpeURI. err: %s", result.Err())
+			}
+			if c.Deprecated {
+				if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "true", time.Duration(0)); result.Err() != nil {
+					return fmt.Errorf("Failed to set to deprecated CPE. err: %s", result.Err())
+				}
+			}
+		}
+		if _, err = pipe.Exec(ctx); err != nil {
+			return fmt.Errorf("Failed to exec pipeline. err: %s", err)
+		}
+	}
+	bar.Finish()
+	log15.Info(fmt.Sprintf("Refreshed %d CPEs.", len(cpes)))
+	return nil
 }
 
 // IsDeprecated : IsDeprecated

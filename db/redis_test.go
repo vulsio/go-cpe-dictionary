@@ -13,7 +13,7 @@ func setupRedis() (*miniredis.Miniredis, DB, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to run miniredis: %s", err)
 	}
-	driver, err := NewDB("redis", "redis://"+s.Addr(), false)
+	driver, _, err := NewDB("redis", "redis://"+s.Addr(), false)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to new db: %s", err)
 	}

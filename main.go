@@ -1,13 +1,11 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/google/subcommands"
 	"github.com/kotakanbe/go-cpe-dictionary/commands"
 )
 
@@ -21,19 +19,12 @@ var version = "`make build` or `make install` will show the version"
 var revision string
 
 func main() {
-	subcommands.Register(subcommands.HelpCommand(), "")
-	subcommands.Register(subcommands.FlagsCommand(), "")
-	subcommands.Register(subcommands.CommandsCommand(), "")
-	subcommands.Register(&commands.FetchNvdCmd{}, "fetchnvd")
-	subcommands.Register(&commands.FetchJvnCmd{}, "fetchjvn")
-	subcommands.Register(&commands.ServerCmd{}, "server")
-
 	var v = flag.Bool("v", false, "Show version")
 
 	if envArgs := os.Getenv("GO_CPE_DICTIONARY_ARGS"); 0 < len(envArgs) {
 		if err := flag.CommandLine.Parse(strings.Fields(envArgs)); err != nil {
-			fmt.Printf("Failed to parse env vars: %s. err: %s", envArgs, err)
-			os.Exit(int(subcommands.ExitFailure))
+			fmt.Printf("Failed to get ENV Vars: %s", err)
+			os.Exit(1)
 		}
 	} else {
 		flag.Parse()
@@ -41,9 +32,12 @@ func main() {
 
 	if *v {
 		fmt.Printf("%s %s %s\n", Name, version, revision)
-		os.Exit(int(subcommands.ExitSuccess))
+		os.Exit(0)
 	}
 
-	ctx := context.Background()
-	os.Exit(int(subcommands.Execute(ctx)))
+	if err := commands.RootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	os.Exit(0)
 }

@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/cheggaaa/pb/v3"
-	"github.com/inconshreveable/log15"
 	"github.com/jinzhu/gorm"
 	"github.com/k0kubun/pp"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
+	sqlite3 "github.com/mattn/go-sqlite3"
+	"golang.org/x/xerrors"
 
 	// Required MySQL.  See http://jinzhu.me/gorm/database.html#connecting-to-a-database
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -35,34 +36,33 @@ func (r *RDBDriver) Name() string {
 	return r.name
 }
 
-// NewRDB return RDB driver
-func NewRDB(dbType, dbpath string, debugSQL bool) (driver *RDBDriver, err error) {
-	driver = &RDBDriver{
-		name: dbType,
-	}
-
-	log15.Debug("Opening DB", "db", driver.Name())
-	if err = driver.OpenDB(dbType, dbpath, debugSQL); err != nil {
-		return
-	}
-
-	log15.Debug("Migrating DB.", "db", driver.Name())
-	if err = driver.MigrateDB(); err != nil {
-		return
-	}
-	return
-}
-
 // OpenDB opens Database
-func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (err error) {
+func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, err error) {
 	r.conn, err = gorm.Open(dbType, dbPath)
 	if err != nil {
-		err = fmt.Errorf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
-		return
+		msg := fmt.Sprintf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
+		if r.name == dialectSqlite3 {
+			switch err.(sqlite3.Error).Code {
+			case sqlite3.ErrLocked, sqlite3.ErrBusy:
+				return true, fmt.Errorf(msg)
+			}
+		}
+		return false, fmt.Errorf(msg)
 	}
 	r.conn.LogMode(debugSQL)
 	if r.name == dialectSqlite3 {
-		r.conn.Exec("PRAGMA journal_mode=WAL;")
+		r.conn.Exec("PRAGMA foreign_keys = ON")
+	}
+	return false, nil
+}
+
+// CloseDB close Database
+func (r *RDBDriver) CloseDB() (err error) {
+	if r.conn == nil {
+		return
+	}
+	if err = r.conn.Close(); err != nil {
+		return xerrors.Errorf("Failed to close DB. Type: %s. err: %w", r.name, err)
 	}
 	return
 }
@@ -80,37 +80,6 @@ func (r *RDBDriver) MigrateDB() error {
 		AddUniqueIndex("idx_cpes_uri", "cpe_uri").Error; err != nil {
 		return fmt.Errorf(errMsg, err)
 	}
-	return nil
-}
-
-// InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
-	insertedCpes := []string{}
-	bar := pb.StartNew(len(cpes))
-
-	for chunked := range chunkSlice(cpes, 100) {
-		tx := r.conn.Begin()
-		for _, c := range chunked {
-			bar.Increment()
-
-			// select old record.
-			old := models.CategorizedCpe{}
-			r := tx.Where(&models.CategorizedCpe{CpeURI: c.CpeURI}).First(&old)
-			if r.RecordNotFound() || old.ID == 0 {
-				if err := tx.Create(&c).Error; err != nil {
-					tx.Rollback()
-					return fmt.Errorf("Failed to insert. cve: %s, err: %s",
-						pp.Sprintf("%v", c), err)
-				}
-				insertedCpes = append(insertedCpes, c.CpeURI)
-			}
-		}
-		tx.Commit()
-	}
-	bar.Finish()
-
-	log15.Info(fmt.Sprintf("Inserted %d CPEs", len(insertedCpes)))
-	//  log.Debugf("%v", refreshedNvds)
 	return nil
 }
 
@@ -151,15 +120,35 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 	return cpeURIs, deprecated, nil
 }
 
-// CloseDB close Database
-func (r *RDBDriver) CloseDB() (err error) {
-	if r.conn == nil {
-		return
+// InsertCpes inserts Cpe Information into DB
+func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
+	return r.deleteAndInsertCpes(r.conn, cpes)
+}
+
+func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.CategorizedCpe) (err error) {
+	bar := pb.StartNew(len(cpes))
+	tx := conn.Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+
+	if err := tx.Delete(&models.CategorizedCpe{}).Error; err != nil {
+		return xerrors.Errorf("Failed to delete: %w", err)
 	}
-	if err = r.conn.Close(); err != nil {
-		return fmt.Errorf("Failed to close DB. err: %s", err)
+
+	for _, c := range cpes {
+		if err := tx.Create(&c).Error; err != nil {
+			return fmt.Errorf("Failed to insert. cpe: %s, err: %s",
+				pp.Sprintf("%v", c), err)
+		}
+		bar.Increment()
 	}
-	return
+	bar.Finish()
+	return nil
 }
 
 // IsDeprecated : IsDeprecated
