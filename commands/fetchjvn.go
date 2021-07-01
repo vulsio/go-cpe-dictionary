@@ -6,6 +6,7 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/fetcher"
+	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -42,7 +43,7 @@ func fetchJvn(cmd *cobra.Command, args []string) (err error) {
 	log15.Info("Fetched", "Number of CPEs", len(cpes))
 
 	if !viper.GetBool("stdout") {
-		if err = driver.InsertCpes(cpes); err != nil {
+		if err = driver.InsertCpes(models.JVNType, cpes); err != nil {
 			log15.Error("Failed to insert.", "err", err)
 			return fmt.Errorf("Failed to insert cpes. err : %s", err)
 		}

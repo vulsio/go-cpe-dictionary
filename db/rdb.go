@@ -74,12 +74,6 @@ func (r *RDBDriver) MigrateDB() error {
 	).Error; err != nil {
 		return fmt.Errorf("Failed to migrate. err: %s", err)
 	}
-
-	errMsg := "Failed to create index. err: %s"
-	if err := r.conn.Model(&models.CategorizedCpe{}).
-		AddUniqueIndex("idx_cpes_uri", "cpe_uri").Error; err != nil {
-		return fmt.Errorf(errMsg, err)
-	}
 	return nil
 }
 
@@ -121,11 +115,11 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
-	return r.deleteAndInsertCpes(r.conn, cpes)
+func (r *RDBDriver) InsertCpes(fetchType models.CPEDBType, cpes []models.CategorizedCpe) error {
+	return r.deleteAndInsertCpes(r.conn, fetchType, cpes)
 }
 
-func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.CategorizedCpe) (err error) {
+func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.CPEDBType, cpes []models.CategorizedCpe) (err error) {
 	bar := pb.StartNew(len(cpes))
 	tx := conn.Begin()
 	defer func() {
@@ -136,7 +130,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.Categorized
 		tx.Commit()
 	}()
 
-	if err := tx.Delete(&models.CategorizedCpe{}).Error; err != nil {
+	if err := tx.Where(&models.CategorizedCpe{FetchType: fetchType}).Delete(models.CategorizedCpe{}).Error; err != nil {
 		return xerrors.Errorf("Failed to delete: %w", err)
 	}
 
@@ -147,7 +141,11 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.Categorized
 		}
 		bar.Increment()
 	}
+
+	// TODO:
+	// DELETE FROM categorized_cpes WHERE id NOT IN (SLECT id FROM (SELECT DISTINCT cpi_uri, deprecated FROM categorized_cpes));
 	bar.Finish()
+
 	return nil
 }
 

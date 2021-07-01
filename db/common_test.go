@@ -36,6 +36,7 @@ func prepareTestData(driver DB) error {
 		}
 
 		testCpes = append(testCpes, models.CategorizedCpe{
+			FetchType:       models.NVDType,
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),
@@ -53,7 +54,7 @@ func prepareTestData(driver DB) error {
 		})
 	}
 
-	return driver.InsertCpes(testCpes)
+	return driver.InsertCpes(models.NVDType, testCpes)
 }
 
 func testGetVendorProducts(t *testing.T, driver DB) {

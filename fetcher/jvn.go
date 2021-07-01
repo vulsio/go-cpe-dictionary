@@ -100,6 +100,7 @@ func convertJvnCpesToModel(jvnCpes []cpe) (cpes []models.CategorizedCpe, err err
 			continue
 		}
 		cpes = append(cpes, models.CategorizedCpe{
+			FetchType:       models.JVNType,
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),
