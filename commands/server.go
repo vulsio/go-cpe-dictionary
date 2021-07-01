@@ -8,6 +8,7 @@ import (
 	"github.com/google/subcommands"
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/config"
+	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/server"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
 )
@@ -81,8 +82,14 @@ func (p *ServerCmd) Execute(_ context.Context, f *flag.FlagSet, _ ...interface{}
 		return subcommands.ExitUsageError
 	}
 
+	driver, err := db.NewDB(config.Conf.DBType, config.Conf.DBPath, config.Conf.DebugSQL)
+	if err != nil {
+		log15.Error("Failed to new DB.", "err", err)
+		return subcommands.ExitFailure
+	}
+
 	log15.Info("Starting HTTP Server...")
-	if err := server.Start(p.logDir); err != nil {
+	if err := server.Start(p.logDir, driver); err != nil {
 		log15.Error("Failed to start server", "err", err)
 		return subcommands.ExitFailure
 	}

@@ -79,7 +79,7 @@ $ sqlite3 ./cpe.sqlite3 'select cpe_uri from categorized_cpes' | peco
 
 # Usage:
 
-```
+```console
 $ go-cpe-dictionary -help
 Usage: go-cpe-dictionary <flags> <subcommand> <subcommand args>
 
@@ -88,13 +88,19 @@ Subcommands:
 	flags            describe all known top-level flags
 	help             describe subcommands and their syntax
 
+Subcommands for fetchjvn:
+	fetchjvn         Fetch CPE from JVN
+
 Subcommands for fetchnvd:
 	fetchnvd         Fetch CPE from NVD
+
+Subcommands for server:
+	server           Start CPE dictionary HTTP server
 
 
 Use "go-cpe-dictionary flags" for a list of top-level flags
 
-$ go-cpe-dictionary fetchnvd -help
+$ go-cpe-dictionary fetchnvd --help
 fetchnvd:
 	fetchnvd
 		[-dbtype=mysql|postgres|sqlite3|redis]
@@ -102,11 +108,14 @@ fetchnvd:
 		[-http-proxy=http://192.168.0.1:8080]
 		[-debug]
 		[-debug-sql]
+		[-log-to-file]
 		[-log-dir=/path/to/log]
 		[-log-json]
+		[-stdout]
 
 For the first time, run the blow command to fetch data. (It takes about 10 minutes)
-   $ go-cpe-dictionary fetchnvd
+   $ ./go-cpe-dictionary fetchnvd
+   $ ./go-cpe-dictionary fetchnvd --stdout | sort -u > /tmp/nvd.txt
   -dbpath string
     	/path/to/sqlite3 or SQL connection string (default "$PWD/cpe.sqlite3")
   -dbtype string
@@ -118,10 +127,84 @@ For the first time, run the blow command to fetch data. (It takes about 10 minut
   -http-proxy string
     	http://proxy-url:port (default: empty)
   -log-dir string
-    	/path/to/log (default "/var/log/vuls")
+    	/path/to/log (default "/var/log/go-cpe-dictionary")
   -log-json
     	output log as JSON
+  -log-to-file
+    	output log to file
+  -stdout
+    	display all CPEs to stdout
 
+$ go-cpe-dictionary fetchjvn --help
+fetchjvn:
+	fetchjvn
+		[-dbtype=mysql|postgres|sqlite3|redis]
+		[-dbpath=$PWD/cpe.sqlite3 or connection string]
+		[-http-proxy=http://192.168.0.1:8080]
+		[-debug]
+		[-log-to-file]
+		[-log-dir=/path/to/log]
+		[-log-json]
+
+   $ go-cpe-dictionary fetchjvn | sort -u > /tmp/jvn.txt
+  -dbpath string
+    	/path/to/sqlite3 or SQL connection string (default "$PWD/cpe.sqlite3")
+  -dbtype string
+    	Database type to store data in (sqlite3, mysql, postgres or redis supported) (default "sqlite3")
+  -debug
+    	debug mode
+  -debug-sql
+    	SQL debug mode
+  -http-proxy string
+    	http://proxy-url:port (default: empty)
+  -log-dir string
+    	/path/to/log (default "/var/log/go-cpe-dictionary")
+  -log-json
+    	output log as JSON
+  -log-to-file
+    	output log to file
+  -stdout
+    	display all CPEs to stdout
+
+$ go-cpe-dictionary server --help
+server:
+	server
+		[-bind=127.0.0.1]
+		[-port=8000]
+		[-dbtype=mysql|postgres|sqlite3|redis]
+		[-dbpath=$PWD/cpe.sqlite3 or connection string]
+		[-http-proxy=http://192.168.0.1:8080]
+		[-debug]
+		[-debug-sql]
+		[-log-to-file]
+		[-log-dir=/path/to/log]
+		[-log-json]
+		[-stdout]
+
+For the first time, run the blow command to fetch data. (It takes about 10 minutes)
+   $ ./go-cpe-dictionary server
+  -bind string
+    	HTTP server bind to IP address (default: loop back interface) (default "127.0.0.1")
+  -dbpath string
+    	/path/to/sqlite3 or SQL connection string (default "$PWD/cpe.sqlite3")
+  -dbtype string
+    	Database type to store data in (sqlite3, mysql, postgres or redis supported) (default "sqlite3")
+  -debug
+    	debug mode
+  -debug-sql
+    	SQL debug mode
+  -http-proxy string
+    	http://proxy-url:port (default: empty)
+  -log-dir string
+    	/path/to/log (default "/var/log/go-cpe-dictionary")
+  -log-json
+    	output log as JSON
+  -log-to-file
+    	output log to file
+  -port string
+    	HTTP server port number (default "1323")
+  -stdout
+    	display all CPEs to stdout
 ```
 
 ----
@@ -138,7 +221,7 @@ If your system is behind HTTP proxy, you have to specify --http-proxy option.
     ```
 
 - Debug  
-Run with --debug, --sql-debug option.
+Run with --debug, --debug-sql option.
 
 ----
 
