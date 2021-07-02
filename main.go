@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/kotakanbe/go-cpe-dictionary/commands"
+	"github.com/kotakanbe/go-cpe-dictionary/config"
 )
 
 // Name ... Name
@@ -31,7 +32,7 @@ func main() {
 	}
 
 	if *v {
-		fmt.Printf("%s %s %s\n", Name, version, revision)
+		fmt.Printf("%s %s %s\n", Name, config.Version, config.Revision)
 		os.Exit(0)
 	}
 
