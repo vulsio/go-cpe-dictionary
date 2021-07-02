@@ -70,7 +70,7 @@ if not os.path.isfile(list_path):
     exit(1)
 
 with open(list_path) as f:
-    list = [s.strip() for s in f.readlines()]
+    list = [s.strip().split("|", 1) for s in f.readlines()]
     with ThreadPoolExecutor() as executor:
-        ins = (e.split("|", 1) for e in list)
-        executor.map(diff_response, (ins[0], ins[1]))
+        ins = ((e[0], e[1]) for e in list)
+        executor.map(diff_response, ins)
