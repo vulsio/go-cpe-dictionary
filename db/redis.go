@@ -100,7 +100,7 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 }
 
 // InsertCpes Select Cve information from DB.
-func (r *RedisDriver) InsertCpes(_ models.CPEDBType, cpes []models.CategorizedCpe) (err error) {
+func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()

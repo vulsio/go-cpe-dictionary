@@ -16,7 +16,7 @@ type DB interface {
 
 	GetVendorProducts() ([]string, error)
 	GetCpesByVendorProduct(string, string) ([]string, []string, error)
-	InsertCpes(models.CPEDBType, []models.CategorizedCpe) error
+	InsertCpes([]models.CategorizedCpe) error
 	IsDeprecated(string) (bool, error)
 }
 

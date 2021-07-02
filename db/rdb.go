@@ -86,7 +86,7 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 
 	// TODO Is there a better way to use distinct with GORM? Needing
 	// explicit column names seems like an antipattern for an orm.
-	if err = r.conn.Select("DISTINCT vendor, product").Find(&models.CategorizedCpe{}).Scan(&results).Error; err != nil {
+	if err = r.conn.Select("DISTINCT vendor, product").Find(&models.CategorizedCpe{}).Scan(&results).Error; err != nil && err != gorm.ErrRecordNotFound {
 		return nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
 
@@ -100,7 +100,7 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []string, error) {
 	results := []models.CategorizedCpe{}
 	err := r.conn.Select("DISTINCT cpe_uri, deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error
-	if err != nil {
+	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
 	cpeURIs, deprecated := []string{}, []string{}
@@ -115,11 +115,11 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(fetchType models.CPEDBType, cpes []models.CategorizedCpe) error {
-	return r.deleteAndInsertCpes(r.conn, fetchType, cpes)
+func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
+	return r.deleteAndInsertCpes(r.conn, cpes)
 }
 
-func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.CPEDBType, cpes []models.CategorizedCpe) (err error) {
+func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.CategorizedCpe) (err error) {
 	bar := pb.StartNew(len(cpes))
 	tx := conn.Begin()
 	defer func() {
@@ -130,20 +130,13 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.CPEDBTyp
 		tx.Commit()
 	}()
 
-	if err := tx.Where(&models.CategorizedCpe{FetchType: fetchType}).Delete(models.CategorizedCpe{}).Error; err != nil {
-		return xerrors.Errorf("Failed to delete: %w", err)
-	}
-
 	for _, c := range cpes {
-		if err := tx.Create(&c).Error; err != nil {
+		if err := tx.FirstOrCreate(&c, models.CategorizedCpe{CpeURI: c.CpeURI}).Error; err != nil {
 			return fmt.Errorf("Failed to insert. cpe: %s, err: %s",
 				pp.Sprintf("%v", c), err)
 		}
 		bar.Increment()
 	}
-
-	// TODO:
-	// DELETE FROM categorized_cpes WHERE id NOT IN (SLECT id FROM (SELECT DISTINCT cpi_uri, deprecated FROM categorized_cpes));
 	bar.Finish()
 
 	return nil
