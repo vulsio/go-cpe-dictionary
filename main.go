@@ -10,15 +10,6 @@ import (
 	"github.com/kotakanbe/go-cpe-dictionary/config"
 )
 
-// Name ... Name
-const Name string = "go-cpe-dictionary"
-
-// Version ... Version
-var version = "`make build` or `make install` will show the version"
-
-// Revision of Git
-var revision string
-
 func main() {
 	var v = flag.Bool("v", false, "Show version")
 
@@ -32,7 +23,7 @@ func main() {
 	}
 
 	if *v {
-		fmt.Printf("%s %s %s\n", Name, config.Version, config.Revision)
+		fmt.Printf("go-cpe-dictionary %s %s\n", config.Version, config.Revision)
 		os.Exit(0)
 	}
 
