@@ -169,7 +169,7 @@ Run with --debug, --debug-sql option.
 
 # Authors
 
-kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created go-cpe-dictionary and [these fine people](https://github.com/future-architect/go-cpe-dictionary/graphs/contributors) have contributed.
+kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created go-cpe-dictionary and [these fine people](https://github.com/kotakanbe/go-cpe-dictionary/graphs/contributors) have contributed.
 
 ----
 
