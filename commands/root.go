@@ -63,7 +63,7 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".gost" (without extension).
+		// Search config in home directory with name ".go-cpe-dictionary" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".go-cpe-dictionary")
 	}
