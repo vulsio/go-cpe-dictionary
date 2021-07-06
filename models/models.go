@@ -4,7 +4,7 @@ package models
 // https://cpe.mitre.org/specification/CPE_2.3_for_ITSAC_Nov2011.pdf
 type CategorizedCpe struct {
 	ID              int64  `json:"-"`
-	CpeURI          string `gorm:"index:idx_categorized_cpe_cpe_uri"`
+	CpeURI          string `gorm:"unique;index:idx_categorized_cpe_cpe_uri"`
 	CpeFS           string
 	Part            string
 	Vendor          string `gorm:"index:idx_categorized_cpe_vendor"`

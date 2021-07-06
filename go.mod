@@ -5,17 +5,13 @@ go 1.16
 require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
 	github.com/alicebob/miniredis/v2 v2.14.1
-	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cheggaaa/pb/v3 v3.0.8
 	github.com/elazarl/goproxy v0.0.0-20200426045556-49ad98f6dac1 // indirect
 	github.com/fatih/color v1.12.0 // indirect
 	github.com/go-redis/redis/v8 v8.10.0
-	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac
-	github.com/jinzhu/gorm v1.9.16
-	github.com/k0kubun/colorstring v0.0.0-20150214042306-9440f1994b88 // indirect
-	github.com/k0kubun/pp v3.0.1+incompatible
+	github.com/jackc/pgproto3/v2 v2.1.0 // indirect
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
@@ -35,5 +31,9 @@ require (
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
+	gorm.io/driver/mysql v1.1.1
+	gorm.io/driver/postgres v1.1.0
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.21.11
 	moul.io/http2curl v1.0.0 // indirect
 )

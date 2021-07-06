@@ -1,21 +1,23 @@
 package db
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
+	"log"
+	"os"
+	"time"
 
 	"github.com/cheggaaa/pb/v3"
-	"github.com/jinzhu/gorm"
-	"github.com/k0kubun/pp"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"golang.org/x/xerrors"
-
-	// Required MySQL.  See http://jinzhu.me/gorm/database.html#connecting-to-a-database
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-
-	// Required SQLite3.
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 )
 
 // Supported DB dialects.
@@ -38,7 +40,33 @@ func (r *RDBDriver) Name() string {
 
 // OpenDB opens Database
 func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, err error) {
-	r.conn, err = gorm.Open(dbType, dbPath)
+	gormConfig := gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger:                                   logger.Default.LogMode(logger.Silent),
+	}
+
+	if debugSQL {
+		gormConfig.Logger = logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			logger.Config{
+				SlowThreshold: time.Second,
+				LogLevel:      logger.Info,
+				Colorful:      true,
+			},
+		)
+	}
+
+	switch r.name {
+	case dialectSqlite3:
+		r.conn, err = gorm.Open(sqlite.Open(dbPath), &gormConfig)
+	case dialectMysql:
+		r.conn, err = gorm.Open(mysql.Open(dbPath), &gormConfig)
+	case dialectPostgreSQL:
+		r.conn, err = gorm.Open(postgres.Open(dbPath), &gormConfig)
+	default:
+		err = xerrors.Errorf("Not Supported DB dialects. r.name: %s", r.name)
+	}
+
 	if err != nil {
 		msg := fmt.Sprintf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
 		if r.name == dialectSqlite3 {
@@ -49,7 +77,7 @@ func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, e
 		}
 		return false, fmt.Errorf(msg)
 	}
-	r.conn.LogMode(debugSQL)
+
 	if r.name == dialectSqlite3 {
 		r.conn.Exec("PRAGMA foreign_keys = ON")
 	}
@@ -61,7 +89,12 @@ func (r *RDBDriver) CloseDB() (err error) {
 	if r.conn == nil {
 		return
 	}
-	if err = r.conn.Close(); err != nil {
+
+	var sqlDB *sql.DB
+	if sqlDB, err = r.conn.DB(); err != nil {
+		return xerrors.Errorf("Failed to get DB Object. err : %w", err)
+	}
+	if err = sqlDB.Close(); err != nil {
 		return xerrors.Errorf("Failed to close DB. Type: %s. err: %w", r.name, err)
 	}
 	return
@@ -71,7 +104,7 @@ func (r *RDBDriver) CloseDB() (err error) {
 func (r *RDBDriver) MigrateDB() error {
 	if err := r.conn.AutoMigrate(
 		&models.CategorizedCpe{},
-	).Error; err != nil {
+	); err != nil {
 		return fmt.Errorf("Failed to migrate. err: %s", err)
 	}
 	return nil
@@ -86,7 +119,8 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 
 	// TODO Is there a better way to use distinct with GORM? Needing
 	// explicit column names seems like an antipattern for an orm.
-	if err = r.conn.Select("DISTINCT vendor, product").Find(&models.CategorizedCpe{}).Scan(&results).Error; err != nil && err != gorm.ErrRecordNotFound {
+	err = r.conn.Model(&models.CategorizedCpe{}).Distinct("vendor", "product").Find(&results).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
 
@@ -99,8 +133,8 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 // GetCpesByVendorProduct : GetCpesByVendorProduct
 func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []string, error) {
 	results := []models.CategorizedCpe{}
-	err := r.conn.Select("DISTINCT cpe_uri, deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
+	err := r.conn.Distinct("cpe_uri", "deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil, fmt.Errorf("Failed to select results. err: %s", err)
 	}
 	cpeURIs, deprecated := []string{}, []string{}
@@ -130,12 +164,14 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.Categorized
 		tx.Commit()
 	}()
 
-	for _, c := range cpes {
-		if err := tx.FirstOrCreate(&c, models.CategorizedCpe{CpeURI: c.CpeURI}).Error; err != nil {
-			return fmt.Errorf("Failed to insert. cpe: %s, err: %s",
-				pp.Sprintf("%v", c), err)
+	for chunked := range chunkSlice(cpes, 2000) {
+		if err := tx.Clauses(clause.OnConflict{
+			Columns:   []clause.Column{{Name: "cpe_uri"}},
+			DoNothing: true,
+		}).Create(&chunked).Error; err != nil {
+			return xerrors.Errorf("Failed to insert. err: %w", err)
 		}
-		bar.Increment()
+		bar.Add(len(chunked))
 	}
 	bar.Finish()
 
