@@ -167,7 +167,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.Categorized
 	for chunked := range chunkSlice(cpes, 2000) {
 		if err := tx.Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "cpe_uri"}},
-			DoNothing: true,
+			UpdateAll: true,
 		}).Create(&chunked).Error; err != nil {
 			return xerrors.Errorf("Failed to insert. err: %w", err)
 		}
