@@ -48,7 +48,7 @@ func fetchNvd(cmd *cobra.Command, args []string) (err error) {
 		}
 	} else {
 		for _, cpe := range cpes {
-			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%t\n",
+			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%t\n",
 				cpe.CpeURI,
 				cpe.CpeFS,
 				cpe.Part,
