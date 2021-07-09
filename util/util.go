@@ -15,8 +15,8 @@ import (
 	"github.com/cenkalti/backoff"
 	"github.com/inconshreveable/log15"
 	logger "github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 )
 
 // GenWorkers generate workers
@@ -42,7 +42,7 @@ func GetDefaultLogDir() string {
 }
 
 // SetLogger set logger
-func SetLogger(logDir string, debug, logJSON, logToFile bool) {
+func SetLogger(logDir string, debug, logJSON bool) {
 	stderrHandler := log15.StderrHandler
 	logFormat := log15.LogfmtFormat()
 	if logJSON {
@@ -55,30 +55,27 @@ func SetLogger(logDir string, debug, logJSON, logToFile bool) {
 		lvlHandler = log15.LvlFilterHandler(log15.LvlDebug, stderrHandler)
 	}
 
-	var handler logger.Handler
-	if logToFile {
-		if _, err := os.Stat(logDir); os.IsNotExist(err) {
-			if err := os.Mkdir(logDir, 0700); err != nil {
-				logger.Error("Failed to create a log directory", "err", err)
-			}
+	if _, err := os.Stat(logDir); os.IsNotExist(err) {
+		if err := os.Mkdir(logDir, 0700); err != nil {
+			log15.Error("Failed to create log directory", "err", err)
 		}
-		if _, err := os.Stat(logDir); err == nil {
-			logPath := filepath.Join(logDir, "cve-dictionary.log")
-			if err := ioutil.WriteFile(logPath, []byte{}, 0700); err != nil {
-				logger.Error("Failed to create a log file", "err", err)
-				handler = lvlHandler
-			} else {
-				handler = logger.MultiHandler(
-					logger.Must.FileHandler(logPath, logFormat),
-					lvlHandler,
-				)
-			}
-
+	}
+	var handler log15.Handler
+	if _, err := os.Stat(logDir); err == nil {
+		logPath := filepath.Join(logDir, "go-cpe-dictionary.log")
+		if _, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644); err != nil {
+			log15.Error("Failed to create a log file", "err", err)
+			handler = lvlHandler
+		} else {
+			handler = log15.MultiHandler(
+				log15.Must.FileHandler(logPath, logFormat),
+				lvlHandler,
+			)
 		}
 	} else {
 		handler = lvlHandler
 	}
-	logger.Root().SetHandler(handler)
+	log15.Root().SetHandler(handler)
 }
 
 // GetYearsUntilThisYear : GetYearsUntilThisYear
@@ -101,7 +98,7 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 	var resp *http.Response
 	f := func() (err error) {
 		log15.Info("Fetching...", "URL", url)
-		resp, body, errs = gorequest.New().Timeout(60 * time.Second).Proxy(config.Conf.HTTPProxy).Get(url).End()
+		resp, body, errs = gorequest.New().Timeout(60 * time.Second).Proxy(viper.GetString("http-proxy")).Get(url).End()
 		defer func() {
 			if resp != nil && resp.Body != nil {
 				resp.Body.Close()

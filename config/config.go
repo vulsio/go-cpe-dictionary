@@ -1,40 +1,7 @@
 package config
 
-import (
-	"fmt"
+// Version of go-cpe-dictionary
+var Version = "`make build` or `make install` will show the version"
 
-	valid "github.com/asaskevich/govalidator"
-	"github.com/inconshreveable/log15"
-)
-
-// Conf has Configuration
-var Conf Config
-
-// Config has config
-type Config struct {
-	Debug    bool
-	DebugSQL bool
-
-	DBPath string
-	DBType string
-
-	Bind string `valid:"ipv4"`
-	Port string `valid:"port"`
-
-	Stdout bool
-
-	//TODO Validator
-	HTTPProxy string
-}
-
-// Validate validates configuration
-// TODO test case
-func (c *Config) Validate() bool {
-	if c.DBType == "sqlite3" {
-		if ok, _ := valid.IsFilePath(c.DBPath); !ok {
-			log15.Crit(fmt.Sprintf("--dbpath : %s is not valid *Absolute* file path", c.DBPath))
-			return false
-		}
-	}
-	return true
-}
+// Revision of Git
+var Revision string

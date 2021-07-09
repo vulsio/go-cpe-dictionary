@@ -1,4 +1,4 @@
-package nvd
+package fetcher
 
 import (
 	"bytes"
@@ -10,15 +10,13 @@ import (
 	"math"
 	"time"
 
-	"github.com/cheggaaa/pb/v3"
 	"github.com/inconshreveable/log15"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
-	"github.com/kotakanbe/go-cpe-dictionary/config"
-	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/kotakanbe/go-cpe-dictionary/util"
 	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 )
 
 // CpeDictionary has cpe-item list
@@ -47,34 +45,43 @@ type V3Feed struct {
 	} `json:"CVE_Items"`
 }
 
-// FetchAndInsertCPE : FetchAndInsertCPE
-func FetchAndInsertCPE() ([]models.CategorizedCpe, error) {
-	driver, err := db.NewDB(config.Conf.DBType, config.Conf.DBPath, config.Conf.DebugSQL)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to new DB. err : %s", err)
-	}
-	defer func() {
-		_ = driver.CloseDB()
-	}()
+// FetchNVD NVD feeds
+func FetchNVD() ([]models.CategorizedCpe, error) {
+	cpeURIs := map[string]models.CategorizedCpe{}
 
-	cpes, err := FetchAndInsertCpeDictionary(driver)
+	dictCpes, err := FetchCpeDictionary()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch cpe dictionary. err : %s", err)
 	}
+	for _, c := range dictCpes {
+		if _, ok := cpeURIs[c.CpeURI]; !ok {
+			cpeURIs[c.CpeURI] = c
+		}
+	}
 
-	jsonCpes, err := FetchAndInsertJSONFeed(driver)
+	jsonCpes, err := FetchJSONFeed()
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch nvd JSON feed. err : %s", err)
 	}
-	cpes = append(cpes, jsonCpes...)
-	return cpes, nil
+	for _, c := range jsonCpes {
+		if _, ok := cpeURIs[c.CpeURI]; !ok {
+			cpeURIs[c.CpeURI] = c
+		}
+	}
+
+	allCpes := []models.CategorizedCpe{}
+	for _, c := range cpeURIs {
+		allCpes = append(allCpes, c)
+	}
+
+	return allCpes, nil
 }
 
-// FetchAndInsertCpeDictionary : FetchCPE
-func FetchAndInsertCpeDictionary(driver db.DB) ([]models.CategorizedCpe, error) {
+// FetchCpeDictionary : FetchCpeDictionary
+func FetchCpeDictionary() ([]models.CategorizedCpe, error) {
 	url := "http://nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
 	log15.Info("Fetching...", "URL", url)
-	resp, body, errs := gorequest.New().Proxy(config.Conf.HTTPProxy).Get(url).End()
+	resp, body, errs := gorequest.New().Proxy(viper.GetString("http-proxy")).Get(url).End()
 	if len(errs) > 0 || resp.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
 	}
@@ -98,20 +105,15 @@ func FetchAndInsertCpeDictionary(driver db.DB) ([]models.CategorizedCpe, error) 
 	}
 
 	var cpes []models.CategorizedCpe
-	if cpes, err = ConvertNvdCpeDictionaryToModel(cpeDictionary); err != nil {
+	if cpes, err = convertNvdCpeDictionaryToModel(cpeDictionary); err != nil {
 		return nil, err
 	}
 
-	if !config.Conf.Stdout {
-		if err = driver.InsertCpes(cpes); err != nil {
-			return nil, fmt.Errorf("Failed to insert cpes. err : %s", err)
-		}
-	}
 	return cpes, nil
 }
 
-// FetchAndInsertJSONFeed : FetchAndInsertJSONFeed
-func FetchAndInsertJSONFeed(driver db.DB) ([]models.CategorizedCpe, error) {
+// FetchJSONFeed : FetchJSONFeed
+func FetchJSONFeed() ([]models.CategorizedCpe, error) {
 	startYear := 2002
 	years, err := util.GetYearsUntilThisYear(startYear)
 	if err != nil {
@@ -119,29 +121,23 @@ func FetchAndInsertJSONFeed(driver db.DB) ([]models.CategorizedCpe, error) {
 	}
 
 	allCpes := []models.CategorizedCpe{}
-	urlBlocks := MakeFeedURLBlocks(years, 2)
+	urlBlocks := makeFeedURLBlocks(years, 2)
 	for _, urls := range urlBlocks {
 		nvds, err := fetchFeedFileConcurrently(urls)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
 		}
-		cpes, err := ConvertNvdV3FeedToModel(nvds)
+		cpes, err := convertNvdV3FeedToModel(nvds)
 		if err != nil {
 			return nil, err
 		}
 		allCpes = append(allCpes, cpes...)
-
-		if !config.Conf.Stdout {
-			if err = driver.InsertCpes(cpes); err != nil {
-				return nil, fmt.Errorf("Failed to insert cpes. err : %s", err)
-			}
-		}
 	}
 	return allCpes, nil
 }
 
-// MakeFeedURLBlocks : MakeFeedURLBlocks
-func MakeFeedURLBlocks(years []int, n int) (urlBlocks [][]string) {
+// makeFeedURLBlocks : makeFeedURLBlocks
+func makeFeedURLBlocks(years []int, n int) (urlBlocks [][]string) {
 	//  http://nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2016.xml.gz
 	formatTemplate := "https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-%d.json.gz"
 	blockNum := int(math.Ceil(float64(len(years)) / float64(n)))
@@ -192,8 +188,6 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 	}
 
 	errs := []error{}
-	bar := pb.New(len(urls))
-	bar.Start()
 	timeout := time.After(10 * 60 * time.Second)
 	for range urls {
 		select {
@@ -204,10 +198,7 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 		case <-timeout:
 			return nvds, fmt.Errorf("Timeout Fetching Nvd")
 		}
-		bar.Increment()
 	}
-	bar.Finish()
-	//  bar.FinishPrint("Finished to fetch CVE information from JVN.")
 	if 0 < len(errs) {
 		return nvds, fmt.Errorf("%s", errs)
 	}
@@ -225,8 +216,8 @@ func fetchFeedFile(url string) (nvd *V3Feed, err error) {
 	return nvd, nil
 }
 
-// ConvertNvdCpeDictionaryToModel :
-func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.CategorizedCpe, err error) {
+// convertNvdCpeDictionaryToModel :
+func convertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.CategorizedCpe, err error) {
 	for _, item := range nvd.Items {
 		var wfn common.WellFormedName
 		if wfn, err = naming.UnbindFS(item.Cpe23Item.Name); err != nil {
@@ -254,8 +245,8 @@ func ConvertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.Categorize
 	return cpes, nil
 }
 
-// ConvertNvdV3FeedToModel :
-func ConvertNvdV3FeedToModel(nvds []V3Feed) (cpes []models.CategorizedCpe, err error) {
+// convertNvdV3FeedToModel :
+func convertNvdV3FeedToModel(nvds []V3Feed) (cpes []models.CategorizedCpe, err error) {
 	for _, nvd := range nvds {
 		for _, item := range nvd.CVEItems {
 			for _, node := range item.Configurations.Nodes {

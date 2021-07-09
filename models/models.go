@@ -1,18 +1,14 @@
 package models
 
-import (
-	"github.com/jinzhu/gorm"
-)
-
 // CategorizedCpe :
 // https://cpe.mitre.org/specification/CPE_2.3_for_ITSAC_Nov2011.pdf
 type CategorizedCpe struct {
-	gorm.Model      `json:"-" xml:"-"`
-	CpeURI          string
+	ID              int64  `json:"-"`
+	CpeURI          string `gorm:"index:idx_categorized_cpe_cpe_uri"`
 	CpeFS           string
 	Part            string
-	Vendor          string
-	Product         string
+	Vendor          string `gorm:"index:idx_categorized_cpe_vendor"`
+	Product         string `gorm:"index:idx_categorized_cpe_product"`
 	Version         string
 	Update          string
 	Edition         string
