@@ -2,10 +2,10 @@ package models
 
 import "gorm.io/gorm"
 
-// LatestSchemaVersion manages the Schema version used in the latest go-osv.
-const LatestSchemaVersion = 1
+// LatestSchemaVersion manages the Schema version used in the latest go-cpe-dictionary.
+const LatestSchemaVersion = 2
 
-// FetchMeta has meta infomation about fetched security tracker
+// FetchMeta has meta infomation about fetched data
 type FetchMeta struct {
 	gorm.Model        `json:"-"`
 	GoCPEDictRevision string
