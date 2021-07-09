@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
+	"github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"golang.org/x/xerrors"
@@ -16,7 +17,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 	"gorm.io/gorm/logger"
 )
 
@@ -103,11 +103,56 @@ func (r *RDBDriver) CloseDB() (err error) {
 // MigrateDB migrates Database
 func (r *RDBDriver) MigrateDB() error {
 	if err := r.conn.AutoMigrate(
+		&models.FetchMeta{},
 		&models.CategorizedCpe{},
 	); err != nil {
 		return fmt.Errorf("Failed to migrate. err: %s", err)
 	}
 	return nil
+}
+
+// IsGoCPEDictModelV1 determines if the DB was created at the time of go-cpe-dictionary Model v1
+func (r *RDBDriver) IsGoCPEDictModelV1() (bool, error) {
+	if r.conn.Migrator().HasTable(&models.FetchMeta{}) {
+		return false, nil
+	}
+
+	var (
+		count int64
+		err   error
+	)
+	switch r.name {
+	case dialectSqlite3:
+		err = r.conn.Table("sqlite_master").Where("type = ?", "table").Count(&count).Error
+	case dialectMysql:
+		err = r.conn.Table("information_schema.tables").Where("table_schema = ?", r.conn.Migrator().CurrentDatabase()).Count(&count).Error
+	case dialectPostgreSQL:
+		err = r.conn.Table("pg_tables").Where("schemaname = ?", "public").Count(&count).Error
+	}
+
+	if count > 0 {
+		return true, nil
+	}
+	return false, err
+}
+
+// GetFetchMeta get FetchMeta from Database
+func (r *RDBDriver) GetFetchMeta() (fetchMeta *models.FetchMeta, err error) {
+	if err = r.conn.Take(&fetchMeta).Error; err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, err
+		}
+		return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion}, nil
+	}
+
+	return fetchMeta, nil
+}
+
+// UpsertFetchMeta upsert FetchMeta to Database
+func (r *RDBDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
+	fetchMeta.GoCPEDictRevision = config.Revision
+	fetchMeta.SchemaVersion = models.LatestSchemaVersion
+	return r.conn.Save(fetchMeta).Error
 }
 
 // GetVendorProducts : GetVendorProducts
@@ -149,11 +194,11 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(cpes []models.CategorizedCpe) error {
-	return r.deleteAndInsertCpes(r.conn, cpes)
+func (r *RDBDriver) InsertCpes(fetchType models.FetchType, cpes []models.CategorizedCpe) error {
+	return r.deleteAndInsertCpes(r.conn, fetchType, cpes)
 }
 
-func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.CategorizedCpe) (err error) {
+func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchType, cpes []models.CategorizedCpe) (err error) {
 	bar := pb.StartNew(len(cpes))
 	tx := conn.Begin()
 	defer func() {
@@ -164,14 +209,26 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, cpes []models.Categorized
 		tx.Commit()
 	}()
 
-	for chunked := range chunkSlice(cpes, 2000) {
-		if err := tx.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "cpe_uri"}},
-			UpdateAll: true,
-		}).Create(&chunked).Error; err != nil {
+	// Delete all old records
+	oldIDs := []int64{}
+	result := tx.Model(models.CategorizedCpe{}).Select("id").Where("fetch_type = ?", fetchType).Find(&oldIDs)
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return xerrors.Errorf("Failed to select old defs: %w", result.Error)
+	}
+
+	if result.RowsAffected > 0 {
+		for idx := range chunkSlice(len(oldIDs), 10000) {
+			if err := tx.Where("id IN ?", oldIDs[idx.From:idx.To]).Delete(&models.CategorizedCpe{}).Error; err != nil {
+				return xerrors.Errorf("Failed to delete: %w", err)
+			}
+		}
+	}
+
+	for idx := range chunkSlice(len(cpes), 2000) {
+		if err := tx.Create(cpes[idx.From:idx.To]).Error; err != nil {
 			return xerrors.Errorf("Failed to insert. err: %w", err)
 		}
-		bar.Add(len(chunked))
+		bar.Add(idx.To - idx.From)
 	}
 	bar.Finish()
 
