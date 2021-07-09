@@ -19,12 +19,13 @@ import (
 )
 
 // GenWorkers generate workers
-func GenWorkers(num int) chan<- func() {
+func GenWorkers(num, wait int) chan<- func() {
 	tasks := make(chan func())
 	for i := 0; i < num; i++ {
 		go func() {
 			for f := range tasks {
 				f()
+				time.Sleep(time.Duration(wait) * time.Second)
 			}
 		}()
 	}

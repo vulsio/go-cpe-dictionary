@@ -7,7 +7,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"time"
 
 	"github.com/inconshreveable/log15"
@@ -121,43 +120,29 @@ func FetchJSONFeed() ([]models.CategorizedCpe, error) {
 	}
 
 	allCpes := []models.CategorizedCpe{}
-	urlBlocks := makeFeedURLBlocks(years, 2)
-	for _, urls := range urlBlocks {
-		nvds, err := fetchFeedFileConcurrently(urls)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
-		}
-		cpes, err := convertNvdV3FeedToModel(nvds)
-		if err != nil {
-			return nil, err
-		}
-		allCpes = append(allCpes, cpes...)
+	urls := makeFeedURLBlocks(years)
+	nvds, err := fetchNVDFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
 	}
+	cpes, err := convertNvdV3FeedToModel(nvds)
+	if err != nil {
+		return nil, err
+	}
+	allCpes = append(allCpes, cpes...)
 	return allCpes, nil
 }
 
 // makeFeedURLBlocks : makeFeedURLBlocks
-func makeFeedURLBlocks(years []int, n int) (urlBlocks [][]string) {
-	//  http://nvd.nist.gov/feeds/xml/cve/nvdcve-2.0-2016.xml.gz
+func makeFeedURLBlocks(years []int) (urls []string) {
 	formatTemplate := "https://nvd.nist.gov/feeds/json/cve/1.1/nvdcve-1.1-%d.json.gz"
-	blockNum := int(math.Ceil(float64(len(years)) / float64(n)))
-	urlBlocks = make([][]string, blockNum, blockNum)
-	var i int
-	for j := range urlBlocks {
-		var urls []string
-		for k := 0; k < n; k++ {
-			urls = append(urls, fmt.Sprintf(formatTemplate, years[i]))
-			i++
-			if len(years) <= i {
-				break
-			}
-		}
-		urlBlocks[j] = urls
+	for _, year := range years {
+		urls = append(urls, fmt.Sprintf(formatTemplate, year))
 	}
-	return urlBlocks
+	return urls
 }
 
-func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
+func fetchNVDFeedFileConcurrently(urls []string, concurrency, wait int) (nvds []V3Feed, err error) {
 	reqChan := make(chan string, len(urls))
 	resChan := make(chan V3Feed, len(urls))
 	errChan := make(chan error, len(urls))
@@ -171,13 +156,12 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 		}
 	}()
 
-	concurrency := len(urls)
-	tasks := util.GenWorkers(concurrency)
+	tasks := util.GenWorkers(concurrency, wait)
 	for range urls {
 		tasks <- func() {
 			select {
 			case url := <-reqChan:
-				nvd, err := fetchFeedFile(url)
+				nvd, err := fetchNVDFeedFile(url)
 				if err != nil {
 					errChan <- err
 					return
@@ -205,7 +189,7 @@ func fetchFeedFileConcurrently(urls []string) (nvds []V3Feed, err error) {
 	return nvds, nil
 }
 
-func fetchFeedFile(url string) (nvd *V3Feed, err error) {
+func fetchNVDFeedFile(url string) (nvd *V3Feed, err error) {
 	bytes, err := util.FetchFeedFile(url, true)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch. url: %s, err: %s", url, err)

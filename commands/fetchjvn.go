@@ -24,6 +24,12 @@ func init() {
 
 	fetchJvnCmd.PersistentFlags().Bool("stdout", false, "display all CPEs to stdout")
 	_ = viper.BindPFlag("stdout", fetchJvnCmd.PersistentFlags().Lookup("stdout"))
+
+	fetchJvnCmd.PersistentFlags().Int("wait", 0, "Interval between fetch (seconds)")
+	_ = viper.BindPFlag("wait", fetchJvnCmd.PersistentFlags().Lookup("wait"))
+
+	fetchJvnCmd.PersistentFlags().Int("threads", 5, "The number of threads to be used")
+	_ = viper.BindPFlag("threads", fetchJvnCmd.PersistentFlags().Lookup("threads"))
 }
 
 func fetchJvn(cmd *cobra.Command, args []string) (err error) {
