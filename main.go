@@ -14,10 +14,7 @@ func main() {
 	var v = flag.Bool("v", false, "Show version")
 
 	if envArgs := os.Getenv("GO_CPE_DICTIONARY_ARGS"); 0 < len(envArgs) {
-		if err := flag.CommandLine.Parse(strings.Fields(envArgs)); err != nil {
-			fmt.Printf("Failed to get ENV Vars: %s", err)
-			os.Exit(1)
-		}
+		commands.RootCmd.SetArgs(strings.Fields(envArgs))
 	} else {
 		flag.Parse()
 	}
