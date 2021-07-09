@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"github.com/inconshreveable/log15"
 	logger "github.com/inconshreveable/log15"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
@@ -43,39 +42,39 @@ func GetDefaultLogDir() string {
 
 // SetLogger set logger
 func SetLogger(logDir string, debug, logJSON bool) {
-	stderrHundler := log15.StderrHandler
-	logFormat := log15.LogfmtFormat()
+	stderrHandler := logger.StderrHandler
+	logFormat := logger.LogfmtFormat()
 	if logJSON {
-		logFormat = log15.JsonFormatEx(false, true)
-		stderrHundler = log15.StreamHandler(os.Stderr, logFormat)
+		logFormat = logger.JsonFormatEx(false, true)
+		stderrHandler = logger.StreamHandler(os.Stderr, logFormat)
 	}
 
-	lvlHundler := log15.LvlFilterHandler(log15.LvlInfo, stderrHundler)
+	lvlHandler := logger.LvlFilterHandler(logger.LvlInfo, stderrHandler)
 	if debug {
-		lvlHundler = log15.LvlFilterHandler(log15.LvlDebug, stderrHundler)
+		lvlHandler = logger.LvlFilterHandler(logger.LvlDebug, stderrHandler)
 	}
 
 	if _, err := os.Stat(logDir); os.IsNotExist(err) {
 		if err := os.Mkdir(logDir, 0700); err != nil {
-			log15.Error("Failed to create log directory", "err", err)
+			logger.Error("Failed to create log directory", "err", err)
 		}
 	}
-	var hundler log15.Handler
+	var handler logger.Handler
 	if _, err := os.Stat(logDir); err == nil {
 		logPath := filepath.Join(logDir, "go-cpe-dictionary.log")
 		if _, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644); err != nil {
-			log15.Error("Failed to create a log file", "err", err)
-			hundler = lvlHundler
+			logger.Error("Failed to create a log file", "err", err)
+			handler = lvlHandler
 		} else {
-			hundler = log15.MultiHandler(
-				log15.Must.FileHandler(logPath, logFormat),
-				lvlHundler,
+			handler = logger.MultiHandler(
+				logger.Must.FileHandler(logPath, logFormat),
+				lvlHandler,
 			)
 		}
 	} else {
-		hundler = lvlHundler
+		handler = lvlHandler
 	}
-	log15.Root().SetHandler(hundler)
+	logger.Root().SetHandler(handler)
 }
 
 // GetYearsUntilThisYear : GetYearsUntilThisYear
@@ -97,7 +96,7 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 	var errs []error
 	var resp *http.Response
 	f := func() (err error) {
-		log15.Info("Fetching...", "URL", url)
+		logger.Info("Fetching...", "URL", url)
 		resp, body, errs = gorequest.New().Timeout(60 * time.Second).Proxy(viper.GetString("http-proxy")).Get(url).End()
 		defer func() {
 			if resp != nil && resp.Body != nil {
