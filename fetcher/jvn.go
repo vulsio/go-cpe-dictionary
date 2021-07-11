@@ -44,7 +44,7 @@ func FetchJVN() ([]models.CategorizedCpe, error) {
 	}
 	for _, rdf := range rdfs {
 		for _, item := range rdf.Items {
-			cpes, err := convertJvnCpesToModel(item.Cpes)
+			cpes, err := convertJvnCpesToModel(item.Cpes, viper.GetInt("threads"), viper.GetInt("wait"))
 			if err != nil {
 				return nil, fmt.Errorf("Failed to convert. err: %s", err)
 			}
@@ -145,7 +145,61 @@ func fetchJVNFeedFile(url string) (rdf *rdf, err error) {
 	return rdf, nil
 }
 
-func convertJvnCpesToModel(jvnCpes []cpe) (cpes []models.CategorizedCpe, err error) {
+func convertJvnCpesToModel(jvnCpes []cpe, concurrency, wait int) (cpes []models.CategorizedCpe, err error) {
+	blockJVNCpes := [][]cpe{}
+	for i := 0; i < len(jvnCpes); i += concurrency {
+		end := i + concurrency
+		if len(jvnCpes) < end {
+			end = len(jvnCpes)
+		}
+		blockJVNCpes = append(blockJVNCpes, jvnCpes[i:end])
+	}
+
+	reqChan := make(chan []cpe, len(jvnCpes))
+	resChan := make(chan []models.CategorizedCpe, len(jvnCpes))
+	errChan := make(chan error)
+	defer close(reqChan)
+	defer close(resChan)
+	defer close(errChan)
+
+	go func() {
+		for _, blockJvnCpe := range blockJVNCpes {
+			reqChan <- blockJvnCpe
+		}
+	}()
+
+	tasks := util.GenWorkers(concurrency, wait)
+	for range blockJVNCpes {
+		tasks <- func() {
+			req := <-reqChan
+			cpes, err := convertJvnCpes(req)
+			if err != nil {
+				errChan <- err
+				return
+			}
+			resChan <- cpes
+		}
+	}
+
+	errs := []error{}
+	timeout := time.After(10 * 60 * time.Second)
+	for range blockJVNCpes {
+		select {
+		case res := <-resChan:
+			cpes = append(cpes, res...)
+		case err := <-errChan:
+			errs = append(errs, err)
+		case <-timeout:
+			return nil, fmt.Errorf("Timeout Converting")
+		}
+	}
+	if 0 < len(errs) {
+		return nil, fmt.Errorf("%s", errs)
+	}
+	return cpes, nil
+}
+
+func convertJvnCpes(jvnCpes []cpe) (cpes []models.CategorizedCpe, err error) {
 	for _, c := range jvnCpes {
 		var wfn common.WellFormedName
 		if wfn, err = naming.UnbindURI(c.Value); err != nil {

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"runtime"
 
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
@@ -28,7 +29,7 @@ func init() {
 	fetchNvdCmd.PersistentFlags().Int("wait", 0, "Interval between fetch (seconds)")
 	_ = viper.BindPFlag("wait", fetchNvdCmd.PersistentFlags().Lookup("wait"))
 
-	fetchNvdCmd.PersistentFlags().Int("threads", 5, "The number of threads to be used")
+	fetchNvdCmd.PersistentFlags().Int("threads", runtime.NumCPU(), "The number of threads to be used")
 	_ = viper.BindPFlag("threads", fetchNvdCmd.PersistentFlags().Lookup("threads"))
 }
 
