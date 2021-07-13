@@ -10,8 +10,8 @@ import (
 // fetchCmd represents the fetch command
 var fetchCmd = &cobra.Command{
 	Use:   "fetch",
-	Short: "Fetch the data of exploit",
-	Long:  `Fetch the data of exploit`,
+	Short: "Fetch the data of CPE",
+	Long:  `Fetch the data of CPE`,
 }
 
 func init() {
