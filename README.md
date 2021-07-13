@@ -56,7 +56,7 @@ $ make install
 Fetch CPE data from NVD. It takes about 1 minutes.  
 
 ```bash
-$ go-cpe-dictionary fetchnvd
+$ go-cpe-dictionary fetch nvd
 ... snip ...
 $ ls -alh cpe.sqlite3
 -rw-r--r-- 1 ec2-user ec2-user 7.0M Mar 24 13:20 cpe.sqlite3
@@ -80,15 +80,21 @@ $ sqlite3 ./cpe.sqlite3 'select cpe_uri from categorized_cpes' | peco
 # Usage:
 
 ```console
-$ go-cpe-dictionary fetchnvd --help
-Fetch CPE from NVD
+$ go-cpe-dictionary fetch --help
+Fetch the data of CPE
 
 Usage:
-  go-cpe-dictionary fetchnvd [flags]
+  go-cpe-dictionary fetch [command]
+
+Available Commands:
+  jvn         Fetch CPE from JVN
+  nvd         Fetch CPE from NVD
 
 Flags:
-  -h, --help     help for fetchnvd
-      --stdout   display all CPEs to stdout
+  -h, --help          help for fetch
+      --stdout        display all CPEs to stdout
+      --threads int   The number of threads to be used (default 4)
+      --wait int      Interval between fetch (seconds)
 
 Global Flags:
       --config string       config file (default is $HOME/.go-cpe-dictionary.yaml)
@@ -100,25 +106,7 @@ Global Flags:
       --log-dir string      /path/to/log (default "/var/log/go-cpe-dictionary")
       --log-json            output log as JSON
 
-$ go-cpe-dictionary fetchjvn --help
-Fetch CPE from JVN
-
-Usage:
-  go-cpe-dictionary fetchjvn [flags]
-
-Flags:
-  -h, --help     help for fetchjvn
-      --stdout   display all CPEs to stdout
-
-Global Flags:
-      --config string       config file (default is $HOME/.go-cpe-dictionary.yaml)
-      --dbpath string       /path/to/sqlite3 or SQL connection string (default "$PWD/cpe.sqlite3")
-      --dbtype string       Database type to store data in (sqlite3, mysql, postgres or redis supported) (default "sqlite3")
-      --debug               debug mode (default: false)
-      --debug-sql           SQL debug mode
-      --http-proxy string   http://proxy-url:port (default: empty)
-      --log-dir string      /path/to/log (default "/var/log/go-cpe-dictionary")
-      --log-json            output log as JSON
+Use "go-cpe-dictionary fetch [command] --help" for more information about a command.
 
 $ go-cpe-dictionary server --help
 Start CPE dictionary HTTP server
