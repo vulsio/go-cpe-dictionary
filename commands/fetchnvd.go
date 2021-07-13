@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"runtime"
 
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
@@ -14,23 +13,14 @@ import (
 )
 
 var fetchNvdCmd = &cobra.Command{
-	Use:   "fetchnvd",
+	Use:   "nvd",
 	Short: "Fetch CPE from NVD",
 	Long:  "Fetch CPE from NVD",
 	RunE:  fetchNvd,
 }
 
 func init() {
-	RootCmd.AddCommand(fetchNvdCmd)
-
-	fetchNvdCmd.PersistentFlags().Bool("stdout", false, "display all CPEs to stdout")
-	_ = viper.BindPFlag("stdout", fetchNvdCmd.PersistentFlags().Lookup("stdout"))
-
-	fetchNvdCmd.PersistentFlags().Int("wait", 0, "Interval between fetch (seconds)")
-	_ = viper.BindPFlag("wait", fetchNvdCmd.PersistentFlags().Lookup("wait"))
-
-	fetchNvdCmd.PersistentFlags().Int("threads", runtime.NumCPU(), "The number of threads to be used")
-	_ = viper.BindPFlag("threads", fetchNvdCmd.PersistentFlags().Lookup("threads"))
+	fetchCmd.AddCommand(fetchNvdCmd)
 }
 
 func fetchNvd(cmd *cobra.Command, args []string) (err error) {

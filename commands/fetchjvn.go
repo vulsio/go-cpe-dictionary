@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"runtime"
 
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/db"
@@ -14,23 +13,14 @@ import (
 )
 
 var fetchJvnCmd = &cobra.Command{
-	Use:   "fetchjvn",
+	Use:   "jvn",
 	Short: "Fetch CPE from JVN",
 	Long:  "Fetch CPE from JVN",
 	RunE:  fetchJvn,
 }
 
 func init() {
-	RootCmd.AddCommand(fetchJvnCmd)
-
-	fetchJvnCmd.PersistentFlags().Bool("stdout", false, "display all CPEs to stdout")
-	_ = viper.BindPFlag("stdout", fetchJvnCmd.PersistentFlags().Lookup("stdout"))
-
-	fetchJvnCmd.PersistentFlags().Int("wait", 0, "Interval between fetch (seconds)")
-	_ = viper.BindPFlag("wait", fetchJvnCmd.PersistentFlags().Lookup("wait"))
-
-	fetchJvnCmd.PersistentFlags().Int("threads", runtime.NumCPU(), "The number of threads to be used")
-	_ = viper.BindPFlag("threads", fetchJvnCmd.PersistentFlags().Lookup("threads"))
+	fetchCmd.AddCommand(fetchJvnCmd)
 }
 
 func fetchJvn(cmd *cobra.Command, args []string) (err error) {
