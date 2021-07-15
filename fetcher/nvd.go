@@ -210,6 +210,7 @@ func convertNvdCpeDictionaryToModel(nvd CpeDictionary) (cpes []models.Categorize
 			continue
 		}
 		cpes = append(cpes, models.CategorizedCpe{
+			FetchType:       models.NVD,
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),
@@ -241,6 +242,7 @@ func convertNvdV3FeedToModel(nvds []V3Feed) (cpes []models.CategorizedCpe, err e
 						continue
 					}
 					cpes = append(cpes, models.CategorizedCpe{
+						FetchType:       models.NVD,
 						CpeURI:          naming.BindToURI(wfn),
 						CpeFS:           naming.BindToFS(wfn),
 						Part:            wfn.GetString(common.AttributePart),
