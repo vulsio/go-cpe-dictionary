@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
+	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/config"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
 	sqlite3 "github.com/mattn/go-sqlite3"
@@ -199,7 +200,6 @@ func (r *RDBDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categor
 }
 
 func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchType, cpes []models.CategorizedCpe) (err error) {
-	bar := pb.StartNew(len(cpes))
 	tx := conn.Begin()
 	defer func() {
 		if err != nil {
@@ -217,6 +217,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	}
 
 	if result.RowsAffected > 0 {
+		log15.Info(fmt.Sprintf("Deleting records that match fetch_type = %s from your DB. This will take some time.", fetchType))
 		for idx := range chunkSlice(len(oldIDs), 10000) {
 			if err := tx.Where("id IN ?", oldIDs[idx.From:idx.To]).Delete(&models.CategorizedCpe{}).Error; err != nil {
 				return xerrors.Errorf("Failed to delete: %w", err)
@@ -224,6 +225,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 		}
 	}
 
+	bar := pb.StartNew(len(cpes))
 	for idx := range chunkSlice(len(cpes), 2000) {
 		if err := tx.Create(cpes[idx.From:idx.To]).Error; err != nil {
 			return xerrors.Errorf("Failed to insert. err: %w", err)
