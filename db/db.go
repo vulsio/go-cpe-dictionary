@@ -41,7 +41,7 @@ func NewDB(dbType string, dbPath string, debugSQL bool) (driver DB, locked bool,
 
 	isV1, err := driver.IsGoCPEDictModelV1()
 	if err != nil {
-		log15.Error("Failed to IsGoOSVModelV1.", "err", err)
+		log15.Error("Failed to IsGoCPEDictModelV1.", "err", err)
 		return nil, false, err
 	}
 	if isV1 {
