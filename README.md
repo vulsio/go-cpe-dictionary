@@ -115,9 +115,9 @@ Usage:
   go-cpe-dictionary server [flags]
 
 Flags:
-      --bind string   HTTP server bind to IP address (default: loop back interface (default "127.0.0.1")
+      --bind string   HTTP server bind to IP address (default "127.0.0.1")
   -h, --help          help for server
-      --port string   HTTP server port number (default: 1328 (default "1328")
+      --port string   HTTP server port number (default "1328")
 
 Global Flags:
       --config string       config file (default is $HOME/.go-cpe-dictionary.yaml)
