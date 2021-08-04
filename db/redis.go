@@ -9,6 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/inconshreveable/log15"
 	"github.com/kotakanbe/go-cpe-dictionary/models"
+	"github.com/spf13/viper"
 )
 
 const (
@@ -101,6 +102,8 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 
 // InsertCpes Select Cve information from DB.
 func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
+	expire := viper.GetUint("expire")
+
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()
@@ -115,8 +118,16 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 			if result := pipe.ZAdd(ctx, hKeyPrefix+c.Vendor+sep+c.Product, &redis.Z{Score: 0, Member: c.CpeURI}); result.Err() != nil {
 				return fmt.Errorf("Failed to ZAdd CpeURI. err: %s", result.Err())
 			}
+			if expire > 0 {
+				if err := pipe.Expire(ctx, hKeyPrefix+"VendorProduct", time.Duration(expire*uint(time.Second))).Err(); err != nil {
+					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+				}
+				if err := pipe.Expire(ctx, hKeyPrefix+c.Vendor+sep+c.Product, time.Duration(expire*uint(time.Second))).Err(); err != nil {
+					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+				}
+			}
 			if c.Deprecated {
-				if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "true", time.Duration(0)); result.Err() != nil {
+				if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "true", time.Duration(expire*uint(time.Second))); result.Err() != nil {
 					return fmt.Errorf("Failed to set to deprecated CPE. err: %s", result.Err())
 				}
 			}
