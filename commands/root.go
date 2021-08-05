@@ -53,7 +53,7 @@ func init() {
 	RootCmd.PersistentFlags().Bool("stdout", false, "display all CPEs to stdout")
 	_ = viper.BindPFlag("stdout", RootCmd.PersistentFlags().Lookup("stdout"))
 
-	RootCmd.PersistentFlags().Uint("expire", 0, "timeout to set for Redis keys")
+	RootCmd.PersistentFlags().Uint("expire", 0, "timeout to set for Redis keys in seconds. If set to 0, the key is persistent.")
 	_ = viper.BindPFlag("expire", RootCmd.PersistentFlags().Lookup("expire"))
 }
 

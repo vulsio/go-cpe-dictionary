@@ -125,6 +125,13 @@ func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
 				if err := pipe.Expire(ctx, hKeyPrefix+c.Vendor+sep+c.Product, time.Duration(expire*uint(time.Second))).Err(); err != nil {
 					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
 				}
+			} else {
+				if err := pipe.Persist(ctx, hKeyPrefix+"VendorProduct").Err(); err != nil {
+					return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+				}
+				if err := pipe.Persist(ctx, hKeyPrefix+c.Vendor+sep+c.Product).Err(); err != nil {
+					return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+				}
 			}
 			if c.Deprecated {
 				if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "true", time.Duration(expire*uint(time.Second))); result.Err() != nil {
