@@ -19,9 +19,6 @@ var fetchNvdCmd = &cobra.Command{
 
 func init() {
 	RootCmd.AddCommand(fetchNvdCmd)
-
-	fetchNvdCmd.PersistentFlags().Bool("stdout", false, "display all CPEs to stdout")
-	_ = viper.BindPFlag("stdout", fetchNvdCmd.PersistentFlags().Lookup("stdout"))
 }
 
 func fetchNvd(cmd *cobra.Command, args []string) (err error) {
