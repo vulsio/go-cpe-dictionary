@@ -25,4 +25,7 @@ func init() {
 
 	fetchCmd.PersistentFlags().Int("threads", runtime.NumCPU(), "The number of threads to be used")
 	_ = viper.BindPFlag("threads", fetchCmd.PersistentFlags().Lookup("threads"))
+
+	fetchCmd.PersistentFlags().Uint("expire", 0, "timeout to set for Redis keys in seconds. If set to 0, the key is persistent.")
+	_ = viper.BindPFlag("expire", fetchCmd.PersistentFlags().Lookup("expire"))
 }
