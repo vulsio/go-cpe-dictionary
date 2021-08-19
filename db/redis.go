@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
@@ -13,11 +14,37 @@ import (
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
+/**
+# Redis Data Structure
+- Sets
+  ┌─────────────────────────────┬──────────────────────┬──────────────────────────────────┐
+  │       KEY                   │  MEMBER              │             PURPOSE              │
+  └─────────────────────────────┴──────────────────────┴──────────────────────────────────┘
+  ┌─────────────────────────────┬──────────────────────┬──────────────────────────────────┐
+  │ CPE#VendorProducts          │ ${vendor}#${product} │ Get ALL Vendor Products          │
+  ├─────────────────────────────┼──────────────────────┼──────────────────────────────────┤
+  │ CPE#VP#${vendor}#${product} │ CPEURI               │ Get CPEURI by vendor and product │
+  ├─────────────────────────────┼──────────────────────┼──────────────────────────────────┤
+  │ CPE#DeprecatedCPEs          │ CPEURI               │ Get DeprecatedCPEs               │
+  └─────────────────────────────┴──────────────────────┴──────────────────────────────────┘
+
+- Hash
+  ┌───┬────────────────┬───────────────┬────────┬───────────────────────────────────────┐
+  │NO │    KEY         │   FIELD       │  VALUE │       PURPOSE                         │
+  └───┴────────────────┴───────────────┴────────┴───────────────────────────────────────┘
+  ┌────────────────────┬───────────────┬────────┬───────────────────────────────────────┐
+  │ 1 │ CPE#FETCHMETA  │   Revision    │ string │ GET Go-Cpe-Dictionary Binary Revision │
+  ├───┼────────────────┼───────────────┼────────┼───────────────────────────────────────┤
+  │ 2 │ CPE#FETCHMETA  │ SchemaVersion │  uint  │ GET Go-Cpe-Dictionary Schema Version  │
+  └───┴────────────────┴───────────────┴────────┴───────────────────────────────────────┘
+**/
+
 const (
-	dialectRedis     = "redis"
-	hKeyPrefix       = "CPE#"
-	deprecatedPrefix = hKeyPrefix + "dep#"
-	sep              = "::"
+	dialectRedis      = "redis"
+	vpKeyPrefix       = "CPE#VP#"
+	vpListKey         = "CPE#VendorProducts"
+	deprecatedCPEsKey = "CPE#DeprecatedCPEs"
+	fetchMetaKey      = "CPE#FETCHMETA"
 )
 
 // RedisDriver is Driver for Redis
@@ -68,27 +95,70 @@ func (r *RedisDriver) MigrateDB() error {
 
 // IsGoCPEDictModelV1 determines if the DB was created at the time of go-cpe-dictionary Model v1
 func (r *RedisDriver) IsGoCPEDictModelV1() (bool, error) {
+	ctx := context.Background()
+
+	exists, err := r.conn.Exists(ctx, fetchMetaKey).Result()
+	if err != nil {
+		return false, fmt.Errorf("Failed to Exists. err: %s", err)
+	}
+	if exists == 0 {
+		key, err := r.conn.RandomKey(ctx).Result()
+		if err != nil {
+			if err == redis.Nil {
+				return false, nil
+			}
+			return false, fmt.Errorf("Failed to RandomKey. err: %s", err)
+		}
+		if key != "" {
+			return true, nil
+		}
+	}
+
 	return false, nil
 }
 
 // GetFetchMeta get FetchMeta from Database
 func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
-	return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion}, nil
+	ctx := context.Background()
+
+	exists, err := r.conn.Exists(ctx, fetchMetaKey).Result()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to Exists %s. err: %s", fetchMetaKey, err)
+	}
+	if exists == 0 {
+		return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion}, nil
+	}
+
+	revision, err := r.conn.HGet(ctx, fetchMetaKey, "Revision").Result()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to HGet Revision. err: %s", err)
+	}
+
+	verstr, err := r.conn.HGet(ctx, fetchMetaKey, "SchemaVersion").Result()
+	if err != nil {
+		return nil, fmt.Errorf("Failed to HGet SchemaVersion. err: %s", err)
+	}
+	version, err := strconv.ParseUint(verstr, 10, 8)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to ParseUint. err: %s", err)
+	}
+
+	return &models.FetchMeta{GoCPEDictRevision: revision, SchemaVersion: uint(version)}, nil
 }
 
 // UpsertFetchMeta upsert FetchMeta to Database
-func (r *RedisDriver) UpsertFetchMeta(*models.FetchMeta) error {
-	return nil
+func (r *RedisDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
+	return r.conn.HSet(context.Background(), fetchMetaKey, map[string]interface{}{"Revision": fetchMeta.GoCPEDictRevision, "SchemaVersion": fetchMeta.SchemaVersion}).Err()
 }
 
 // GetVendorProducts : GetVendorProducts
 func (r *RedisDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	ctx := context.Background()
-	var result *redis.StringSliceCmd
-	if result = r.conn.ZRange(ctx, hKeyPrefix+"VendorProduct", 0, -1); result.Err() != nil {
-		return nil, result.Err()
+	result, err := r.conn.SMembers(ctx, vpListKey).Result()
+	if err != nil {
+		return nil, err
 	}
-	return result.Val(), nil
+	return result, nil
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
@@ -96,13 +166,13 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 	if vendor == "" || product == "" {
 		return nil, nil, nil
 	}
-	result := r.conn.ZRange(context.Background(), hKeyPrefix+vendor+sep+product, 0, -1)
-	if result.Err() != nil {
-		return nil, nil, fmt.Errorf("Failed to zrange CPE. err :%s", result.Err())
+	result, err := r.conn.SMembers(context.Background(), fmt.Sprintf("%s%s#%s", vpKeyPrefix, vendor, product)).Result()
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to SMembers CPE. err: %s", err)
 	}
 
 	cpeURIs, deprecated := []string{}, []string{}
-	for _, cpeURI := range result.Val() {
+	for _, cpeURI := range result {
 		ok, err := r.IsDeprecated(cpeURI)
 		if err != nil {
 			return nil, nil, fmt.Errorf("Failed to get deprecated CPE. err :%s", err)
@@ -123,27 +193,26 @@ func (r *RedisDriver) InsertCpes(_ models.FetchType, cpes []models.CategorizedCp
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()
-	vendorProductRootKey := hKeyPrefix + "VendorProduct"
 	for idx := range chunkSlice(len(cpes), 10) {
 		pipe := r.conn.Pipeline()
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
-			key := hKeyPrefix + c.Vendor + sep + c.Product
-			if result := pipe.ZAdd(ctx, vendorProductRootKey, &redis.Z{Score: 0, Member: c.Vendor + sep + c.Product}); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd vendorProduct. err: %s", result.Err())
+			key := fmt.Sprintf("%s%s#%s", vpKeyPrefix, c.Vendor, c.Product)
+			if err := pipe.SAdd(ctx, vpListKey, fmt.Sprintf("%s#%s", c.Vendor, c.Product)).Err(); err != nil {
+				return fmt.Errorf("Failed to SAdd vendorProduct. err: %s", err)
 			}
-			if result := pipe.ZAdd(ctx, key, &redis.Z{Score: 0, Member: c.CpeURI}); result.Err() != nil {
-				return fmt.Errorf("Failed to ZAdd CpeURI. err: %s", result.Err())
+			if err := pipe.SAdd(ctx, key, c.CpeURI).Err(); err != nil {
+				return fmt.Errorf("Failed to SAdd CpeURI. err: %s", err)
 			}
 			if expire > 0 {
-				if err := pipe.Expire(ctx, vendorProductRootKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
+				if err := pipe.Expire(ctx, vpListKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
 					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
 				}
 				if err := pipe.Expire(ctx, key, time.Duration(expire*uint(time.Second))).Err(); err != nil {
 					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
 				}
 			} else {
-				if err := pipe.Persist(ctx, vendorProductRootKey).Err(); err != nil {
+				if err := pipe.Persist(ctx, vpListKey).Err(); err != nil {
 					return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
 				}
 				if err := pipe.Persist(ctx, key).Err(); err != nil {
@@ -151,8 +220,17 @@ func (r *RedisDriver) InsertCpes(_ models.FetchType, cpes []models.CategorizedCp
 				}
 			}
 			if c.Deprecated {
-				if result := pipe.Set(ctx, fmt.Sprintf("%s%s", deprecatedPrefix, c.CpeURI), "true", time.Duration(expire*uint(time.Second))); result.Err() != nil {
-					return fmt.Errorf("Failed to set to deprecated CPE. err: %s", result.Err())
+				if err := pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI).Err(); err != nil {
+					return fmt.Errorf("Failed to set to deprecated CPE. err: %s", err)
+				}
+				if expire > 0 {
+					if err := pipe.Expire(ctx, deprecatedCPEsKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
+						return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+					}
+				} else {
+					if err := pipe.Persist(ctx, deprecatedCPEsKey).Err(); err != nil {
+						return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+					}
 				}
 			}
 		}
@@ -167,12 +245,12 @@ func (r *RedisDriver) InsertCpes(_ models.FetchType, cpes []models.CategorizedCp
 
 // IsDeprecated : IsDeprecated
 func (r *RedisDriver) IsDeprecated(cpeURI string) (bool, error) {
-	cmd := r.conn.Get(context.Background(), fmt.Sprintf("%s%s", deprecatedPrefix, cpeURI))
-	if cmd.Err() == redis.Nil {
-		// key not found means the CPE is not deprecated
-		return false, nil
-	} else if cmd.Err() != nil {
-		return false, fmt.Errorf("Failed to get deprecated CPE. err :%s", cmd.Err())
+	result, err := r.conn.SIsMember(context.Background(), deprecatedCPEsKey, cpeURI).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return false, nil
+		}
+		return false, fmt.Errorf("Failed to SIsMember. err :%s", err)
 	}
-	return cmd.Val() == "true", nil
+	return result, nil
 }
