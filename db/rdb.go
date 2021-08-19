@@ -177,7 +177,7 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	}
 
 	for _, vp := range results {
-		vendorProducts = append(vendorProducts, fmt.Sprintf("%s::%s", vp.Vendor, vp.Product))
+		vendorProducts = append(vendorProducts, fmt.Sprintf("%s#%s", vp.Vendor, vp.Product))
 	}
 	return
 }

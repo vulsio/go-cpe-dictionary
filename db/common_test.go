@@ -7,6 +7,7 @@ import (
 
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
+	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
@@ -53,6 +54,7 @@ func prepareTestData(driver DB) error {
 		})
 	}
 
+	viper.Set("batch-size", 1)
 	return driver.InsertCpes(models.NVD, testCpes)
 }
 
@@ -74,15 +76,15 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 		"OK": {
 			Expected: Expected{
 				VendorProduct: []string{
-					"ntp::ntp",
-					"responsive_coming_soon_page_project::responsive_coming_soon_page",
-					"vendorName1::productName1\\-1", // TODO: what's with these slashes? Is it a bug?
-					"vendorName1::productName1\\-2", // TODO: what's with these slashes? Is it a bug?
-					"vendorName2::productName2",
-					"vendorName3::productName3",
-					"vendorName4::productName4",
-					"vendorName5::productName5",
-					"vendorName6::productName6",
+					"ntp#ntp",
+					"responsive_coming_soon_page_project#responsive_coming_soon_page",
+					"vendorName1#productName1\\-1", // TODO: what's with these slashes? Is it a bug?
+					"vendorName1#productName1\\-2", // TODO: what's with these slashes? Is it a bug?
+					"vendorName2#productName2",
+					"vendorName3#productName3",
+					"vendorName4#productName4",
+					"vendorName5#productName5",
+					"vendorName6#productName6",
 				},
 			},
 		},
