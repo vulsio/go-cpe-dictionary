@@ -122,7 +122,7 @@ func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
 
 	exists, err := r.conn.Exists(ctx, fetchMetaKey).Result()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Exists %s. err: %s", fetchMetaKey, err)
+		return nil, fmt.Errorf("Failed to Exists. err: %s", err)
 	}
 	if exists == 0 {
 		return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion}, nil
