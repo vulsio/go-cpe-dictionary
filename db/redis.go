@@ -75,8 +75,7 @@ func (r *RedisDriver) connectRedis(dbPath string) error {
 	}
 	ctx := context.Background()
 	r.conn = redis.NewClient(option)
-	err = r.conn.Ping(ctx).Err()
-	return err
+	return r.conn.Ping(ctx).Err()
 }
 
 // CloseDB close Database
@@ -189,11 +188,12 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 // InsertCpes Select Cve information from DB.
 func (r *RedisDriver) InsertCpes(_ models.FetchType, cpes []models.CategorizedCpe) (err error) {
 	expire := viper.GetUint("expire")
+	batchSize := viper.GetInt("batch-size")
 
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()
-	for idx := range chunkSlice(len(cpes), 10) {
+	for idx := range chunkSlice(len(cpes), batchSize) {
 		pipe := r.conn.Pipeline()
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
