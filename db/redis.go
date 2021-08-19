@@ -188,10 +188,14 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 // InsertCpes Select Cve information from DB.
 func (r *RedisDriver) InsertCpes(_ models.FetchType, cpes []models.CategorizedCpe) (err error) {
 	expire := viper.GetUint("expire")
+	batchSize := viper.GetInt("batch-size")
+	if batchSize < 1 {
+		return fmt.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
+	}
 
 	ctx := context.Background()
 	bar := pb.StartNew(len(cpes))
-	for idx := range chunkSlice(len(cpes), viper.GetInt("batch-size")) {
+	for idx := range chunkSlice(len(cpes), batchSize) {
 		pipe := r.conn.Pipeline()
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
