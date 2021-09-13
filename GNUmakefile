@@ -83,6 +83,7 @@ clean-integration:
 	-pkill go-cpe.old
 	-pkill go-cpe.new
 	-rm integration/go-cpe.old integration/go-cpe.new integration/go-cpe.old.sqlite3 integration/go-cpe.new.sqlite3
+	-rm -rf integration/diff
 	-docker kill redis-old redis-new
 	-docker rm redis-old redis-new
 
