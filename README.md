@@ -46,8 +46,8 @@ $ source /etc/profile.d/goenv.sh
 To install:
 
 ```bash
-$ mkdir -p $GOPATH/src/github.com/kotakanbe
-$ cd $GOPATH/src/github.com/kotakanbe
+$ mkdir -p $GOPATH/src/github.com/vulsio
+$ cd $GOPATH/src/github.com/vulsio
 $ git clone https://github.com/vulsio/go-cpe-dictionary.git
 $ cd go-cpe-dictionary
 $ make install
