@@ -48,7 +48,7 @@ To install:
 ```bash
 $ mkdir -p $GOPATH/src/github.com/kotakanbe
 $ cd $GOPATH/src/github.com/kotakanbe
-$ git clone https://github.com/kotakanbe/go-cpe-dictionary.git
+$ git clone https://github.com/vulsio/go-cpe-dictionary.git
 $ cd go-cpe-dictionary
 $ make install
 ```
@@ -169,14 +169,14 @@ Run with --debug, --debug-sql option.
 
 # Authors
 
-kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created go-cpe-dictionary and [these fine people](https://github.com/kotakanbe/go-cpe-dictionary/graphs/contributors) have contributed.
+kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created go-cpe-dictionary and [these fine people](https://github.com/vulsio/go-cpe-dictionary/graphs/contributors) have contributed.
 
 ----
 
 # Contribute
 
-1. fork a repository: github.com/kotakanbe/go-cpe-dictionary to github.com/you/repo
-2. get original code: go get github.com/kotakanbe/go-cpe-dictionary
+1. fork a repository: github.com/vulsio/go-cpe-dictionary to github.com/you/repo
+2. get original code: go get github.com/vulsio/go-cpe-dictionary
 3. work on original code
 4. add remote to your repo: git remote add myfork https://github.com/you/repo.git
 5. push your changes: git push myfork
@@ -188,7 +188,7 @@ kotakanbe ([@kotakanbe](https://twitter.com/kotakanbe)) created go-cpe-dictionar
 
 # Licence
 
-Please see [LICENSE](https://github.com/kotakanbe/go-cpe-dictionary/blob/master/LICENSE).
+Please see [LICENSE](https://github.com/vulsio/go-cpe-dictionary/blob/master/LICENSE).
 
 ----
 

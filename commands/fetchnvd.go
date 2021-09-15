@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/db"
-	"github.com/kotakanbe/go-cpe-dictionary/fetcher"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/vulsio/go-cpe-dictionary/db"
+	"github.com/vulsio/go-cpe-dictionary/fetcher"
 )
 
 var fetchNvdCmd = &cobra.Command{

@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/db"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
+	"github.com/vulsio/go-cpe-dictionary/db"
 )
 
 // Start starts CVE dictionary HTTP Server.
