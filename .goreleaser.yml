@@ -1,7 +1,7 @@
 project_name: go-cpe-dictionary
 release:
   github:
-    owner: kotakanbe
+    owner: vulsio
     name: go-cpe-dictionary
 builds:
 - goos:
