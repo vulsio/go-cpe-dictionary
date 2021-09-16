@@ -7,7 +7,7 @@ import (
 
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
-	"github.com/kotakanbe/go-cpe-dictionary/models"
+	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 func prepareTestData(driver DB) error {

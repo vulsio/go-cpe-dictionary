@@ -24,8 +24,8 @@ SRCS = $(shell git ls-files '*.go')
 PKGS =  ./config ./db ./models
 VERSION := $(shell git describe --tags --abbrev=0)
 REVISION := $(shell git rev-parse --short HEAD)
-LDFLAGS := -X 'github.com/kotakanbe/go-cpe-dictionary/config.Version=$(VERSION)' \
-	-X 'github.com/kotakanbe/go-cpe-dictionary/config.Revision=$(REVISION)'
+LDFLAGS := -X 'github.com/vulsio/go-cpe-dictionary/config.Version=$(VERSION)' \
+	-X 'github.com/vulsio/go-cpe-dictionary/config.Revision=$(REVISION)'
 GO := GO111MODULE=on go
 GO_OFF := GO111MODULE=off go
 

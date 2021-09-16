@@ -8,9 +8,9 @@ import (
 	"github.com/cheggaaa/pb/v3"
 	"github.com/go-redis/redis/v8"
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/config"
-	"github.com/kotakanbe/go-cpe-dictionary/models"
 	"github.com/spf13/viper"
+	"github.com/vulsio/go-cpe-dictionary/config"
+	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 const (

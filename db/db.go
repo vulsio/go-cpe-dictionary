@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/models"
+	"github.com/vulsio/go-cpe-dictionary/models"
 	"golang.org/x/xerrors"
 )
 

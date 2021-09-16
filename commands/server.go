@@ -2,10 +2,10 @@ package commands
 
 import (
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/db"
-	"github.com/kotakanbe/go-cpe-dictionary/server"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/vulsio/go-cpe-dictionary/db"
+	"github.com/vulsio/go-cpe-dictionary/server"
 )
 
 var serverCmd = &cobra.Command{

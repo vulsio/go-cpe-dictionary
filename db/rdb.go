@@ -10,9 +10,9 @@ import (
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/inconshreveable/log15"
-	"github.com/kotakanbe/go-cpe-dictionary/config"
-	"github.com/kotakanbe/go-cpe-dictionary/models"
 	sqlite3 "github.com/mattn/go-sqlite3"
+	"github.com/vulsio/go-cpe-dictionary/config"
+	"github.com/vulsio/go-cpe-dictionary/models"
 	"golang.org/x/xerrors"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
