@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kotakanbe/go-cpe-dictionary/commands"
-	"github.com/kotakanbe/go-cpe-dictionary/config"
+	"github.com/vulsio/go-cpe-dictionary/commands"
+	"github.com/vulsio/go-cpe-dictionary/config"
 )
 
 func main() {
