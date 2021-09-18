@@ -9,6 +9,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/inconshreveable/log15"
 	"github.com/spf13/viper"
+	"github.com/vulsio/go-cpe-dictionary/config"
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
@@ -65,6 +66,21 @@ func (r *RedisDriver) MigrateDB() error {
 	return nil
 }
 
+// IsGoCPEDictModelV1 determines if the DB was created at the time of go-cpe-dictionary Model v1
+func (r *RedisDriver) IsGoCPEDictModelV1() (bool, error) {
+	return false, nil
+}
+
+// GetFetchMeta get FetchMeta from Database
+func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
+	return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion}, nil
+}
+
+// UpsertFetchMeta upsert FetchMeta to Database
+func (r *RedisDriver) UpsertFetchMeta(*models.FetchMeta) error {
+	return nil
+}
+
 // GetVendorProducts : GetVendorProducts
 func (r *RedisDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	ctx := context.Background()
@@ -101,16 +117,16 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 }
 
 // InsertCpes Select Cve information from DB.
-func (r *RedisDriver) InsertCpes(cpes []models.CategorizedCpe) (err error) {
+func (r *RedisDriver) InsertCpes(_ models.FetchType, cpes []models.CategorizedCpe) (err error) {
 	expire := viper.GetUint("expire")
 
 	ctx := context.Background()
 	bar := pb.New(len(cpes))
 	bar.Start()
 	vendorProductRootKey := hKeyPrefix + "VendorProduct"
-	for chunked := range chunkSlice(cpes, 10) {
+	for idx := range chunkSlice(len(cpes), 10) {
 		pipe := r.conn.Pipeline()
-		for _, c := range chunked {
+		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
 			key := hKeyPrefix + c.Vendor + sep + c.Product
 			if result := pipe.ZAdd(ctx, vendorProductRootKey, &redis.Z{Score: 0, Member: c.Vendor + sep + c.Product}); result.Err() != nil {

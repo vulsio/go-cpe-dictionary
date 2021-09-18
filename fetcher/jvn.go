@@ -8,6 +8,7 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
+	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
 )
@@ -37,16 +38,11 @@ func FetchJVN() ([]models.CategorizedCpe, error) {
 	urls := makeJvnURLs(years)
 
 	cpeURIs := map[string]models.CategorizedCpe{}
-	for _, url := range urls {
-		bytes, err := util.FetchFeedFile(url, false)
-		if err != nil {
-			return nil, fmt.Errorf("Failed to fetch. url: %s, err: %s", url, err)
-		}
-		var rdf rdf
-		if err = xml.Unmarshal(bytes, &rdf); err != nil {
-			return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
-		}
-
+	rdfs, err := fetchJVNFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
+	}
+	for _, rdf := range rdfs {
 		for _, item := range rdf.Items {
 			cpes, err := convertJvnCpesToModel(item.Cpes)
 			if err != nil {
@@ -91,6 +87,64 @@ func makeJvnURLs(years []int) (urls []string) {
 	return
 }
 
+func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []rdf, err error) {
+	reqChan := make(chan string, len(urls))
+	resChan := make(chan rdf, len(urls))
+	errChan := make(chan error, len(urls))
+	defer close(reqChan)
+	defer close(resChan)
+	defer close(errChan)
+
+	go func() {
+		for _, url := range urls {
+			reqChan <- url
+		}
+	}()
+
+	tasks := util.GenWorkers(concurrency, wait)
+	for range urls {
+		tasks <- func() {
+			select {
+			case url := <-reqChan:
+				rdf, err := fetchJVNFeedFile(url)
+				if err != nil {
+					errChan <- err
+					return
+				}
+				resChan <- *rdf
+			}
+		}
+	}
+
+	errs := []error{}
+	timeout := time.After(10 * 60 * time.Second)
+	for range urls {
+		select {
+		case rdf := <-resChan:
+			rdfs = append(rdfs, rdf)
+		case err := <-errChan:
+			errs = append(errs, err)
+		case <-timeout:
+			return rdfs, fmt.Errorf("Timeout Fetching Nvd")
+		}
+	}
+	if 0 < len(errs) {
+		return rdfs, fmt.Errorf("%s", errs)
+	}
+	return rdfs, nil
+}
+
+func fetchJVNFeedFile(url string) (rdf *rdf, err error) {
+	bytes, err := util.FetchFeedFile(url, false)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to fetch. url: %s, err: %s", url, err)
+	}
+	if err = xml.Unmarshal(bytes, &rdf); err != nil {
+		return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
+	}
+	return rdf, nil
+}
+
 func convertJvnCpesToModel(jvnCpes []cpe) (cpes []models.CategorizedCpe, err error) {
 	for _, c := range jvnCpes {
 		var wfn common.WellFormedName
@@ -100,6 +154,7 @@ func convertJvnCpesToModel(jvnCpes []cpe) (cpes []models.CategorizedCpe, err err
 			continue
 		}
 		cpes = append(cpes, models.CategorizedCpe{
+			FetchType:       models.JVN,
 			CpeURI:          naming.BindToURI(wfn),
 			CpeFS:           naming.BindToFS(wfn),
 			Part:            wfn.GetString(common.AttributePart),

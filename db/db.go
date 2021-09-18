@@ -5,6 +5,7 @@ import (
 
 	"github.com/inconshreveable/log15"
 	"github.com/vulsio/go-cpe-dictionary/models"
+	"golang.org/x/xerrors"
 )
 
 // DB is interface for a database driver
@@ -14,9 +15,13 @@ type DB interface {
 	CloseDB() error
 	MigrateDB() error
 
+	IsGoCPEDictModelV1() (bool, error)
+	GetFetchMeta() (*models.FetchMeta, error)
+	UpsertFetchMeta(*models.FetchMeta) error
+
 	GetVendorProducts() ([]string, error)
 	GetCpesByVendorProduct(string, string) ([]string, []string, error)
-	InsertCpes([]models.CategorizedCpe) error
+	InsertCpes(models.FetchType, []models.CategorizedCpe) error
 	IsDeprecated(string) (bool, error)
 }
 
@@ -32,6 +37,16 @@ func NewDB(dbType string, dbPath string, debugSQL bool) (driver DB, locked bool,
 			return nil, true, err
 		}
 		return nil, false, err
+	}
+
+	isV1, err := driver.IsGoCPEDictModelV1()
+	if err != nil {
+		log15.Error("Failed to IsGoCPEDictModelV1.", "err", err)
+		return nil, false, err
+	}
+	if isV1 {
+		log15.Error("Failed to NewDB. Since SchemaVersion is incompatible, delete Database and fetch again")
+		return nil, false, xerrors.New("Failed to NewDB. Since SchemaVersion is incompatible, delete Database and fetch again.")
 	}
 
 	if err := driver.MigrateDB(); err != nil {
@@ -51,18 +66,25 @@ func newDB(dbType string) (DB, error) {
 	return nil, fmt.Errorf("Invalid database dialect, %s", dbType)
 }
 
-func chunkSlice(l []models.CategorizedCpe, n int) chan []models.CategorizedCpe {
-	ch := make(chan []models.CategorizedCpe)
+// IndexChunk has a starting point and an ending point for Chunk
+type IndexChunk struct {
+	From, To int
+}
+
+func chunkSlice(length int, chunkSize int) <-chan IndexChunk {
+	ch := make(chan IndexChunk)
+
 	go func() {
-		for i := 0; i < len(l); i += n {
-			fromIdx := i
-			toIdx := i + n
-			if toIdx > len(l) {
-				toIdx = len(l)
+		defer close(ch)
+
+		for i := 0; i < length; i += chunkSize {
+			idx := IndexChunk{i, i + chunkSize}
+			if length < idx.To {
+				idx.To = length
 			}
-			ch <- l[fromIdx:toIdx]
+			ch <- idx
 		}
-		close(ch)
 	}()
+
 	return ch
 }

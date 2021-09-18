@@ -49,12 +49,6 @@ func init() {
 
 	RootCmd.PersistentFlags().String("http-proxy", "", "http://proxy-url:port (default: empty)")
 	_ = viper.BindPFlag("http-proxy", RootCmd.PersistentFlags().Lookup("http-proxy"))
-
-	RootCmd.PersistentFlags().Bool("stdout", false, "display all CPEs to stdout")
-	_ = viper.BindPFlag("stdout", RootCmd.PersistentFlags().Lookup("stdout"))
-
-	RootCmd.PersistentFlags().Uint("expire", 0, "timeout to set for Redis keys in seconds. If set to 0, the key is persistent.")
-	_ = viper.BindPFlag("expire", RootCmd.PersistentFlags().Lookup("expire"))
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -53,7 +53,7 @@ func prepareTestData(driver DB) error {
 		})
 	}
 
-	return driver.InsertCpes(testCpes)
+	return driver.InsertCpes(models.NVD, testCpes)
 }
 
 func testGetVendorProducts(t *testing.T, driver DB) {
