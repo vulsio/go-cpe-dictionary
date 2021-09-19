@@ -83,6 +83,7 @@ clean-integration:
 	-pkill go-cpe.old
 	-pkill go-cpe.new
 	-rm integration/go-cpe.old integration/go-cpe.new integration/go-cpe.old.sqlite3 integration/go-cpe.new.sqlite3
+	-rm -rf integration/diff
 	-docker kill redis-old redis-new
 	-docker rm redis-old redis-new
 
@@ -102,21 +103,21 @@ fetch-redis:
 	integration/go-cpe.new fetch jvn --dbtype redis --dbpath "redis://127.0.0.1:6380/0"
 
 diff-server-rdb:
-	integration/go-cpe.old server --dbpath=$(PWD)/integration/go-cpe.old.sqlite3 --port 1325 > /dev/null & 
-	integration/go-cpe.new server --dbpath=$(PWD)/integration/go-cpe.new.sqlite3 --port 1326 > /dev/null &
-	@ python integration/diff_server_mode.py cpes --sample_rate 0.001
+	integration/go-cpe.old server --dbpath=$(PWD)/integration/go-cpe.old.sqlite3 --port 1325 > /dev/null 2>&1 & 
+	integration/go-cpe.new server --dbpath=$(PWD)/integration/go-cpe.new.sqlite3 --port 1326 > /dev/null 2>&1 &
+	@ python integration/diff_server_mode.py cpes --sample_rate 0.01
 	pkill go-cpe.old 
 	pkill go-cpe.new
 
 diff-server-redis:
-	integration/go-cpe.old server --dbtype redis --dbpath "redis://127.0.0.1:6379/0" --port 1325 > /dev/null & 
-	integration/go-cpe.new server --dbtype redis --dbpath "redis://127.0.0.1:6380/0" --port 1326 > /dev/null &
-	@ python integration/diff_server_mode.py cpes --sample_rate 0.001
+	integration/go-cpe.old server --dbtype redis --dbpath "redis://127.0.0.1:6379/0" --port 1325 > /dev/null 2>&1 &
+	integration/go-cpe.new server --dbtype redis --dbpath "redis://127.0.0.1:6380/0" --port 1326 > /dev/null 2>&1 &
+	@ python integration/diff_server_mode.py cpes --sample_rate 0.01
 	pkill go-cpe.old 
 	pkill go-cpe.new
 
 diff-server-rdb-redis:
-	integration/go-cpe.new server --dbpath=$(PWD)/integration/go-cpe.new.sqlite3 --port 1325 > /dev/null &
-	integration/go-cpe.new server --dbtype redis --dbpath "redis://127.0.0.1:6380/0" --port 1326 > /dev/null &
-	@ python integration/diff_server_mode.py cpes --sample_rate 0.001
+	integration/go-cpe.new server --dbpath=$(PWD)/integration/go-cpe.new.sqlite3 --port 1325 > /dev/null 2>&1 &
+	integration/go-cpe.new server --dbtype redis --dbpath "redis://127.0.0.1:6380/0" --port 1326 > /dev/null 2>&1 &
+	@ python integration/diff_server_mode.py cpes --sample_rate 0.01
 	pkill go-cpe.new

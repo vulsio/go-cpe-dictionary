@@ -11,6 +11,7 @@ import (
 	"github.com/cheggaaa/pb/v3"
 	"github.com/inconshreveable/log15"
 	sqlite3 "github.com/mattn/go-sqlite3"
+	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/config"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"golang.org/x/xerrors"
@@ -43,12 +44,17 @@ func (r *RDBDriver) Name() string {
 func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, err error) {
 	gormConfig := gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
-		Logger:                                   logger.Default.LogMode(logger.Silent),
+		Logger: logger.New(
+			log.New(os.Stderr, "\r\n", log.LstdFlags),
+			logger.Config{
+				LogLevel: logger.Silent,
+			},
+		),
 	}
 
 	if debugSQL {
 		gormConfig.Logger = logger.New(
-			log.New(os.Stdout, "\r\n", log.LstdFlags),
+			log.New(os.Stderr, "\r\n", log.LstdFlags),
 			logger.Config{
 				SlowThreshold: time.Second,
 				LogLevel:      logger.Info,
@@ -171,7 +177,7 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	}
 
 	for _, vp := range results {
-		vendorProducts = append(vendorProducts, fmt.Sprintf("%s::%s", vp.Vendor, vp.Product))
+		vendorProducts = append(vendorProducts, fmt.Sprintf("%s#%s", vp.Vendor, vp.Product))
 	}
 	return
 }
@@ -209,6 +215,11 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 		tx.Commit()
 	}()
 
+	batchSize := viper.GetInt("batch-size")
+	if batchSize < 1 {
+		return xerrors.New("Failed to set batch-size. err: batch-size option is not set properly")
+	}
+
 	// Delete all old records
 	oldIDs := []int64{}
 	result := tx.Model(models.CategorizedCpe{}).Select("id").Where("fetch_type = ?", fetchType).Find(&oldIDs)
@@ -218,7 +229,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 
 	if result.RowsAffected > 0 {
 		log15.Info(fmt.Sprintf("Deleting records that match fetch_type = %s from your DB. This will take some time.", fetchType))
-		for idx := range chunkSlice(len(oldIDs), 10000) {
+		for idx := range chunkSlice(len(oldIDs), batchSize) {
 			if err := tx.Where("id IN ?", oldIDs[idx.From:idx.To]).Delete(&models.CategorizedCpe{}).Error; err != nil {
 				return xerrors.Errorf("Failed to delete: %w", err)
 			}
@@ -226,7 +237,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	}
 
 	bar := pb.StartNew(len(cpes))
-	for idx := range chunkSlice(len(cpes), 2000) {
+	for idx := range chunkSlice(len(cpes), batchSize) {
 		if err := tx.Create(cpes[idx.From:idx.To]).Error; err != nil {
 			return xerrors.Errorf("Failed to insert. err: %w", err)
 		}

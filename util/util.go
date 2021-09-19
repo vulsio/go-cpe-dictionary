@@ -42,7 +42,7 @@ func GetDefaultLogDir() string {
 }
 
 // SetLogger set logger
-func SetLogger(logDir string, debug, logJSON bool) {
+func SetLogger(logToFile bool, logDir string, debug, logJSON bool) error {
 	stderrHandler := logger.StderrHandler
 	logFormat := logger.LogfmtFormat()
 	if logJSON {
@@ -55,27 +55,31 @@ func SetLogger(logDir string, debug, logJSON bool) {
 		lvlHandler = logger.LvlFilterHandler(logger.LvlDebug, stderrHandler)
 	}
 
-	if _, err := os.Stat(logDir); os.IsNotExist(err) {
-		if err := os.Mkdir(logDir, 0700); err != nil {
-			logger.Error("Failed to create log directory", "err", err)
-		}
-	}
 	var handler logger.Handler
-	if _, err := os.Stat(logDir); err == nil {
-		logPath := filepath.Join(logDir, "go-cpe-dictionary.log")
-		if _, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644); err != nil {
-			logger.Error("Failed to create a log file", "err", err)
-			handler = lvlHandler
-		} else {
-			handler = logger.MultiHandler(
-				logger.Must.FileHandler(logPath, logFormat),
-				lvlHandler,
-			)
+	if logToFile {
+		if _, err := os.Stat(logDir); err != nil {
+			if os.IsNotExist(err) {
+				if err := os.Mkdir(logDir, 0700); err != nil {
+					return fmt.Errorf("Failed to create log directory. err: %w", err)
+				}
+			} else {
+				return fmt.Errorf("Failed to check log directory. err: %w", err)
+			}
 		}
+
+		logPath := filepath.Join(logDir, "gost.log")
+		if _, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644); err != nil {
+			return fmt.Errorf("Failed to open a log file. err: %w", err)
+		}
+		handler = logger.MultiHandler(
+			logger.Must.FileHandler(logPath, logFormat),
+			lvlHandler,
+		)
 	} else {
 		handler = lvlHandler
 	}
 	logger.Root().SetHandler(handler)
+	return nil
 }
 
 // GetYearsUntilThisYear : GetYearsUntilThisYear

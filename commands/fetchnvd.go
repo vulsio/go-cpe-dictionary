@@ -9,6 +9,7 @@ import (
 	"github.com/vulsio/go-cpe-dictionary/db"
 	"github.com/vulsio/go-cpe-dictionary/fetcher"
 	"github.com/vulsio/go-cpe-dictionary/models"
+	"github.com/vulsio/go-cpe-dictionary/util"
 	"golang.org/x/xerrors"
 )
 
@@ -24,6 +25,10 @@ func init() {
 }
 
 func fetchNvd(cmd *cobra.Command, args []string) (err error) {
+	if err := util.SetLogger(viper.GetBool("log-to-file"), viper.GetString("log-dir"), viper.GetBool("debug"), viper.GetBool("log-json")); err != nil {
+		return xerrors.Errorf("Failed to SetLogger. err: %w", err)
+	}
+
 	log15.Info("Initialize Database")
 	driver, locked, err := db.NewDB(viper.GetString("dbtype"), viper.GetString("dbpath"), viper.GetBool("debug-sql"))
 	if err != nil {
