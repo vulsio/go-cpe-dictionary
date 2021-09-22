@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/config"
 	"github.com/vulsio/go-cpe-dictionary/models"
+	"golang.org/x/xerrors"
 )
 
 /**
@@ -104,19 +105,17 @@ func (r *RedisDriver) IsGoCPEDictModelV1() (bool, error) {
 
 	exists, err := r.conn.Exists(ctx, fetchMetaKey).Result()
 	if err != nil {
-		return false, fmt.Errorf("Failed to Exists. err: %s", err)
+		return false, xerrors.Errorf("Failed to Exists. err: %w", err)
 	}
 	if exists == 0 {
-		key, err := r.conn.RandomKey(ctx).Result()
+		keys, _, err := r.conn.Scan(ctx, 0, "CPE#*", 1).Result()
 		if err != nil {
-			if err == redis.Nil {
-				return false, nil
-			}
-			return false, fmt.Errorf("Failed to RandomKey. err: %s", err)
+			return false, fmt.Errorf("Failed to Scan. err: %s", err)
 		}
-		if key != "" {
-			return true, nil
+		if len(keys) == 0 {
+			return false, nil
 		}
+		return true, nil
 	}
 
 	return false, nil
