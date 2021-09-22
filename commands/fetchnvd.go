@@ -48,6 +48,11 @@ func fetchNvd(cmd *cobra.Command, args []string) (err error) {
 		return xerrors.New("Failed to Insert CVEs into DB. SchemaVersion is old")
 	}
 
+	if err := driver.UpsertFetchMeta(fetchMeta); err != nil {
+		log15.Error("Failed to upsert FetchMeta to DB.", "err", err)
+		return err
+	}
+
 	cpes, err := fetcher.FetchNVD()
 	if err != nil {
 		log15.Error("Failed to fetch.", "err", err)
@@ -61,11 +66,6 @@ func fetchNvd(cmd *cobra.Command, args []string) (err error) {
 			return fmt.Errorf("Failed to insert cpes. err : %s", err)
 		}
 		log15.Info(fmt.Sprintf("Inserted %d CPEs", len(cpes)))
-
-		if err := driver.UpsertFetchMeta(fetchMeta); err != nil {
-			log15.Error("Failed to upsert FetchMeta to DB.", "err", err)
-			return err
-		}
 	} else {
 		for _, cpe := range cpes {
 			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%t\n",
