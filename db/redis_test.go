@@ -1,21 +1,21 @@
 package db
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v8"
+	"golang.org/x/xerrors"
 )
 
 func setupRedis() (*miniredis.Miniredis, DB, error) {
 	s, err := miniredis.Run()
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to run miniredis: %s", err)
+		return nil, nil, xerrors.Errorf("Failed to run miniredis: %w", err)
 	}
 	driver, _, err := NewDB("redis", "redis://"+s.Addr(), false)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to new db: %s", err)
+		return nil, nil, xerrors.Errorf("Failed to new db: %w", err)
 	}
 	return s, driver, nil
 }

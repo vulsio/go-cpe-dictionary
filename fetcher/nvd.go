@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
+	"golang.org/x/xerrors"
 )
 
 // CpeDictionary has cpe-item list
@@ -50,7 +51,7 @@ func FetchNVD() ([]models.CategorizedCpe, error) {
 
 	dictCpes, err := FetchCpeDictionary()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to fetch cpe dictionary. err : %s", err)
+		return nil, xerrors.Errorf("Failed to fetch cpe dictionary. err: %w", err)
 	}
 	for _, c := range dictCpes {
 		if _, ok := cpeURIs[c.CpeURI]; !ok {
@@ -60,7 +61,7 @@ func FetchNVD() ([]models.CategorizedCpe, error) {
 
 	jsonCpes, err := FetchJSONFeed()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to fetch nvd JSON feed. err : %s", err)
+		return nil, xerrors.Errorf("Failed to fetch nvd JSON feed. err: %w", err)
 	}
 	for _, c := range jsonCpes {
 		if _, ok := cpeURIs[c.CpeURI]; !ok {
@@ -82,7 +83,7 @@ func FetchCpeDictionary() ([]models.CategorizedCpe, error) {
 	log15.Info("Fetching...", "URL", url)
 	resp, body, errs := gorequest.New().Proxy(viper.GetString("http-proxy")).Get(url).End()
 	if len(errs) > 0 || resp.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
+		return nil, xerrors.Errorf("HTTP error. errs: %v, url: %s", errs, url)
 	}
 
 	b := bytes.NewBufferString(body)
@@ -91,16 +92,16 @@ func FetchCpeDictionary() ([]models.CategorizedCpe, error) {
 		_ = reader.Close()
 	}()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to decompress NVD feedfile. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to decompress NVD feedfile. url: %s, err: %w", url, err)
 	}
 	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Read NVD feedfile. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to Read NVD feedfile. url: %s, err: %w", url, err)
 	}
 
 	var cpeDictionary CpeDictionary
 	if err = xml.Unmarshal(bytes, &cpeDictionary); err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to unmarshal. url: %s, err: %w", url, err)
 	}
 
 	var cpes []models.CategorizedCpe
@@ -123,7 +124,7 @@ func FetchJSONFeed() ([]models.CategorizedCpe, error) {
 	urls := makeFeedURLBlocks(years)
 	nvds, err := fetchNVDFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
+		return nil, xerrors.Errorf("Failed to get feeds. err: %w", err)
 	}
 	cpes, err := convertNvdV3FeedToModel(nvds)
 	if err != nil {
@@ -180,11 +181,11 @@ func fetchNVDFeedFileConcurrently(urls []string, concurrency, wait int) (nvds []
 		case err := <-errChan:
 			errs = append(errs, err)
 		case <-timeout:
-			return nvds, fmt.Errorf("Timeout Fetching Nvd")
+			return nvds, xerrors.Errorf("Timeout Fetching Nvd")
 		}
 	}
 	if 0 < len(errs) {
-		return nvds, fmt.Errorf("%s", errs)
+		return nvds, xerrors.Errorf("%s", errs)
 	}
 	return nvds, nil
 }
@@ -192,10 +193,10 @@ func fetchNVDFeedFileConcurrently(urls []string, concurrency, wait int) (nvds []
 func fetchNVDFeedFile(url string) (nvd *V3Feed, err error) {
 	bytes, err := util.FetchFeedFile(url, true)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to fetch. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to fetch. url: %s, err: %w", url, err)
 	}
 	if err = json.Unmarshal(bytes, &nvd); err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to unmarshal. url: %s, err: %w", url, err)
 	}
 	return nvd, nil
 }

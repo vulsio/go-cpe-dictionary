@@ -66,32 +66,25 @@ func (r *RedisDriver) Name() string {
 }
 
 // OpenDB opens Database
-func (r *RedisDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, err error) {
-	if err = r.connectRedis(dbPath); err != nil {
-		err = fmt.Errorf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
-	}
-	return
+func (r *RedisDriver) OpenDB(dbType, dbPath string, debugSQL bool) (bool, error) {
+	return false, r.connectRedis(dbPath)
 }
 
 func (r *RedisDriver) connectRedis(dbPath string) error {
-	var err error
-	var option *redis.Options
-	if option, err = redis.ParseURL(dbPath); err != nil {
-		log15.Error("Failed to parse url.", "err", err)
-		return err
+	option, err := redis.ParseURL(dbPath)
+	if err != nil {
+		return xerrors.Errorf("Failed to parse url. err: %w", err)
 	}
-	ctx := context.Background()
 	r.conn = redis.NewClient(option)
-	return r.conn.Ping(ctx).Err()
+	return r.conn.Ping(context.Background()).Err()
 }
 
 // CloseDB close Database
-func (r *RedisDriver) CloseDB() (err error) {
-	if err = r.conn.Close(); err != nil {
-		log15.Error("Failed to close DB.", "Type", r.name, "err", err)
-		return
+func (r *RedisDriver) CloseDB() error {
+	if err := r.conn.Close(); err != nil {
+		return xerrors.Errorf("Failed to close DB. Type: %s, err: %w", r.name, err)
 	}
-	return
+	return nil
 }
 
 // MigrateDB migrates Database
@@ -110,7 +103,7 @@ func (r *RedisDriver) IsGoCPEDictModelV1() (bool, error) {
 	if exists == 0 {
 		keys, _, err := r.conn.Scan(ctx, 0, "CPE#*", 1).Result()
 		if err != nil {
-			return false, fmt.Errorf("Failed to Scan. err: %s", err)
+			return false, xerrors.Errorf("Failed to Scan. err: %w", err)
 		}
 		if len(keys) == 0 {
 			return false, nil
@@ -127,7 +120,7 @@ func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
 
 	exists, err := r.conn.Exists(ctx, fetchMetaKey).Result()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Exists. err: %s", err)
+		return nil, xerrors.Errorf("Failed to Exists. err: %w", err)
 	}
 	if exists == 0 {
 		return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion}, nil
@@ -135,16 +128,16 @@ func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
 
 	revision, err := r.conn.HGet(ctx, fetchMetaKey, "Revision").Result()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to HGet Revision. err: %s", err)
+		return nil, xerrors.Errorf("Failed to HGet Revision. err: %w", err)
 	}
 
 	verstr, err := r.conn.HGet(ctx, fetchMetaKey, "SchemaVersion").Result()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to HGet SchemaVersion. err: %s", err)
+		return nil, xerrors.Errorf("Failed to HGet SchemaVersion. err: %w", err)
 	}
 	version, err := strconv.ParseUint(verstr, 10, 8)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to ParseUint. err: %s", err)
+		return nil, xerrors.Errorf("Failed to ParseUint. err: %w", err)
 	}
 
 	return &models.FetchMeta{GoCPEDictRevision: revision, SchemaVersion: uint(version)}, nil
@@ -172,14 +165,14 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 	}
 	result, err := r.conn.SMembers(context.Background(), fmt.Sprintf(vpKeyFormat, vendor, product)).Result()
 	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to SMembers CPE. err: %s", err)
+		return nil, nil, xerrors.Errorf("Failed to SMembers CPE. err: %w", err)
 	}
 
 	cpeURIs, deprecated := []string{}, []string{}
 	for _, cpeURI := range result {
 		ok, err := r.IsDeprecated(cpeURI)
 		if err != nil {
-			return nil, nil, fmt.Errorf("Failed to get deprecated CPE. err :%s", err)
+			return nil, nil, xerrors.Errorf("Failed to get deprecated CPE. err :%s", err)
 		}
 		if ok {
 			deprecated = append(deprecated, cpeURI)
@@ -196,7 +189,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	expire := viper.GetUint("expire")
 	batchSize := viper.GetInt("batch-size")
 	if batchSize < 1 {
-		return fmt.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
+		return xerrors.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
 	}
 
 	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}}
@@ -208,7 +201,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	oldDepsStr, err := r.conn.HGet(ctx, depKey, string(fetchType)).Result()
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
-			return fmt.Errorf("Failed to Get key: %s. err: %s", depKey, err)
+			return xerrors.Errorf("Failed to Get key: %s. err: %w", depKey, err)
 		}
 		oldDepsStr = `{
 			"VP": {},
@@ -218,7 +211,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	}
 	var oldDeps map[string]map[string]map[string]struct{}
 	if err := json.Unmarshal([]byte(oldDepsStr), &oldDeps); err != nil {
-		return fmt.Errorf("Failed to unmarshal JSON. err: %s", err)
+		return xerrors.Errorf("Failed to unmarshal JSON. err: %w", err)
 	}
 
 	bar := pb.StartNew(len(cpes))
@@ -229,24 +222,24 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 			vendorProductStr := fmt.Sprintf("%s#%s", c.Vendor, c.Product)
 			vpKey := fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product)
 			if err := pipe.SAdd(ctx, vpListKey, vendorProductStr).Err(); err != nil {
-				return fmt.Errorf("Failed to SAdd vendorProduct. err: %s", err)
+				return xerrors.Errorf("Failed to SAdd vendorProduct. err: %w", err)
 			}
 			if err := pipe.SAdd(ctx, vpKey, c.CpeURI).Err(); err != nil {
-				return fmt.Errorf("Failed to SAdd CpeURI. err: %s", err)
+				return xerrors.Errorf("Failed to SAdd CpeURI. err: %w", err)
 			}
 			if expire > 0 {
 				if err := pipe.Expire(ctx, vpListKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+					return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
 				}
 				if err := pipe.Expire(ctx, vpKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-					return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+					return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
 				}
 			} else {
 				if err := pipe.Persist(ctx, vpListKey).Err(); err != nil {
-					return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+					return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
 				}
 				if err := pipe.Persist(ctx, vpKey).Err(); err != nil {
-					return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+					return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
 				}
 			}
 			if _, ok := newDeps["VP"][vendorProductStr]; !ok {
@@ -264,15 +257,15 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 
 			if c.Deprecated {
 				if err := pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI).Err(); err != nil {
-					return fmt.Errorf("Failed to set to deprecated CPE. err: %s", err)
+					return xerrors.Errorf("Failed to set to deprecated CPE. err: %w", err)
 				}
 				if expire > 0 {
 					if err := pipe.Expire(ctx, deprecatedCPEsKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-						return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+						return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
 					}
 				} else {
 					if err := pipe.Persist(ctx, deprecatedCPEsKey).Err(); err != nil {
-						return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+						return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
 					}
 				}
 				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
@@ -280,7 +273,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 			}
 		}
 		if _, err = pipe.Exec(ctx); err != nil {
-			return fmt.Errorf("Failed to exec pipeline. err: %s", err)
+			return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
 		}
 	}
 	bar.Finish()
@@ -291,39 +284,39 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		for cpeURI := range cpeURIs {
 			ss := strings.Split(vendorProductStr, "#")
 			if err := pipe.SRem(ctx, fmt.Sprintf(vpKeyFormat, ss[0], ss[1]), cpeURI).Err(); err != nil {
-				return fmt.Errorf("Failed to SRem. err: %s", err)
+				return xerrors.Errorf("Failed to SRem. err: %w", err)
 			}
 		}
 	}
 	for vendorProductStr := range oldDeps["VendorProducts"] {
 		if err := pipe.SRem(ctx, vpListKey, vendorProductStr).Err(); err != nil {
-			return fmt.Errorf("Failed to SRem. err: %s", err)
+			return xerrors.Errorf("Failed to SRem. err: %w", err)
 		}
 	}
 	for cpeURI := range oldDeps["DeprecatedCPEs"] {
 		if err := pipe.SRem(ctx, deprecatedCPEsKey, cpeURI).Err(); err != nil {
-			return fmt.Errorf("Failed to SRem. err: %s", err)
+			return xerrors.Errorf("Failed to SRem. err: %w", err)
 		}
 	}
 
 	newDepsJSON, err := json.Marshal(newDeps)
 	if err != nil {
-		return fmt.Errorf("Failed to Marshal JSON. err: %s", err)
+		return xerrors.Errorf("Failed to Marshal JSON. err: %w", err)
 	}
 	if err := pipe.HSet(ctx, depKey, string(fetchType), string(newDepsJSON)).Err(); err != nil {
-		return fmt.Errorf("Failed to Set depkey. err: %s", err)
+		return xerrors.Errorf("Failed to Set depkey. err: %w", err)
 	}
 	if expire > 0 {
 		if err := pipe.Expire(ctx, depKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-			return fmt.Errorf("Failed to set Expire to Key. err: %s", err)
+			return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
 		}
 	} else {
 		if err := pipe.Persist(ctx, depKey).Err(); err != nil {
-			return fmt.Errorf("Failed to remove the existing timeout on Key. err: %s", err)
+			return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
 		}
 	}
 	if _, err = pipe.Exec(ctx); err != nil {
-		return fmt.Errorf("Failed to exec pipeline. err: %s", err)
+		return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
 	}
 
 	return nil
@@ -336,7 +329,7 @@ func (r *RedisDriver) IsDeprecated(cpeURI string) (bool, error) {
 		if err == redis.Nil {
 			return false, nil
 		}
-		return false, fmt.Errorf("Failed to SIsMember. err :%s", err)
+		return false, xerrors.Errorf("Failed to SIsMember. err :%s", err)
 	}
 	return result, nil
 }

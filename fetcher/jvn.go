@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
+	"golang.org/x/xerrors"
 )
 
 type rdf struct {
@@ -40,13 +41,13 @@ func FetchJVN() ([]models.CategorizedCpe, error) {
 	cpeURIs := map[string]models.CategorizedCpe{}
 	rdfs, err := fetchJVNFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
 	if err != nil {
-		return nil, fmt.Errorf("Failed to get feeds. err : %s", err)
+		return nil, xerrors.Errorf("Failed to get feeds. err: %w", err)
 	}
 	for _, rdf := range rdfs {
 		for _, item := range rdf.Items {
 			cpes, err := convertJvnCpesToModel(item.Cpes)
 			if err != nil {
-				return nil, fmt.Errorf("Failed to convert. err: %s", err)
+				return nil, xerrors.Errorf("Failed to convert. err: %w", err)
 			}
 
 			for _, c := range cpes {
@@ -125,11 +126,11 @@ func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []
 		case err := <-errChan:
 			errs = append(errs, err)
 		case <-timeout:
-			return rdfs, fmt.Errorf("Timeout Fetching Nvd")
+			return rdfs, xerrors.Errorf("Timeout Fetching Nvd")
 		}
 	}
 	if 0 < len(errs) {
-		return rdfs, fmt.Errorf("%s", errs)
+		return rdfs, xerrors.Errorf("%s", errs)
 	}
 	return rdfs, nil
 }
@@ -137,10 +138,10 @@ func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []
 func fetchJVNFeedFile(url string) (rdf *rdf, err error) {
 	bytes, err := util.FetchFeedFile(url, false)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to fetch. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to fetch. url: %s, err: %w", url, err)
 	}
 	if err = xml.Unmarshal(bytes, &rdf); err != nil {
-		return nil, fmt.Errorf("Failed to unmarshal. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to unmarshal. url: %s, err: %w", url, err)
 	}
 	return rdf, nil
 }

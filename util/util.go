@@ -3,7 +3,6 @@ package util
 import (
 	"bytes"
 	"compress/gzip"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -16,6 +15,7 @@ import (
 	logger "github.com/inconshreveable/log15"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
 )
 
 // GenWorkers generate workers
@@ -60,16 +60,16 @@ func SetLogger(logToFile bool, logDir string, debug, logJSON bool) error {
 		if _, err := os.Stat(logDir); err != nil {
 			if os.IsNotExist(err) {
 				if err := os.Mkdir(logDir, 0700); err != nil {
-					return fmt.Errorf("Failed to create log directory. err: %w", err)
+					return xerrors.Errorf("Failed to create log directory. err: %w", err)
 				}
 			} else {
-				return fmt.Errorf("Failed to check log directory. err: %w", err)
+				return xerrors.Errorf("Failed to check log directory. err: %w", err)
 			}
 		}
 
 		logPath := filepath.Join(logDir, "gost.log")
 		if _, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644); err != nil {
-			return fmt.Errorf("Failed to open a log file. err: %w", err)
+			return xerrors.Errorf("Failed to open a log file. err: %w", err)
 		}
 		handler = logger.MultiHandler(
 			logger.Must.FileHandler(logPath, logFormat),
@@ -86,7 +86,7 @@ func SetLogger(logToFile bool, logDir string, debug, logJSON bool) error {
 func GetYearsUntilThisYear(startYear int) (years []int, err error) {
 	var thisYear int
 	if thisYear, err = strconv.Atoi(time.Now().Format("2006")); err != nil {
-		return years, fmt.Errorf("Failed to convert this year. err : %s", err)
+		return years, xerrors.Errorf("Failed to convert this year. err: %w", err)
 	}
 	years = make([]int, thisYear-startYear+1)
 	for i := range years {
@@ -109,7 +109,7 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 			}
 		}()
 		if len(errs) > 0 || resp == nil || resp.StatusCode != 200 {
-			return fmt.Errorf("HTTP error. errs: %v, url: %s", errs, url)
+			return xerrors.Errorf("HTTP error. errs: %v, url: %s", errs, url)
 		}
 		return nil
 	}
@@ -133,11 +133,11 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 		}
 	}()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to decompress NVD feedfile. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to decompress NVD feedfile. url: %s, err: %w", url, err)
 	}
 	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to Read NVD feedfile. url: %s, err: %s", url, err)
+		return nil, xerrors.Errorf("Failed to Read NVD feedfile. url: %s, err: %w", url, err)
 	}
 	return bytes, nil
 }
