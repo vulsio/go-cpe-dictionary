@@ -42,8 +42,7 @@ func executeServer(cmd *cobra.Command, args []string) (err error) {
 
 	log15.Info("Starting HTTP Server...")
 	if err = server.Start(viper.GetBool("log-to-file"), viper.GetString("log-dir"), driver); err != nil {
-		xerrors.Errorf("Failed to start server. err: %w", err)
-		return err
+		return xerrors.Errorf("Failed to start server. err: %w", err)
 	}
 
 	return nil
