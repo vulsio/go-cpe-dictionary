@@ -82,7 +82,7 @@ func FetchCpeDictionary() ([]models.CategorizedCpe, error) {
 	url := "http://nvd.nist.gov/feeds/xml/cpe/dictionary/official-cpe-dictionary_v2.3.xml.gz"
 	log15.Info("Fetching...", "URL", url)
 	resp, body, errs := gorequest.New().Proxy(viper.GetString("http-proxy")).Get(url).End()
-	if len(errs) > 0 || resp.StatusCode != 200 {
+	if len(errs) > 0 || resp == nil || resp.StatusCode != 200 {
 		return nil, xerrors.Errorf("HTTP error. errs: %v, url: %s", errs, url)
 	}
 
