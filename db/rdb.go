@@ -75,18 +75,19 @@ func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool) (locked bool, e
 	}
 
 	if err != nil {
-		msg := fmt.Sprintf("Failed to open DB. dbtype: %s, dbpath: %s, err: %s", dbType, dbPath, err)
 		if r.name == dialectSqlite3 {
 			switch err.(sqlite3.Error).Code {
 			case sqlite3.ErrLocked, sqlite3.ErrBusy:
-				return true, fmt.Errorf(msg)
+				return true, xerrors.Errorf("Failed to open DB. dbtype: %s, dbpath: %s, err: %w", dbType, dbPath, err)
 			}
 		}
-		return false, fmt.Errorf(msg)
+		return false, xerrors.Errorf("Failed to open DB. dbtype: %s, dbpath: %s, err: %w", dbType, dbPath, err)
 	}
 
 	if r.name == dialectSqlite3 {
-		r.conn.Exec("PRAGMA foreign_keys = ON")
+		if err := r.conn.Exec("PRAGMA foreign_keys = ON").Error; err != nil {
+			return false, err
+		}
 	}
 	return false, nil
 }
@@ -99,7 +100,7 @@ func (r *RDBDriver) CloseDB() (err error) {
 
 	var sqlDB *sql.DB
 	if sqlDB, err = r.conn.DB(); err != nil {
-		return xerrors.Errorf("Failed to get DB Object. err : %w", err)
+		return xerrors.Errorf("Failed to get DB Object. err: %w", err)
 	}
 	if err = sqlDB.Close(); err != nil {
 		return xerrors.Errorf("Failed to close DB. Type: %s. err: %w", r.name, err)
@@ -113,7 +114,7 @@ func (r *RDBDriver) MigrateDB() error {
 		&models.FetchMeta{},
 		&models.CategorizedCpe{},
 	); err != nil {
-		return fmt.Errorf("Failed to migrate. err: %s", err)
+		return xerrors.Errorf("Failed to migrate. err: %w", err)
 	}
 	return nil
 }
@@ -173,7 +174,7 @@ func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
 	// explicit column names seems like an antipattern for an orm.
 	err = r.conn.Model(&models.CategorizedCpe{}).Distinct("vendor", "product").Find(&results).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, fmt.Errorf("Failed to select results. err: %s", err)
+		return nil, xerrors.Errorf("Failed to select results. err: %w", err)
 	}
 
 	for _, vp := range results {
@@ -187,7 +188,7 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 	results := []models.CategorizedCpe{}
 	err := r.conn.Distinct("cpe_uri", "deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil, fmt.Errorf("Failed to select results. err: %s", err)
+		return nil, nil, xerrors.Errorf("Failed to select results. err: %w", err)
 	}
 	cpeURIs, deprecated := []string{}, []string{}
 	for _, r := range results {
