@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/go-redis/redis/v8"
@@ -186,7 +185,6 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 // InsertCpes Select Cve information from DB.
 func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.CategorizedCpe) (err error) {
 	ctx := context.Background()
-	expire := viper.GetUint("expire")
 	batchSize := viper.GetInt("batch-size")
 	if batchSize < 1 {
 		return xerrors.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
@@ -220,27 +218,11 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
 			vendorProductStr := fmt.Sprintf("%s#%s", c.Vendor, c.Product)
-			vpKey := fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product)
 			if err := pipe.SAdd(ctx, vpListKey, vendorProductStr).Err(); err != nil {
 				return xerrors.Errorf("Failed to SAdd vendorProduct. err: %w", err)
 			}
-			if err := pipe.SAdd(ctx, vpKey, c.CpeURI).Err(); err != nil {
+			if err := pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI).Err(); err != nil {
 				return xerrors.Errorf("Failed to SAdd CpeURI. err: %w", err)
-			}
-			if expire > 0 {
-				if err := pipe.Expire(ctx, vpListKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-					return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
-				}
-				if err := pipe.Expire(ctx, vpKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-					return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
-				}
-			} else {
-				if err := pipe.Persist(ctx, vpListKey).Err(); err != nil {
-					return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
-				}
-				if err := pipe.Persist(ctx, vpKey).Err(); err != nil {
-					return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
-				}
 			}
 			if _, ok := newDeps["VP"][vendorProductStr]; !ok {
 				newDeps["VP"][vendorProductStr] = map[string]struct{}{}
@@ -258,15 +240,6 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 			if c.Deprecated {
 				if err := pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI).Err(); err != nil {
 					return xerrors.Errorf("Failed to set to deprecated CPE. err: %w", err)
-				}
-				if expire > 0 {
-					if err := pipe.Expire(ctx, deprecatedCPEsKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-						return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
-					}
-				} else {
-					if err := pipe.Persist(ctx, deprecatedCPEsKey).Err(); err != nil {
-						return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
-					}
 				}
 				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
 				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
@@ -305,15 +278,6 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	}
 	if err := pipe.HSet(ctx, depKey, string(fetchType), string(newDepsJSON)).Err(); err != nil {
 		return xerrors.Errorf("Failed to Set depkey. err: %w", err)
-	}
-	if expire > 0 {
-		if err := pipe.Expire(ctx, depKey, time.Duration(expire*uint(time.Second))).Err(); err != nil {
-			return xerrors.Errorf("Failed to set Expire to Key. err: %w", err)
-		}
-	} else {
-		if err := pipe.Persist(ctx, depKey).Err(); err != nil {
-			return xerrors.Errorf("Failed to remove the existing timeout on Key. err: %w", err)
-		}
 	}
 	if _, err = pipe.Exec(ctx); err != nil {
 		return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
