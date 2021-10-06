@@ -164,21 +164,12 @@ func (r *RDBDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
 }
 
 // GetVendorProducts : GetVendorProducts
-func (r *RDBDriver) GetVendorProducts() (vendorProducts []string, err error) {
-	var results []struct {
-		Vendor  string
-		Product string
-	}
-
+func (r *RDBDriver) GetVendorProducts() (vendorProducts []models.VendorProduct, err error) {
 	// TODO Is there a better way to use distinct with GORM? Needing
 	// explicit column names seems like an antipattern for an orm.
-	err = r.conn.Model(&models.CategorizedCpe{}).Distinct("vendor", "product").Find(&results).Error
+	err = r.conn.Model(&models.CategorizedCpe{}).Distinct("vendor", "product").Find(&vendorProducts).Error
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, xerrors.Errorf("Failed to select results. err: %w", err)
-	}
-
-	for _, vp := range results {
-		vendorProducts = append(vendorProducts, fmt.Sprintf("%s#%s", vp.Vendor, vp.Product))
 	}
 	return
 }
