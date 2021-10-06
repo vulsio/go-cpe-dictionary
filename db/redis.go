@@ -48,6 +48,7 @@ const (
 	dialectRedis      = "redis"
 	vpKeyFormat       = "CPE#VP#%s#%s"
 	vpListKey         = "CPE#VendorProducts"
+	vpSeparator       = "##"
 	deprecatedCPEsKey = "CPE#DeprecatedCPEs"
 	depKey            = "CPE#DEP"
 	fetchMetaKey      = "CPE#FETCHMETA"
@@ -148,13 +149,23 @@ func (r *RedisDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
 }
 
 // GetVendorProducts : GetVendorProducts
-func (r *RedisDriver) GetVendorProducts() (vendorProducts []string, err error) {
+func (r *RedisDriver) GetVendorProducts() (vendorProducts []models.VendorProduct, err error) {
 	ctx := context.Background()
 	result, err := r.conn.SMembers(ctx, vpListKey).Result()
 	if err != nil {
 		return nil, err
 	}
-	return result, nil
+	for _, vp := range result {
+		vpParts := strings.Split(vp, vpSeparator)
+		if len(vpParts) != 2 {
+			continue
+		}
+		vendorProducts = append(vendorProducts, models.VendorProduct{
+			Vendor:  vpParts[0],
+			Product: vpParts[1],
+		})
+	}
+	return vendorProducts, nil
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
@@ -217,7 +228,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		pipe := r.conn.Pipeline()
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
-			vendorProductStr := fmt.Sprintf("%s#%s", c.Vendor, c.Product)
+			vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
 			if err := pipe.SAdd(ctx, vpListKey, vendorProductStr).Err(); err != nil {
 				return xerrors.Errorf("Failed to SAdd vendorProduct. err: %w", err)
 			}

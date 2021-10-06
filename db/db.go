@@ -18,7 +18,7 @@ type DB interface {
 	GetFetchMeta() (*models.FetchMeta, error)
 	UpsertFetchMeta(*models.FetchMeta) error
 
-	GetVendorProducts() ([]string, error)
+	GetVendorProducts() ([]models.VendorProduct, error)
 	GetCpesByVendorProduct(string, string) ([]string, []string, error)
 	InsertCpes(models.FetchType, []models.CategorizedCpe) error
 	IsDeprecated(string) (bool, error)

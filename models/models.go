@@ -47,3 +47,8 @@ type CategorizedCpe struct {
 	Other           string    `gorm:"type:varchar(255)"`
 	Deprecated      bool
 }
+
+type VendorProduct struct {
+	Vendor  string
+	Product string
+}

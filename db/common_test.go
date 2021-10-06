@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
@@ -26,6 +27,7 @@ func prepareTestData(driver DB) error {
 		{"cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*", false},
 		{"cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*", false},
 		{"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*", true},
+		{`cpe:2.3:a:mongodb:c\#_driver:1.10.0:-:*:*:*:mongodb:*:*`, false},
 	}
 
 	testCpes := []models.CategorizedCpe{}
@@ -66,7 +68,7 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 	}
 
 	type Expected struct {
-		VendorProduct []string
+		VendorProduct []models.VendorProduct
 		ErrString     string
 	}
 
@@ -75,22 +77,23 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 	}{
 		"OK": {
 			Expected: Expected{
-				VendorProduct: []string{
-					"ntp#ntp",
-					"responsive_coming_soon_page_project#responsive_coming_soon_page",
-					"vendorName1#productName1\\-1", // TODO: what's with these slashes? Is it a bug?
-					"vendorName1#productName1\\-2", // TODO: what's with these slashes? Is it a bug?
-					"vendorName2#productName2",
-					"vendorName3#productName3",
-					"vendorName4#productName4",
-					"vendorName5#productName5",
-					"vendorName6#productName6",
+				VendorProduct: []models.VendorProduct{
+					{Vendor: "mongodb", Product: "c\\#_driver"},
+					{Vendor: "ntp", Product: "ntp"},
+					{Vendor: "responsive_coming_soon_page_project", Product: "responsive_coming_soon_page"},
+					{Vendor: "vendorName1", Product: "productName1\\-1"}, // TODO: what's with these slashes? Is it a bug?
+					{Vendor: "vendorName1", Product: "productName1\\-2"}, // TODO: what's with these slashes? Is it a bug?
+					{Vendor: "vendorName2", Product: "productName2"},
+					{Vendor: "vendorName3", Product: "productName3"},
+					{Vendor: "vendorName4", Product: "productName4"},
+					{Vendor: "vendorName5", Product: "productName5"},
+					{Vendor: "vendorName6", Product: "productName6"},
 				},
 			},
 		},
 	}
 	for k, tc := range cases {
-		var vendorProducts []string
+		var vendorProducts []models.VendorProduct
 		if vendorProducts, err = driver.GetVendorProducts(); err != nil {
 			if !strings.Contains(err.Error(), tc.Expected.ErrString) {
 				t.Errorf("%s : actual %s, expected %s", k, err, tc.Expected.ErrString)
@@ -103,8 +106,8 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 		} else if 0 < len(tc.Expected.ErrString) {
 			t.Errorf("%s : actual %s, expected %s", k, err, tc.Expected.ErrString)
 		}
-		if !reflect.DeepEqual(vendorProducts, tc.Expected.VendorProduct) {
-			t.Errorf("%s: actual %#v, expected %#v", k, vendorProducts, tc.Expected.VendorProduct)
+		if diff := cmp.Diff(vendorProducts, tc.Expected.VendorProduct); diff != "" {
+			t.Errorf("%s: diff %s", k, diff)
 		}
 	}
 }
