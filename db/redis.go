@@ -20,16 +20,16 @@ import (
 /**
 # Redis Data Structure
 - Sets
-  ┌─────────────────────────────┬──────────────────────┬──────────────────────────────────┐
-  │       KEY                   │  MEMBER              │             PURPOSE              │
-  └─────────────────────────────┴──────────────────────┴──────────────────────────────────┘
-  ┌─────────────────────────────┬──────────────────────┬──────────────────────────────────┐
-  │ CPE#VendorProducts          │ ${vendor}#${product} │ Get ALL Vendor Products          │
-  ├─────────────────────────────┼──────────────────────┼──────────────────────────────────┤
-  │ CPE#VP#${vendor}#${product} │ CPEURI               │ Get CPEURI by vendor and product │
-  ├─────────────────────────────┼──────────────────────┼──────────────────────────────────┤
-  │ CPE#DeprecatedCPEs          │ CPEURI               │ Get DeprecatedCPEs               │
-  └─────────────────────────────┴──────────────────────┴──────────────────────────────────┘
+  ┌─────────────────────────────┬───────────────────────┬──────────────────────────────────┐
+  │       KEY                   │  MEMBER               │             PURPOSE              │
+  └─────────────────────────────┴───────────────────────┴──────────────────────────────────┘
+  ┌─────────────────────────────┬───────────────────────┬──────────────────────────────────┐
+  │ CPE#VendorProducts          │ ${vendor}##${product} │ Get ALL Vendor Products          │
+  ├─────────────────────────────┼───────────────────────┼──────────────────────────────────┤
+  │ CPE#VP#${vendor}##${product} │ CPEURI               │ Get CPEURI by vendor and product │
+  ├─────────────────────────────┼───────────────────────┼──────────────────────────────────┤
+  │ CPE#DeprecatedCPEs          │ CPEURI                │ Get DeprecatedCPEs               │
+  └─────────────────────────────┴───────────────────────┴──────────────────────────────────┘
 
 - Hash
   ┌───┬────────────────┬───────────────┬────────┬──────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@ import (
 
 const (
 	dialectRedis      = "redis"
-	vpKeyFormat       = "CPE#VP#%s#%s"
+	vpKeyFormat       = "CPE#VP#%s##%s"
 	vpListKey         = "CPE#VendorProducts"
 	vpSeparator       = "##"
 	deprecatedCPEsKey = "CPE#DeprecatedCPEs"
@@ -263,7 +263,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	pipe := r.conn.Pipeline()
 	for vendorProductStr, cpeURIs := range oldDeps["VP"] {
 		for cpeURI := range cpeURIs {
-			ss := strings.Split(vendorProductStr, "#")
+			ss := strings.Split(vendorProductStr, vpSeparator)
 			_ = pipe.SRem(ctx, fmt.Sprintf(vpKeyFormat, ss[0], ss[1]), cpeURI)
 		}
 	}
