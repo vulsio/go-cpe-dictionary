@@ -232,12 +232,8 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
 			vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
-			if err := pipe.SAdd(ctx, vpListKey, vendorProductStr).Err(); err != nil {
-				return xerrors.Errorf("Failed to SAdd vendorProduct. err: %w", err)
-			}
-			if err := pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI).Err(); err != nil {
-				return xerrors.Errorf("Failed to SAdd CpeURI. err: %w", err)
-			}
+			_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
+			_ = pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI)
 			if _, ok := newDeps["VP"][vendorProductStr]; !ok {
 				newDeps["VP"][vendorProductStr] = map[string]struct{}{}
 			}
@@ -252,9 +248,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 			delete(oldDeps["VendorProducts"], vendorProductStr)
 
 			if c.Deprecated {
-				if err := pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI).Err(); err != nil {
-					return xerrors.Errorf("Failed to set to deprecated CPE. err: %w", err)
-				}
+				_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
 				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
 				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
 			}
@@ -270,29 +264,21 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	for vendorProductStr, cpeURIs := range oldDeps["VP"] {
 		for cpeURI := range cpeURIs {
 			ss := strings.Split(vendorProductStr, "#")
-			if err := pipe.SRem(ctx, fmt.Sprintf(vpKeyFormat, ss[0], ss[1]), cpeURI).Err(); err != nil {
-				return xerrors.Errorf("Failed to SRem. err: %w", err)
-			}
+			_ = pipe.SRem(ctx, fmt.Sprintf(vpKeyFormat, ss[0], ss[1]), cpeURI)
 		}
 	}
 	for vendorProductStr := range oldDeps["VendorProducts"] {
-		if err := pipe.SRem(ctx, vpListKey, vendorProductStr).Err(); err != nil {
-			return xerrors.Errorf("Failed to SRem. err: %w", err)
-		}
+		_ = pipe.SRem(ctx, vpListKey, vendorProductStr)
 	}
 	for cpeURI := range oldDeps["DeprecatedCPEs"] {
-		if err := pipe.SRem(ctx, deprecatedCPEsKey, cpeURI).Err(); err != nil {
-			return xerrors.Errorf("Failed to SRem. err: %w", err)
-		}
+		_ = pipe.SRem(ctx, deprecatedCPEsKey, cpeURI)
 	}
 
 	newDepsJSON, err := json.Marshal(newDeps)
 	if err != nil {
 		return xerrors.Errorf("Failed to Marshal JSON. err: %w", err)
 	}
-	if err := pipe.HSet(ctx, depKey, string(fetchType), string(newDepsJSON)).Err(); err != nil {
-		return xerrors.Errorf("Failed to Set depkey. err: %w", err)
-	}
+	_ = pipe.HSet(ctx, depKey, string(fetchType), string(newDepsJSON))
 	if _, err = pipe.Exec(ctx); err != nil {
 		return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
 	}
