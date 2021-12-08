@@ -5,7 +5,7 @@ import "gorm.io/gorm"
 // LatestSchemaVersion manages the Schema version used in the latest go-cpe-dictionary.
 const LatestSchemaVersion = 2
 
-// FetchMeta has meta infomation about fetched data
+// FetchMeta has meta information about fetched data
 type FetchMeta struct {
 	gorm.Model        `json:"-"`
 	GoCPEDictRevision string
