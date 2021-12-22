@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/inconshreveable/log15"
 	"github.com/spf13/cobra"
@@ -34,7 +35,7 @@ func fetchJvn(cmd *cobra.Command, args []string) (err error) {
 		if locked {
 			return xerrors.Errorf("Failed to initialize DB. Close DB connection before fetching. err: %w", err)
 		}
-		return err
+		return xerrors.Errorf("Failed to open DB. err: %w", err)
 	}
 
 	fetchMeta, err := driver.GetFetchMeta()
@@ -42,9 +43,9 @@ func fetchJvn(cmd *cobra.Command, args []string) (err error) {
 		return xerrors.Errorf("Failed to get FetchMeta from DB. err: %w", err)
 	}
 	if fetchMeta.OutDated() {
-		return xerrors.Errorf("Failed to Insert CVEs into DB. SchemaVersion is old. SchemaVersion: %+v", map[string]uint{"latest": models.LatestSchemaVersion, "DB": fetchMeta.SchemaVersion})
+		return xerrors.Errorf("Failed to Insert CVEs into DB. err: SchemaVersion is old. SchemaVersion: %+v", map[string]uint{"latest": models.LatestSchemaVersion, "DB": fetchMeta.SchemaVersion})
 	}
-
+	// If the fetch fails the first time (without SchemaVersion), the DB needs to be cleaned every time, so insert SchemaVersion.
 	if err := driver.UpsertFetchMeta(fetchMeta); err != nil {
 		return xerrors.Errorf("Failed to upsert FetchMeta to DB. err: %w", err)
 	}
@@ -79,6 +80,11 @@ func fetchJvn(cmd *cobra.Command, args []string) (err error) {
 				cpe.Deprecated,
 			)
 		}
+	}
+
+	fetchMeta.LastFetchedDate = time.Now()
+	if err := driver.UpsertFetchMeta(fetchMeta); err != nil {
+		return xerrors.Errorf("Failed to upsert FetchMeta to DB. dbpath: %s, err: %w", viper.GetString("dbpath"), err)
 	}
 
 	return nil
