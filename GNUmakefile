@@ -1,8 +1,8 @@
 .PHONY: \
+	all \
 	build \
 	install \
-	all \
-	vendor \
+	lint \
 	vet \
 	fmt \
 	fmtcheck \
@@ -20,7 +20,7 @@
 	diff-server-rdb-redis
 
 SRCS = $(shell git ls-files '*.go')
-PKGS =  ./config ./db ./models
+PKGS = $(shell go list ./...)
 VERSION := $(shell git describe --tags --abbrev=0)
 REVISION := $(shell git rev-parse --short HEAD)
 LDFLAGS := -X 'github.com/vulsio/go-cpe-dictionary/config.Version=$(VERSION)' \
@@ -31,12 +31,14 @@ GO_OFF := GO111MODULE=off go
 all: build test
 
 build: main.go
-	go build -ldflags "$(LDFLAGS)" -o go-cpe-dictionary $<
+	$(GO) build -ldflags "$(LDFLAGS)" -o go-cpe-dictionary $<
 
 install: main.go
-	go install -ldflags "$(LDFLAGS)"
+	$(GO) install -ldflags "$(LDFLAGS)"
 
-all: test
+lint:
+	$(GO_OFF) get -u github.com/mgechev/revive
+	revive -config ./.revive.toml -formatter plain $(PKGS)
 
 vet:
 	$(foreach pkg,$(PKGS),go vet $(pkg);)
@@ -47,7 +49,7 @@ fmt:
 fmtcheck:
 	$(foreach file,$(SRCS),gofmt -d $(file);)
 
-pretest: vet fmtcheck
+pretest: lint vet fmtcheck
 
 test: pretest
 	$(foreach pkg,$(PKGS),go test -v $(pkg) || exit;)

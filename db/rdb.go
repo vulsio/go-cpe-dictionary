@@ -41,7 +41,7 @@ func (r *RDBDriver) Name() string {
 }
 
 // OpenDB opens Database
-func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool, option Option) (locked bool, err error) {
+func (r *RDBDriver) OpenDB(dbType, dbPath string, debugSQL bool, _ Option) (locked bool, err error) {
 	gormConfig := gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 		Logger: logger.New(
@@ -241,7 +241,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 }
 
 // IsDeprecated : IsDeprecated
-func (r *RDBDriver) IsDeprecated(cpeURI string) (bool, error) {
+func (r *RDBDriver) IsDeprecated(_ string) (bool, error) {
 	// not implemented yet
 	return false, nil
 }
