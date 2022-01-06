@@ -1,6 +1,10 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // LatestSchemaVersion manages the Schema version used in the latest go-cpe-dictionary.
 const LatestSchemaVersion = 2
@@ -10,6 +14,7 @@ type FetchMeta struct {
 	gorm.Model        `json:"-"`
 	GoCPEDictRevision string
 	SchemaVersion     uint
+	LastFetchedAt     time.Time
 }
 
 // OutDated checks whether last fetched feed is out dated

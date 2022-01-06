@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/vulsio/go-cpe-dictionary/db"
+	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/server"
 	"github.com/vulsio/go-cpe-dictionary/util"
 	"golang.org/x/xerrors"
@@ -37,7 +38,15 @@ func executeServer(_ *cobra.Command, _ []string) (err error) {
 		if locked {
 			return xerrors.Errorf("Failed to initialize DB. Close DB connection before fetching. err: %w", err)
 		}
-		return err
+		return xerrors.Errorf("Failed to open DB. err: %w", err)
+	}
+
+	fetchMeta, err := driver.GetFetchMeta()
+	if err != nil {
+		return xerrors.Errorf("Failed to get FetchMeta from DB. err: %w", err)
+	}
+	if fetchMeta.OutDated() {
+		return xerrors.Errorf("Failed to start server. err: SchemaVersion is old. SchemaVersion: %+v", map[string]uint{"latest": models.LatestSchemaVersion, "DB": fetchMeta.SchemaVersion})
 	}
 
 	log15.Info("Starting HTTP Server...")
