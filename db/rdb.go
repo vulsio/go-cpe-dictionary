@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -220,14 +219,18 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	}
 
 	if result.RowsAffected > 0 {
-		log15.Info(fmt.Sprintf("Deleting records that match fetch_type = %s from your DB. This will take some time.", fetchType))
+		log15.Info("Deleting old CPEs")
+		bar := pb.StartNew(len(oldIDs))
 		for idx := range chunkSlice(len(oldIDs), batchSize) {
 			if err := tx.Where("id IN ?", oldIDs[idx.From:idx.To]).Delete(&models.CategorizedCpe{}).Error; err != nil {
 				return xerrors.Errorf("Failed to delete: %w", err)
 			}
+			bar.Add(idx.To - idx.From)
 		}
+		bar.Finish()
 	}
 
+	log15.Info("Inserting new CPEs")
 	bar := pb.StartNew(len(cpes))
 	for idx := range chunkSlice(len(cpes), batchSize) {
 		if err := tx.Create(cpes[idx.From:idx.To]).Error; err != nil {
