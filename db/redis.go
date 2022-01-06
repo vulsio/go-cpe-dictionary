@@ -33,18 +33,18 @@ import (
   └─────────────────────────────┴──────────────────────┴──────────────────────────────────┘
 
 - Hash
-  ┌───┬────────────────┬─────────────────┬─────────────┬──────────────────────────────────────────────────┐
-  │NO │    KEY         │   FIELD         │  VALUE      │                     PURPOSE                      │
-  └───┴────────────────┴─────────────────┴─────────────┴──────────────────────────────────────────────────┘
-  ┌───┬────────────────┬─────────────────┬─────────────┬──────────────────────────────────────────────────┐
-  │ 1 │ CPE#DEP        │    NVD/JVN      │  JSON       │ TO DELETE OUTDATED AND UNNEEDED FIELD AND MEMBER │
-  ├───┼────────────────┼─────────────────┼─────────────┼──────────────────────────────────────────────────┤
-  │ 2 │ CPE#FETCHMETA  │   Revision      │ string      │ GET Go-Cpe-Dictionary Binary Revision            │
-  ├───┼────────────────┼─────────────────┼─────────────┼──────────────────────────────────────────────────┤
-  │ 3 │ CPE#FETCHMETA  │ SchemaVersion   │  uint       │ GET Go-Cpe-Dictionary Schema Version             │
-  ├───┼────────────────┼─────────────────┼─────────────┼──────────────────────────────────────────────────┤
-  │ 4 │ CPE#FETCHMETA  │ LastFetchedDate │  time.Time  │ GET Go-Cpe-Dictionary Last Fetched Time          │
-  └───┴────────────────┴─────────────────┴─────────────┴──────────────────────────────────────────────────┘
+  ┌───┬────────────────┬───────────────┬─────────────┬──────────────────────────────────────────────────┐
+  │NO │    KEY         │   FIELD       │  VALUE      │                     PURPOSE                      │
+  └───┴────────────────┴───────────────┴─────────────┴──────────────────────────────────────────────────┘
+  ┌───┬────────────────┬───────────────┬─────────────┬──────────────────────────────────────────────────┐
+  │ 1 │ CPE#DEP        │    NVD/JVN    │  JSON       │ TO DELETE OUTDATED AND UNNEEDED FIELD AND MEMBER │
+  ├───┼────────────────┼───────────────┼─────────────┼──────────────────────────────────────────────────┤
+  │ 2 │ CPE#FETCHMETA  │   Revision    │ string      │ GET Go-Cpe-Dictionary Binary Revision            │
+  ├───┼────────────────┼───────────────┼─────────────┼──────────────────────────────────────────────────┤
+  │ 3 │ CPE#FETCHMETA  │ SchemaVersion │  uint       │ GET Go-Cpe-Dictionary Schema Version             │
+  ├───┼────────────────┼───────────────┼─────────────┼──────────────────────────────────────────────────┤
+  │ 4 │ CPE#FETCHMETA  │ LastFetchedAt │  time.Time  │ GET Go-Cpe-Dictionary Last Fetched Time          │
+  └───┴────────────────┴───────────────┴─────────────┴──────────────────────────────────────────────────┘
 **/
 
 const (
@@ -129,7 +129,7 @@ func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
 		return nil, xerrors.Errorf("Failed to Exists. err: %w", err)
 	}
 	if exists == 0 {
-		return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion, LastFetchedDate: time.Date(1000, time.January, 1, 0, 0, 0, 0, time.UTC)}, nil
+		return &models.FetchMeta{GoCPEDictRevision: config.Revision, SchemaVersion: models.LatestSchemaVersion, LastFetchedAt: time.Date(1000, time.January, 1, 0, 0, 0, 0, time.UTC)}, nil
 	}
 
 	revision, err := r.conn.HGet(ctx, fetchMetaKey, "Revision").Result()
@@ -146,10 +146,10 @@ func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
 		return nil, xerrors.Errorf("Failed to ParseUint. err: %w", err)
 	}
 
-	datestr, err := r.conn.HGet(ctx, fetchMetaKey, "LastFetchedDate").Result()
+	datestr, err := r.conn.HGet(ctx, fetchMetaKey, "LastFetchedAt").Result()
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
-			return nil, xerrors.Errorf("Failed to HGet LastFetchedDate. err: %w", err)
+			return nil, xerrors.Errorf("Failed to HGet LastFetchedAt. err: %w", err)
 		}
 		datestr = time.Date(1000, time.January, 1, 0, 0, 0, 0, time.UTC).Format(time.RFC3339)
 	}
@@ -158,12 +158,12 @@ func (r *RedisDriver) GetFetchMeta() (*models.FetchMeta, error) {
 		return nil, xerrors.Errorf("Failed to Parse date. err: %w", err)
 	}
 
-	return &models.FetchMeta{GoCPEDictRevision: revision, SchemaVersion: uint(version), LastFetchedDate: date}, nil
+	return &models.FetchMeta{GoCPEDictRevision: revision, SchemaVersion: uint(version), LastFetchedAt: date}, nil
 }
 
 // UpsertFetchMeta upsert FetchMeta to Database
 func (r *RedisDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
-	return r.conn.HSet(context.Background(), fetchMetaKey, map[string]interface{}{"Revision": config.Revision, "SchemaVersion": models.LatestSchemaVersion, "LastFetchedDate": fetchMeta.LastFetchedDate}).Err()
+	return r.conn.HSet(context.Background(), fetchMetaKey, map[string]interface{}{"Revision": config.Revision, "SchemaVersion": models.LatestSchemaVersion, "LastFetchedAt": fetchMeta.LastFetchedAt}).Err()
 }
 
 // GetVendorProducts : GetVendorProducts

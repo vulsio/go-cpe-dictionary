@@ -82,7 +82,7 @@ func fetchNvd(cmd *cobra.Command, args []string) (err error) {
 		}
 	}
 
-	fetchMeta.LastFetchedDate = time.Now()
+	fetchMeta.LastFetchedAt = time.Now()
 	if err := driver.UpsertFetchMeta(fetchMeta); err != nil {
 		return xerrors.Errorf("Failed to upsert FetchMeta to DB. dbpath: %s, err: %w", viper.GetString("dbpath"), err)
 	}
