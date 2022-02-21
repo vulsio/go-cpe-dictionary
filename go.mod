@@ -18,7 +18,7 @@ require (
 	github.com/lib/pq v1.10.2 // indirect
 	github.com/mattn/go-isatty v0.0.13 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/mattn/go-sqlite3 v1.14.7
+	github.com/mattn/go-sqlite3 v1.14.9
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/pkg/errors v0.9.1 // indirect
@@ -31,8 +31,8 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	gorm.io/driver/mysql v1.1.1
 	gorm.io/driver/postgres v1.1.0
-	gorm.io/driver/sqlite v1.1.4
-	gorm.io/gorm v1.21.11
+	gorm.io/driver/sqlite v1.3.1
+	gorm.io/gorm v1.23.1
 	moul.io/http2curl v1.0.0 // indirect
 )
 
@@ -60,7 +60,7 @@ require (
 	github.com/jackc/pgtype v1.7.0 // indirect
 	github.com/jackc/pgx/v4 v4.11.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.2 // indirect
+	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
