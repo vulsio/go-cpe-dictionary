@@ -163,21 +163,33 @@ func (r *RDBDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
 }
 
 // GetVendorProducts : GetVendorProducts
-func (r *RDBDriver) GetVendorProducts() (vendorProducts []models.VendorProduct, err error) {
-	// TODO Is there a better way to use distinct with GORM? Needing
-	// explicit column names seems like an antipattern for an orm.
-	err = r.conn.Model(&models.CategorizedCpe{}).Where("deprecated = false").Distinct("vendor", "product").Find(&vendorProducts).Error
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, xerrors.Errorf("Failed to select results. err: %w", err)
+func (r *RDBDriver) GetVendorProducts() ([]models.VendorProduct, []models.VendorProduct, error) {
+	cpes := []models.CategorizedCpe{}
+	if err := r.conn.Distinct("vendor", "product", "deprecated").Find(&cpes).Error; err != nil {
+		return nil, nil, xerrors.Errorf("Failed to select results. err: %w", err)
 	}
-	return
+
+	vendorProducts := []models.VendorProduct{}
+	deprecated := []models.VendorProduct{}
+	for _, c := range cpes {
+		vp := models.VendorProduct{
+			Vendor:  c.Vendor,
+			Product: c.Product,
+		}
+		if c.Deprecated {
+			deprecated = append(deprecated, vp)
+		} else {
+			vendorProducts = append(vendorProducts, vp)
+		}
+	}
+
+	return vendorProducts, deprecated, nil
 }
 
 // GetCpesByVendorProduct : GetCpesByVendorProduct
 func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []string, error) {
 	results := []models.CategorizedCpe{}
-	err := r.conn.Distinct("cpe_uri", "deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := r.conn.Distinct("cpe_uri", "deprecated").Find(&results, "vendor LIKE ? and product LIKE ?", vendor, product).Error; err != nil {
 		return nil, nil, xerrors.Errorf("Failed to select results. err: %w", err)
 	}
 	cpeURIs, deprecated := []string{}, []string{}
@@ -214,7 +226,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	// Delete all old records
 	oldIDs := []int64{}
 	result := tx.Model(models.CategorizedCpe{}).Select("id").Where("fetch_type = ?", fetchType).Find(&oldIDs)
-	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+	if result.Error != nil {
 		return xerrors.Errorf("Failed to select old defs: %w", result.Error)
 	}
 
