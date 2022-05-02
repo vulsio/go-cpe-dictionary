@@ -25,6 +25,7 @@ type DB interface {
 	IsDeprecated(string) (bool, error)
 }
 
+// Option :
 type Option struct {
 	RedisTimeout time.Duration
 }
