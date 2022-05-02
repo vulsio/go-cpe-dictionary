@@ -87,7 +87,6 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 					{Vendor: "vendorName3", Product: "productName3"},
 					{Vendor: "vendorName4", Product: "productName4"},
 					{Vendor: "vendorName5", Product: "productName5"},
-					{Vendor: "vendorName6", Product: "productName6"},
 				},
 			},
 		},
