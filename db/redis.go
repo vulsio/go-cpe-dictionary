@@ -247,7 +247,15 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		for _, c := range cpes[idx.From:idx.To] {
 			bar.Increment()
 			vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
-			_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
+			if c.Deprecated {
+				_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
+				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
+				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
+			} else {
+				_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
+				newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
+				delete(oldDeps["VendorProducts"], vendorProductStr)
+			}
 			_ = pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI)
 			if _, ok := newDeps["VP"][vendorProductStr]; !ok {
 				newDeps["VP"][vendorProductStr] = map[string]struct{}{}
@@ -259,14 +267,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 					delete(oldDeps["VP"], vendorProductStr)
 				}
 			}
-			newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
-			delete(oldDeps["VendorProducts"], vendorProductStr)
 
-			if c.Deprecated {
-				_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
-				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
-				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
-			}
 		}
 		if _, err = pipe.Exec(ctx); err != nil {
 			return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
