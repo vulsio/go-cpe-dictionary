@@ -13,9 +13,10 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/inconshreveable/log15"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
+
 	"github.com/vulsio/go-cpe-dictionary/config"
 	"github.com/vulsio/go-cpe-dictionary/models"
-	"golang.org/x/xerrors"
 )
 
 /**

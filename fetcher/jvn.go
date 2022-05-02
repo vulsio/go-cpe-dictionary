@@ -9,9 +9,10 @@ import (
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
+
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
-	"golang.org/x/xerrors"
 )
 
 type rdf struct {

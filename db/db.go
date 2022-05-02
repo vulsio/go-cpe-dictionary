@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vulsio/go-cpe-dictionary/models"
 	"golang.org/x/xerrors"
+
+	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 // DB is interface for a database driver

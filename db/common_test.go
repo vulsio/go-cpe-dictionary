@@ -9,6 +9,7 @@ import (
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
+
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 

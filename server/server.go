@@ -10,9 +10,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
+
 	"github.com/vulsio/go-cpe-dictionary/db"
 	"github.com/vulsio/go-cpe-dictionary/models"
-	"golang.org/x/xerrors"
 )
 
 // Start starts CVE dictionary HTTP Server.

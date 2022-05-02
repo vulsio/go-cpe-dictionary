@@ -11,14 +11,15 @@ import (
 	"github.com/inconshreveable/log15"
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"github.com/spf13/viper"
-	"github.com/vulsio/go-cpe-dictionary/config"
-	"github.com/vulsio/go-cpe-dictionary/models"
 	"golang.org/x/xerrors"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	"github.com/vulsio/go-cpe-dictionary/config"
+	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 // Supported DB dialects.
