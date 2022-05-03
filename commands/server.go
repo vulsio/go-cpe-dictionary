@@ -4,11 +4,12 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
+
 	"github.com/vulsio/go-cpe-dictionary/db"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/server"
 	"github.com/vulsio/go-cpe-dictionary/util"
-	"golang.org/x/xerrors"
 )
 
 var serverCmd = &cobra.Command{

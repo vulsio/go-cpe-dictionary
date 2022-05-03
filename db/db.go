@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/vulsio/go-cpe-dictionary/models"
 	"golang.org/x/xerrors"
+
+	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 // DB is interface for a database driver
@@ -19,12 +20,13 @@ type DB interface {
 	GetFetchMeta() (*models.FetchMeta, error)
 	UpsertFetchMeta(*models.FetchMeta) error
 
-	GetVendorProducts() ([]models.VendorProduct, error)
+	GetVendorProducts() ([]models.VendorProduct, []models.VendorProduct, error)
 	GetCpesByVendorProduct(string, string) ([]string, []string, error)
 	InsertCpes(models.FetchType, []models.CategorizedCpe) error
 	IsDeprecated(string) (bool, error)
 }
 
+// Option :
 type Option struct {
 	RedisTimeout time.Duration
 }
