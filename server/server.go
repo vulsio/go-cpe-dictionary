@@ -10,8 +10,10 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
-	"github.com/vulsio/go-cpe-dictionary/db"
 	"golang.org/x/xerrors"
+
+	"github.com/vulsio/go-cpe-dictionary/db"
+	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 // Start starts CVE dictionary HTTP Server.
@@ -54,13 +56,13 @@ func health() echo.HandlerFunc {
 // Handler
 func getVendorProducts(driver db.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		products, err := driver.GetVendorProducts()
+		products, deprecated, err := driver.GetVendorProducts()
 		if err != nil {
 			log15.Error("Failed to GetVendorProducts", "err", err)
 			return c.JSON(http.StatusInternalServerError, []string{})
 		}
 
-		return c.JSON(http.StatusOK, products)
+		return c.JSON(http.StatusOK, map[string][]models.VendorProduct{"vendorProducts": products, "deprecated": deprecated})
 	}
 }
 

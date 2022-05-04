@@ -14,9 +14,10 @@ import (
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
+
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
-	"golang.org/x/xerrors"
 )
 
 // CpeDictionary has cpe-item list

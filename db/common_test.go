@@ -9,6 +9,7 @@ import (
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
+
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
@@ -26,7 +27,8 @@ func prepareTestData(driver DB) error {
 		{"cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*", false},
 		{"cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*", false},
 		{"cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*", false},
-		{"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*", true},
+		{"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*", false},
+		{"cpe:2.3:a:vendorName6:productName6:6.1:*:*:*:*:targetSoftware6:targetHardware6:*", true},
 		{`cpe:2.3:a:mongodb:c\#_driver:1.10.0:-:*:*:*:mongodb:*:*`, false},
 	}
 
@@ -61,14 +63,13 @@ func prepareTestData(driver DB) error {
 }
 
 func testGetVendorProducts(t *testing.T, driver DB) {
-	var err error
-
 	if err := prepareTestData(driver); err != nil {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 
 	type Expected struct {
 		VendorProduct []models.VendorProduct
+		Deprecated    []models.VendorProduct
 		ErrString     string
 	}
 
@@ -89,12 +90,15 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 					{Vendor: "vendorName5", Product: "productName5"},
 					{Vendor: "vendorName6", Product: "productName6"},
 				},
+				Deprecated: []models.VendorProduct{
+					{Vendor: "vendorName6", Product: "productName6"},
+				},
 			},
 		},
 	}
 	for k, tc := range cases {
-		var vendorProducts []models.VendorProduct
-		if vendorProducts, err = driver.GetVendorProducts(); err != nil {
+		vendorProducts, deprecated, err := driver.GetVendorProducts()
+		if err != nil {
 			if !strings.Contains(err.Error(), tc.Expected.ErrString) {
 				t.Errorf("%s : actual %s, expected %s", k, err, tc.Expected.ErrString)
 				continue
@@ -107,7 +111,10 @@ func testGetVendorProducts(t *testing.T, driver DB) {
 			t.Errorf("%s : actual %s, expected %s", k, err, tc.Expected.ErrString)
 		}
 		if diff := cmp.Diff(vendorProducts, tc.Expected.VendorProduct); diff != "" {
-			t.Errorf("%s: diff %s", k, diff)
+			t.Errorf("%s: vendor product diff %s", k, diff)
+		}
+		if diff := cmp.Diff(deprecated, tc.Expected.Deprecated); diff != "" {
+			t.Errorf("%s: deprecated vendor product diff %s", k, diff)
 		}
 	}
 }
@@ -163,9 +170,11 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 			Vendor:  "vendorName6",
 			Product: "productName6",
 			Expected: Expected{
-				CpeURIs: []string{},
-				Deprecated: []string{
+				CpeURIs: []string{
 					"cpe:/a:vendorName6:productName6:6.0::~~~targetSoftware6~targetHardware6~",
+				},
+				Deprecated: []string{
+					"cpe:/a:vendorName6:productName6:6.1::~~~targetSoftware6~targetHardware6~",
 				},
 			},
 		},

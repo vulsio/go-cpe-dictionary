@@ -74,7 +74,7 @@ func TestRedisDriver_IsDeprecated(t *testing.T) {
 		{
 			name: "test deprecated",
 			args: args{
-				cpeURI: "cpe:/a:vendorName6:productName6:6.0::~~~targetSoftware6~targetHardware6~",
+				cpeURI: "cpe:/a:vendorName6:productName6:6.1::~~~targetSoftware6~targetHardware6~",
 			},
 			want:    true,
 			wantErr: false,

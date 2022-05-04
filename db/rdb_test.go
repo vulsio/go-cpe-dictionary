@@ -56,9 +56,10 @@ func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 		"cpe:/a:vendorName3:productName3:3.0::~~~targetSoftware3~targetHardware3~",
 		"cpe:/a:vendorName4:productName4:4.0::~~~targetSoftware4~targetHardware4~",
 		"cpe:/a:vendorName5:productName5:5.0::~~~targetSoftware5~targetHardware5~",
+		"cpe:/a:vendorName6:productName6:6.0::~~~targetSoftware6~targetHardware6~",
 	}
 	eDeprecated := []string{
-		"cpe:/a:vendorName6:productName6:6.0::~~~targetSoftware6~targetHardware6~",
+		"cpe:/a:vendorName6:productName6:6.1::~~~targetSoftware6~targetHardware6~",
 	}
 
 	var cpeURIs []string

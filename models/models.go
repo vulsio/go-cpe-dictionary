@@ -53,6 +53,7 @@ type CategorizedCpe struct {
 	Deprecated      bool
 }
 
+// VendorProduct :
 type VendorProduct struct {
 	Vendor  string
 	Product string

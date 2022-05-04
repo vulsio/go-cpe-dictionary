@@ -13,24 +13,27 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/inconshreveable/log15"
 	"github.com/spf13/viper"
+	"golang.org/x/xerrors"
+
 	"github.com/vulsio/go-cpe-dictionary/config"
 	"github.com/vulsio/go-cpe-dictionary/models"
-	"golang.org/x/xerrors"
 )
 
 /**
 # Redis Data Structure
 - Sets
-  ┌─────────────────────────────┬───────────────────────┬──────────────────────────────────┐
-  │       KEY                   │  MEMBER               │             PURPOSE              │
-  └─────────────────────────────┴───────────────────────┴──────────────────────────────────┘
-  ┌─────────────────────────────┬───────────────────────┬──────────────────────────────────┐
-  │ CPE#VendorProducts          │ ${vendor}##${product} │ Get ALL Vendor Products          │
-  ├─────────────────────────────┼───────────────────────┼──────────────────────────────────┤
-  │ CPE#VP#${vendor}##${product} │ CPEURI               │ Get CPEURI by vendor and product │
-  ├─────────────────────────────┼───────────────────────┼──────────────────────────────────┤
-  │ CPE#DeprecatedCPEs          │ CPEURI                │ Get DeprecatedCPEs               │
-  └─────────────────────────────┴───────────────────────┴──────────────────────────────────┘
+  ┌─────────────────────────────┬───────────────────────┬────────────────────────────────────┐
+  │       KEY                   │  MEMBER               │              PURPOSE               │
+  └─────────────────────────────┴───────────────────────┴────────────────────────────────────┘
+  ┌─────────────────────────────┬───────────────────────┬────────────────────────────────────┐
+  │ CPE#VendorProducts          │ ${vendor}##${product} │ Get ALL Vendor Products            │
+  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#DeprecatedVendorProducts│ ${vendor}##${product} │ Get ALL Deprecated Vendor Products │
+  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#VP#${vendor}##${product}│ CPEURI                │ Get CPEURI by vendor and product   │
+  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#DeprecatedCPEs          │ CPEURI                │ Get DeprecatedCPEs                 │
+  └─────────────────────────────┴───────────────────────┴────────────────────────────────────┘
 
 - Hash
   ┌───┬────────────────┬───────────────┬─────────────┬──────────────────────────────────────────────────┐
@@ -48,13 +51,14 @@ import (
 **/
 
 const (
-	dialectRedis      = "redis"
-	vpKeyFormat       = "CPE#VP#%s##%s"
-	vpListKey         = "CPE#VendorProducts"
-	vpSeparator       = "##"
-	deprecatedCPEsKey = "CPE#DeprecatedCPEs"
-	depKey            = "CPE#DEP"
-	fetchMetaKey      = "CPE#FETCHMETA"
+	dialectRedis        = "redis"
+	vpKeyFormat         = "CPE#VP#%s##%s"
+	vpListKey           = "CPE#VendorProducts"
+	deprecatedVPListKey = "CPE#DeprecatedVendorProducts"
+	vpSeparator         = "##"
+	deprecatedCPEsKey   = "CPE#DeprecatedCPEs"
+	depKey              = "CPE#DEP"
+	fetchMetaKey        = "CPE#FETCHMETA"
 )
 
 // RedisDriver is Driver for Redis
@@ -167,12 +171,25 @@ func (r *RedisDriver) UpsertFetchMeta(fetchMeta *models.FetchMeta) error {
 }
 
 // GetVendorProducts : GetVendorProducts
-func (r *RedisDriver) GetVendorProducts() (vendorProducts []models.VendorProduct, err error) {
-	ctx := context.Background()
-	result, err := r.conn.SMembers(ctx, vpListKey).Result()
+func (r *RedisDriver) GetVendorProducts() ([]models.VendorProduct, []models.VendorProduct, error) {
+	vendorProducts, err := r.getVendorProducts(vpListKey)
 	if err != nil {
-		return nil, err
+		return nil, nil, xerrors.Errorf("Failed to get vendor products. err: %w", err)
 	}
+	deprecated, err := r.getVendorProducts(deprecatedVPListKey)
+	if err != nil {
+		return nil, nil, xerrors.Errorf("Failed to get deprecated vendor products. err: %w", err)
+	}
+	return vendorProducts, deprecated, nil
+}
+
+func (r *RedisDriver) getVendorProducts(redisKey string) ([]models.VendorProduct, error) {
+	ctx := context.Background()
+	result, err := r.conn.SMembers(ctx, redisKey).Result()
+	if err != nil {
+		return nil, xerrors.Errorf("Failed to SMembers. key: %s, err: %w", redisKey, err)
+	}
+	vendorProducts := []models.VendorProduct{}
 	for _, vp := range result {
 		vpParts := strings.Split(vp, vpSeparator)
 		if len(vpParts) != 2 {
@@ -219,11 +236,12 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		return xerrors.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
 	}
 
-	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}}
+	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedVendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}}
 	newDeps := map[string]map[string]map[string]struct{}{
-		"VP":             {},
-		"VendorProducts": {},
-		"DeprecatedCPEs": {},
+		"VP":                       {},
+		"VendorProducts":           {},
+		"DeprecatedVendorProducts": {},
+		"DeprecatedCPEs":           {},
 	}
 	oldDepsStr, err := r.conn.HGet(ctx, depKey, string(fetchType)).Result()
 	if err != nil {
@@ -233,6 +251,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		oldDepsStr = `{
 			"VP": {},
 			"VendorProducts": {},
+			"DeprecatedVendorProducts": {},
 			"DeprecatedCPEs": {}
 		}`
 	}
@@ -245,9 +264,20 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	for idx := range chunkSlice(len(cpes), batchSize) {
 		pipe := r.conn.Pipeline()
 		for _, c := range cpes[idx.From:idx.To] {
-			bar.Increment()
 			vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
-			_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
+			if c.Deprecated {
+				_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
+				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
+				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
+
+				_ = pipe.SAdd(ctx, deprecatedVPListKey, vendorProductStr)
+				newDeps["DeprecatedVendorProducts"][vendorProductStr] = map[string]struct{}{}
+				delete(oldDeps["DeprecatedVendorProducts"], vendorProductStr)
+			} else {
+				_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
+				newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
+				delete(oldDeps["VendorProducts"], vendorProductStr)
+			}
 			_ = pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI)
 			if _, ok := newDeps["VP"][vendorProductStr]; !ok {
 				newDeps["VP"][vendorProductStr] = map[string]struct{}{}
@@ -259,18 +289,12 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 					delete(oldDeps["VP"], vendorProductStr)
 				}
 			}
-			newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
-			delete(oldDeps["VendorProducts"], vendorProductStr)
 
-			if c.Deprecated {
-				_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
-				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
-				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
-			}
 		}
 		if _, err = pipe.Exec(ctx); err != nil {
 			return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
 		}
+		bar.Add(idx.To - idx.From)
 	}
 	bar.Finish()
 	log15.Info(fmt.Sprintf("Refreshed %d CPEs.", len(cpes)))
@@ -284,6 +308,9 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 	}
 	for vendorProductStr := range oldDeps["VendorProducts"] {
 		_ = pipe.SRem(ctx, vpListKey, vendorProductStr)
+	}
+	for vendorProductStr := range oldDeps["DeprecatedVendorProducts"] {
+		_ = pipe.SRem(ctx, deprecatedVPListKey, vendorProductStr)
 	}
 	for cpeURI := range oldDeps["DeprecatedCPEs"] {
 		_ = pipe.SRem(ctx, deprecatedCPEsKey, cpeURI)
