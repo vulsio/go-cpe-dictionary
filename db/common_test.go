@@ -6,58 +6,31 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/knqyf263/go-cpe/common"
-	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
 
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
 func prepareTestData(driver DB) error {
-	var testCpeStrings = []struct {
-		cpe        string
-		deprecated bool
-	}{
-		{`cpe:2.3:a:ntp:ntp:4.2.5p48:*:*:*:*:*:*:*`, false},
-		{`cpe:2.3:a:ntp:ntp:4.2.8:p1-beta1:*:*:*:*:*:*`, false},
-		{`cpe:2.3:a:responsive_coming_soon_page_project:responsive_coming_soon_page:1.1.18:*:*:*:*:wordpress:*:*`, false},
-		{`cpe:2.3:a:vendorName1:productName1-1:1.1:*:*:*:*:targetSoftware1:targetHardware1:*`, false},
-		{`cpe:2.3:a:vendorName1:productName1-2:1.2:*:*:*:*:targetSoftware1:targetHardware1:*`, false},
-		{"cpe:2.3:a:vendorName2:productName2:2.0:*:*:*:*:targetSoftware2:targetHardware2:*", false},
-		{"cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*", false},
-		{"cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*", false},
-		{"cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*", false},
-		{"cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*", false},
-		{"cpe:2.3:a:vendorName6:productName6:6.1:*:*:*:*:targetSoftware6:targetHardware6:*", true},
-		{`cpe:2.3:a:mongodb:c\#_driver:1.10.0:-:*:*:*:mongodb:*:*`, false},
+	var testCpes = models.FetchedCPEs{
+		CPEs: []string{
+			`cpe:2.3:a:ntp:ntp:4.2.5p48:*:*:*:*:*:*:*`,
+			`cpe:2.3:a:ntp:ntp:4.2.8:p1-beta1:*:*:*:*:*:*`,
+			`cpe:2.3:a:responsive_coming_soon_page_project:responsive_coming_soon_page:1.1.18:*:*:*:*:wordpress:*:*`,
+			`cpe:2.3:a:vendorName1:productName1-1:1.1:*:*:*:*:targetSoftware1:targetHardware1:*`,
+			`cpe:2.3:a:vendorName1:productName1-2:1.2:*:*:*:*:targetSoftware1:targetHardware1:*`,
+			`cpe:2.3:a:vendorName2:productName2:2.0:*:*:*:*:targetSoftware2:targetHardware2:*`,
+			`cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*`,
+			`cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*`,
+			`cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*`,
+			`cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*`,
+			`cpe:2.3:a:mongodb:c\#_driver:1.10.0:-:*:*:*:mongodb:*:*`,
+		},
+		Deprecated: []string{
+			`cpe:2.3:a:vendorName6:productName6:6.1:*:*:*:*:targetSoftware6:targetHardware6:*`,
+		},
 	}
-
-	testCpes := []models.CategorizedCpe{}
-
-	for _, t := range testCpeStrings {
-		wfn, err := naming.UnbindFS(t.cpe)
-		if err != nil {
-			return err
-		}
-
-		testCpes = append(testCpes, models.CategorizedCpe{
-			CpeURI:          naming.BindToURI(wfn),
-			CpeFS:           naming.BindToFS(wfn),
-			Part:            wfn.GetString(common.AttributePart),
-			Vendor:          wfn.GetString(common.AttributeVendor),
-			Product:         wfn.GetString(common.AttributeProduct),
-			Version:         wfn.GetString(common.AttributeVersion),
-			Update:          wfn.GetString(common.AttributeUpdate),
-			Edition:         wfn.GetString(common.AttributeEdition),
-			Language:        wfn.GetString(common.AttributeLanguage),
-			SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
-			TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
-			TargetHardware:  wfn.GetString(common.AttributeTargetHw),
-			Other:           wfn.GetString(common.AttributeOther),
-			Deprecated:      t.deprecated,
-		})
-	}
-
+	viper.Set("threads", 1)
 	viper.Set("batch-size", 1)
 	return driver.InsertCpes(models.NVD, testCpes)
 }

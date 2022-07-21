@@ -11,7 +11,6 @@ import (
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/go-redis/redis/v8"
-	"github.com/inconshreveable/log15"
 	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
 
@@ -229,7 +228,7 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 }
 
 // InsertCpes Select Cve information from DB.
-func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.CategorizedCpe) (err error) {
+func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.FetchedCPEs) (err error) {
 	ctx := context.Background()
 	batchSize := viper.GetInt("batch-size")
 	if batchSize < 1 {
@@ -260,44 +259,56 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes []models.Categ
 		return xerrors.Errorf("Failed to unmarshal JSON. err: %w", err)
 	}
 
-	bar := pb.StartNew(len(cpes))
-	for idx := range chunkSlice(len(cpes), batchSize) {
-		pipe := r.conn.Pipeline()
-		for _, c := range cpes[idx.From:idx.To] {
-			vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
-			if c.Deprecated {
-				_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
-				newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
-				delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
+	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated))
+	for _, in := range []struct {
+		cpes       []string
+		deprecated bool
+	}{
+		{
+			cpes:       cpes.CPEs,
+			deprecated: false,
+		},
+		{
+			cpes:       cpes.Deprecated,
+			deprecated: true,
+		},
+	} {
+		for idx := range chunkSlice(len(in.cpes), batchSize) {
+			pipe := r.conn.Pipeline()
+			for _, c := range models.ConvertToModels(in.cpes[idx.From:idx.To], fetchType, in.deprecated) {
+				vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
+				if c.Deprecated {
+					_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
+					newDeps["DeprecatedCPEs"][c.CpeURI] = map[string]struct{}{}
+					delete(oldDeps["DeprecatedCPEs"], c.CpeURI)
 
-				_ = pipe.SAdd(ctx, deprecatedVPListKey, vendorProductStr)
-				newDeps["DeprecatedVendorProducts"][vendorProductStr] = map[string]struct{}{}
-				delete(oldDeps["DeprecatedVendorProducts"], vendorProductStr)
-			} else {
-				_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
-				newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
-				delete(oldDeps["VendorProducts"], vendorProductStr)
-			}
-			_ = pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI)
-			if _, ok := newDeps["VP"][vendorProductStr]; !ok {
-				newDeps["VP"][vendorProductStr] = map[string]struct{}{}
-			}
-			newDeps["VP"][vendorProductStr][c.CpeURI] = struct{}{}
-			if _, ok := oldDeps["VP"][vendorProductStr]; ok {
-				delete(oldDeps["VP"][vendorProductStr], c.CpeURI)
-				if len(oldDeps["VP"][vendorProductStr]) == 0 {
-					delete(oldDeps["VP"], vendorProductStr)
+					_ = pipe.SAdd(ctx, deprecatedVPListKey, vendorProductStr)
+					newDeps["DeprecatedVendorProducts"][vendorProductStr] = map[string]struct{}{}
+					delete(oldDeps["DeprecatedVendorProducts"], vendorProductStr)
+				} else {
+					_ = pipe.SAdd(ctx, vpListKey, vendorProductStr)
+					newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
+					delete(oldDeps["VendorProducts"], vendorProductStr)
+				}
+				_ = pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI)
+				if _, ok := newDeps["VP"][vendorProductStr]; !ok {
+					newDeps["VP"][vendorProductStr] = map[string]struct{}{}
+				}
+				newDeps["VP"][vendorProductStr][c.CpeURI] = struct{}{}
+				if _, ok := oldDeps["VP"][vendorProductStr]; ok {
+					delete(oldDeps["VP"][vendorProductStr], c.CpeURI)
+					if len(oldDeps["VP"][vendorProductStr]) == 0 {
+						delete(oldDeps["VP"], vendorProductStr)
+					}
 				}
 			}
-
+			if _, err = pipe.Exec(ctx); err != nil {
+				return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
+			}
+			bar.Add(idx.To - idx.From)
 		}
-		if _, err = pipe.Exec(ctx); err != nil {
-			return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
-		}
-		bar.Add(idx.To - idx.From)
 	}
 	bar.Finish()
-	log15.Info(fmt.Sprintf("Refreshed %d CPEs.", len(cpes)))
 
 	pipe := r.conn.Pipeline()
 	for vendorProductStr, cpeURIs := range oldDeps["VP"] {

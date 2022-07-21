@@ -205,11 +205,11 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 }
 
 // InsertCpes inserts Cpe Information into DB
-func (r *RDBDriver) InsertCpes(fetchType models.FetchType, cpes []models.CategorizedCpe) error {
+func (r *RDBDriver) InsertCpes(fetchType models.FetchType, cpes models.FetchedCPEs) error {
 	return r.deleteAndInsertCpes(r.conn, fetchType, cpes)
 }
 
-func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchType, cpes []models.CategorizedCpe) (err error) {
+func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchType, cpes models.FetchedCPEs) (err error) {
 	tx := conn.Begin()
 	defer func() {
 		if err != nil {
@@ -244,12 +244,26 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	}
 
 	log15.Info("Inserting new CPEs")
-	bar := pb.StartNew(len(cpes))
-	for idx := range chunkSlice(len(cpes), batchSize) {
-		if err := tx.Create(cpes[idx.From:idx.To]).Error; err != nil {
-			return xerrors.Errorf("Failed to insert. err: %w", err)
+	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated))
+	for _, in := range []struct {
+		cpes       []string
+		deprecated bool
+	}{
+		{
+			cpes:       cpes.CPEs,
+			deprecated: false,
+		},
+		{
+			cpes:       cpes.Deprecated,
+			deprecated: true,
+		},
+	} {
+		for idx := range chunkSlice(len(in.cpes), batchSize) {
+			if err := tx.Create(models.ConvertToModels(in.cpes[idx.From:idx.To], fetchType, in.deprecated)).Error; err != nil {
+				return xerrors.Errorf("Failed to insert. err: %w", err)
+			}
+			bar.Add(idx.To - idx.From)
 		}
-		bar.Add(idx.To - idx.From)
 	}
 	bar.Finish()
 

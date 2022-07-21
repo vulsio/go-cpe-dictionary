@@ -36,7 +36,6 @@ func TestGetCpesByVendorProductSqlite(t *testing.T) {
 
 // TestGetCpesByVendorProductSqliteFuzzy includes a % for some simple fuzzy matches not supported by all drivers.
 func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
-
 	driver, _, err := NewDB("sqlite3", ":memory:", false, Option{})
 	if err != nil {
 		t.Error(err)
