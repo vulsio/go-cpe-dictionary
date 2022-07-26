@@ -77,12 +77,16 @@ func ConvertToModels(cpes []string, fetchType FetchType, deprecated bool) []Cate
 		}
 	}()
 
+	unbindFn := naming.UnbindFS
+	if fetchType == JVN {
+		unbindFn = naming.UnbindURI
+	}
 	tasks := util.GenWorkers(viper.GetInt("threads"), 0)
 	for range cpes {
 		tasks <- func() {
 			select {
 			case cpe := <-reqChan:
-				wfn, err := naming.UnbindFS(cpe)
+				wfn, err := unbindFn(cpe)
 				if err != nil {
 					resChan <- nil
 				}

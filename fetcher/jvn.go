@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/inconshreveable/log15"
+	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
@@ -45,6 +47,11 @@ func FetchJVN() (models.FetchedCPEs, error) {
 	for _, rdf := range rdfs {
 		for _, item := range rdf.Items {
 			for _, c := range item.Cpes {
+				if _, err := naming.UnbindURI(c.Value); err != nil {
+					// Logging only
+					log15.Warn("Failed to unbind", c.Value, err)
+					continue
+				}
 				cpeURIs[c.Value] = struct{}{}
 			}
 		}
