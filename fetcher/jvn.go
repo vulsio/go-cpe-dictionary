@@ -127,7 +127,7 @@ func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []
 		case err := <-errChan:
 			errs = append(errs, err)
 		case <-timeout:
-			return rdfs, xerrors.Errorf("Timeout Fetching Nvd")
+			return rdfs, xerrors.Errorf("Timeout Fetching JVN")
 		}
 	}
 	if 0 < len(errs) {
