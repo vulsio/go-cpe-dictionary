@@ -133,11 +133,11 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 		}
 	}()
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to decompress NVD feedfile. url: %s, err: %w", url, err)
+		return nil, xerrors.Errorf("Failed to decompress feedfile. url: %s, err: %w", url, err)
 	}
 	bytes, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to Read NVD feedfile. url: %s, err: %w", url, err)
+		return nil, xerrors.Errorf("Failed to Read feedfile. url: %s, err: %w", url, err)
 	}
 	return bytes, nil
 }
