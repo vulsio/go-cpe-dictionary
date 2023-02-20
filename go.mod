@@ -1,6 +1,6 @@
 module github.com/vulsio/go-cpe-dictionary
 
-go 1.18
+go 1.20
 
 require (
 	github.com/alicebob/miniredis/v2 v2.14.1
