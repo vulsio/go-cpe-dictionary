@@ -22,7 +22,7 @@ type DB interface {
 
 	GetVendorProducts() ([]models.VendorProduct, []models.VendorProduct, error)
 	GetCpesByVendorProduct(string, string) ([]string, []string, error)
-	InsertCpes(models.FetchType, []models.CategorizedCpe) error
+	InsertCpes(models.FetchType, models.FetchedCPEs) error
 	IsDeprecated(string) (bool, error)
 }
 

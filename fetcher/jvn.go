@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/inconshreveable/log15"
-	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
+	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 
 	"github.com/vulsio/go-cpe-dictionary/models"
@@ -32,39 +32,31 @@ type cpe struct {
 }
 
 // FetchJVN JVN feeds
-func FetchJVN() ([]models.CategorizedCpe, error) {
+func FetchJVN() (models.FetchedCPEs, error) {
 	years, err := util.GetYearsUntilThisYear(2002)
 	if err != nil {
-		return nil, err
+		return models.FetchedCPEs{}, err
 	}
 	urls := makeJvnURLs(years)
 
-	cpeURIs := map[string]models.CategorizedCpe{}
+	cpeURIs := map[string]struct{}{}
 	rdfs, err := fetchJVNFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to get feeds. err: %w", err)
+		return models.FetchedCPEs{}, xerrors.Errorf("Failed to get feeds. err: %w", err)
 	}
 	for _, rdf := range rdfs {
 		for _, item := range rdf.Items {
-			cpes, err := convertJvnCpesToModel(item.Cpes)
-			if err != nil {
-				return nil, xerrors.Errorf("Failed to convert. err: %w", err)
-			}
-
-			for _, c := range cpes {
-				if _, ok := cpeURIs[c.CpeURI]; !ok {
-					cpeURIs[c.CpeURI] = c
+			for _, c := range item.Cpes {
+				if _, err := naming.UnbindURI(c.Value); err != nil {
+					// Logging only
+					log15.Warn("Failed to unbind", c.Value, err)
+					continue
 				}
+				cpeURIs[c.Value] = struct{}{}
 			}
 		}
 	}
-
-	allCpes := []models.CategorizedCpe{}
-	for _, c := range cpeURIs {
-		allCpes = append(allCpes, c)
-	}
-
-	return allCpes, nil
+	return models.FetchedCPEs{CPEs: maps.Keys(cpeURIs)}, nil
 }
 
 func makeJvnURLs(years []int) (urls []string) {
@@ -141,36 +133,8 @@ func fetchJVNFeedFile(url string) (rdf *rdf, err error) {
 	if err != nil {
 		return nil, xerrors.Errorf("Failed to fetch. url: %s, err: %w", url, err)
 	}
-	if err = xml.Unmarshal(bytes, &rdf); err != nil {
+	if err := xml.Unmarshal(bytes, &rdf); err != nil {
 		return nil, xerrors.Errorf("Failed to unmarshal. url: %s, err: %w", url, err)
 	}
 	return rdf, nil
-}
-
-func convertJvnCpesToModel(jvnCpes []cpe) (cpes []models.CategorizedCpe, err error) {
-	for _, c := range jvnCpes {
-		var wfn common.WellFormedName
-		if wfn, err = naming.UnbindURI(c.Value); err != nil {
-			// Logging only
-			log15.Warn("Failed to unbind", c.Value, err)
-			continue
-		}
-		cpes = append(cpes, models.CategorizedCpe{
-			FetchType:       models.JVN,
-			CpeURI:          naming.BindToURI(wfn),
-			CpeFS:           naming.BindToFS(wfn),
-			Part:            wfn.GetString(common.AttributePart),
-			Vendor:          wfn.GetString(common.AttributeVendor),
-			Product:         wfn.GetString(common.AttributeProduct),
-			Version:         wfn.GetString(common.AttributeVersion),
-			Update:          wfn.GetString(common.AttributeUpdate),
-			Edition:         wfn.GetString(common.AttributeEdition),
-			Language:        wfn.GetString(common.AttributeLanguage),
-			SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
-			TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
-			TargetHardware:  wfn.GetString(common.AttributeTargetHw),
-			Other:           wfn.GetString(common.AttributeOther),
-		})
-	}
-	return cpes, nil
 }

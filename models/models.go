@@ -3,7 +3,12 @@ package models
 import (
 	"time"
 
+	"github.com/knqyf263/go-cpe/common"
+	"github.com/knqyf263/go-cpe/naming"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
+
+	"github.com/vulsio/go-cpe-dictionary/util"
 )
 
 // LatestSchemaVersion manages the Schema version used in the latest go-cpe-dictionary.
@@ -32,6 +37,12 @@ const (
 	JVN FetchType = "jvn"
 )
 
+// FetchedCPEs :
+type FetchedCPEs struct {
+	CPEs       []string
+	Deprecated []string
+}
+
 // CategorizedCpe :
 // https://cpe.mitre.org/specification/CPE_2.3_for_ITSAC_Nov2011.pdf
 type CategorizedCpe struct {
@@ -51,6 +62,65 @@ type CategorizedCpe struct {
 	TargetHardware  string    `gorm:"type:varchar(255)"`
 	Other           string    `gorm:"type:varchar(255)"`
 	Deprecated      bool
+}
+
+// ConvertToModels :
+func ConvertToModels(cpes []string, fetchType FetchType, deprecated bool) []CategorizedCpe {
+	reqChan := make(chan string, len(cpes))
+	resChan := make(chan *CategorizedCpe, len(cpes))
+	defer close(reqChan)
+	defer close(resChan)
+
+	go func() {
+		for _, cpe := range cpes {
+			reqChan <- cpe
+		}
+	}()
+
+	unbindFn := naming.UnbindFS
+	if fetchType == JVN {
+		unbindFn = naming.UnbindURI
+	}
+	tasks := util.GenWorkers(viper.GetInt("threads"), 0)
+	for range cpes {
+		tasks <- func() {
+			select {
+			case cpe := <-reqChan:
+				wfn, err := unbindFn(cpe)
+				if err != nil {
+					resChan <- nil
+				}
+				resChan <- &CategorizedCpe{
+					FetchType:       fetchType,
+					CpeURI:          naming.BindToURI(wfn),
+					CpeFS:           naming.BindToFS(wfn),
+					Part:            wfn.GetString(common.AttributePart),
+					Vendor:          wfn.GetString(common.AttributeVendor),
+					Product:         wfn.GetString(common.AttributeProduct),
+					Version:         wfn.GetString(common.AttributeVersion),
+					Update:          wfn.GetString(common.AttributeUpdate),
+					Edition:         wfn.GetString(common.AttributeEdition),
+					Language:        wfn.GetString(common.AttributeLanguage),
+					SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
+					TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
+					TargetHardware:  wfn.GetString(common.AttributeTargetHw),
+					Other:           wfn.GetString(common.AttributeOther),
+					Deprecated:      deprecated,
+				}
+			}
+		}
+	}
+
+	var converted []CategorizedCpe
+	for range cpes {
+		select {
+		case cpe := <-resChan:
+			if cpe != nil {
+				converted = append(converted, *cpe)
+			}
+		}
+	}
+	return converted
 }
 
 // VendorProduct :

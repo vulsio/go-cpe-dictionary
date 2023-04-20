@@ -3,7 +3,7 @@ package util
 import (
 	"bytes"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -135,7 +135,7 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 	if err != nil {
 		return nil, xerrors.Errorf("Failed to decompress feedfile. url: %s, err: %w", url, err)
 	}
-	bytes, err := ioutil.ReadAll(reader)
+	bytes, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, xerrors.Errorf("Failed to Read feedfile. url: %s, err: %w", url, err)
 	}

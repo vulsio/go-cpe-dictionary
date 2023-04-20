@@ -1,10 +1,8 @@
 package commands
 
 import (
-	"fmt"
 	"time"
 
-	"github.com/inconshreveable/log15"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
@@ -55,32 +53,8 @@ func fetchNvd(_ *cobra.Command, _ []string) (err error) {
 	if err != nil {
 		return xerrors.Errorf("Failed to fetch. err: %w", err)
 	}
-	log15.Info("Fetched", "Number of CPEs", len(cpes))
-
-	if !viper.GetBool("stdout") {
-		if err = driver.InsertCpes(models.NVD, cpes); err != nil {
-			return xerrors.Errorf("Failed to insert cpes. err: %w", err)
-		}
-		log15.Info(fmt.Sprintf("Inserted %d CPEs", len(cpes)))
-	} else {
-		for _, cpe := range cpes {
-			fmt.Printf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%t\n",
-				cpe.CpeURI,
-				cpe.CpeFS,
-				cpe.Part,
-				cpe.Vendor,
-				cpe.Product,
-				cpe.Version,
-				cpe.Update,
-				cpe.Edition,
-				cpe.Language,
-				cpe.SoftwareEdition,
-				cpe.TargetSoftware,
-				cpe.TargetHardware,
-				cpe.Other,
-				cpe.Deprecated,
-			)
-		}
+	if err := driver.InsertCpes(models.NVD, cpes); err != nil {
+		return xerrors.Errorf("Failed to insert cpes. err: %w", err)
 	}
 
 	fetchMeta.LastFetchedAt = time.Now()
