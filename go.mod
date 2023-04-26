@@ -3,7 +3,7 @@ module github.com/vulsio/go-cpe-dictionary
 go 1.20
 
 require (
-	github.com/alicebob/miniredis/v2 v2.14.1
+	github.com/alicebob/miniredis/v2 v2.30.2
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cheggaaa/pb/v3 v3.1.2
 	github.com/go-redis/redis/v8 v8.10.0
@@ -59,7 +59,7 @@ require (
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
-	github.com/yuin/gopher-lua v0.0.0-20191220021717-ab39c6098bdb // indirect
+	github.com/yuin/gopher-lua v1.1.0 // indirect
 	go.opentelemetry.io/otel v1.0.0-RC1 // indirect
 	go.opentelemetry.io/otel/internal/metric v0.21.0 // indirect
 	go.opentelemetry.io/otel/metric v0.21.0 // indirect
