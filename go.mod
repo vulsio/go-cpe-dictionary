@@ -7,7 +7,7 @@ require (
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cheggaaa/pb/v3 v3.0.8
 	github.com/go-redis/redis/v8 v8.10.0
-	github.com/google/go-cmp v0.5.8
+	github.com/google/go-cmp v0.5.9
 	github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
 	github.com/labstack/echo v3.3.10+incompatible
