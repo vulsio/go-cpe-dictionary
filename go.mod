@@ -8,7 +8,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.0.8
 	github.com/go-redis/redis/v8 v8.10.0
 	github.com/google/go-cmp v0.5.9
-	github.com/inconshreveable/log15 v0.0.0-20201112154412-8562bdadbbac
+	github.com/inconshreveable/log15 v3.0.0-testing.5+incompatible
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -66,6 +66,7 @@ require (
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
