@@ -12,7 +12,7 @@ import (
 // support parallel tests. We get weird go concurrency issues.
 
 func TestGetVendorProductsSqlite(t *testing.T) {
-	driver, _, err := NewDB("sqlite3", ":memory:", false, Option{})
+	driver, err := NewDB("sqlite3", ":memory:", false, Option{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func TestGetVendorProductsSqlite(t *testing.T) {
 }
 
 func TestGetCpesByVendorProductSqlite(t *testing.T) {
-	driver, _, err := NewDB("sqlite3", ":memory:", false, Option{})
+	driver, err := NewDB("sqlite3", ":memory:", false, Option{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -36,7 +36,7 @@ func TestGetCpesByVendorProductSqlite(t *testing.T) {
 
 // TestGetCpesByVendorProductSqliteFuzzy includes a % for some simple fuzzy matches not supported by all drivers.
 func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
-	driver, _, err := NewDB("sqlite3", ":memory:", false, Option{})
+	driver, err := NewDB("sqlite3", ":memory:", false, Option{})
 	if err != nil {
 		t.Error(err)
 	}
