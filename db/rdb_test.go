@@ -34,6 +34,18 @@ func TestGetCpesByVendorProductSqlite(t *testing.T) {
 	testGetCpesByVendorProduct(t, driver)
 }
 
+func TestGetSimilarCpesByTitleSqlite(t *testing.T) {
+	driver, err := NewDB("sqlite3", ":memory:", false, Option{})
+	if err != nil {
+		t.Error(err)
+	}
+	defer func() {
+		_ = driver.CloseDB()
+	}()
+
+	testGetSimilarCpesByTitle(t, driver)
+}
+
 // TestGetCpesByVendorProductSqliteFuzzy includes a % for some simple fuzzy matches not supported by all drivers.
 func TestGetCpesByVendorProductSqliteFuzzy(t *testing.T) {
 	driver, err := NewDB("sqlite3", ":memory:", false, Option{})

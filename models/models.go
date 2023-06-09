@@ -35,12 +35,20 @@ const (
 	NVD FetchType = "nvd"
 	// JVN :
 	JVN FetchType = "jvn"
+	// Vuls :
+	Vuls FetchType = "vls"
 )
 
 // FetchedCPEs :
 type FetchedCPEs struct {
-	CPEs       []string
-	Deprecated []string
+	CPEs       []FetchedCPE
+	Deprecated []FetchedCPE
+}
+
+// FetchedCPE :
+type FetchedCPE struct {
+	Title string   `json:"title,omitempty"`
+	CPEs  []string `json:"cpes,omitempty"`
 }
 
 // CategorizedCpe :
@@ -48,6 +56,7 @@ type FetchedCPEs struct {
 type CategorizedCpe struct {
 	ID              int64     `json:"-"`
 	FetchType       FetchType `gorm:"type:varchar(3)"`
+	Title           string    `gorm:"type:text;index:idx_categorized_cpe_title,length:255"`
 	CpeURI          string    `gorm:"type:varchar(255);index:idx_categorized_cpe_cpe_uri"`
 	CpeFS           string    `gorm:"type:varchar(255)"`
 	Part            string    `gorm:"type:varchar(255)"`
@@ -65,8 +74,8 @@ type CategorizedCpe struct {
 }
 
 // ConvertToModels :
-func ConvertToModels(cpes []string, fetchType FetchType, deprecated bool) []CategorizedCpe {
-	reqChan := make(chan string, len(cpes))
+func ConvertToModels(cpes []FetchedCPE, fetchType FetchType, deprecated bool) []CategorizedCpe {
+	reqChan := make(chan FetchedCPE, len(cpes))
 	resChan := make(chan *CategorizedCpe, len(cpes))
 	defer close(reqChan)
 	defer close(resChan)
@@ -86,26 +95,29 @@ func ConvertToModels(cpes []string, fetchType FetchType, deprecated bool) []Cate
 		tasks <- func() {
 			select {
 			case cpe := <-reqChan:
-				wfn, err := unbindFn(cpe)
-				if err != nil {
-					resChan <- nil
-				}
-				resChan <- &CategorizedCpe{
-					FetchType:       fetchType,
-					CpeURI:          naming.BindToURI(wfn),
-					CpeFS:           naming.BindToFS(wfn),
-					Part:            wfn.GetString(common.AttributePart),
-					Vendor:          wfn.GetString(common.AttributeVendor),
-					Product:         wfn.GetString(common.AttributeProduct),
-					Version:         wfn.GetString(common.AttributeVersion),
-					Update:          wfn.GetString(common.AttributeUpdate),
-					Edition:         wfn.GetString(common.AttributeEdition),
-					Language:        wfn.GetString(common.AttributeLanguage),
-					SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
-					TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
-					TargetHardware:  wfn.GetString(common.AttributeTargetHw),
-					Other:           wfn.GetString(common.AttributeOther),
-					Deprecated:      deprecated,
+				for _, c := range cpe.CPEs {
+					wfn, err := unbindFn(c)
+					if err != nil {
+						resChan <- nil
+					}
+					resChan <- &CategorizedCpe{
+						FetchType:       fetchType,
+						Title:           cpe.Title,
+						CpeURI:          naming.BindToURI(wfn),
+						CpeFS:           naming.BindToFS(wfn),
+						Part:            wfn.GetString(common.AttributePart),
+						Vendor:          wfn.GetString(common.AttributeVendor),
+						Product:         wfn.GetString(common.AttributeProduct),
+						Version:         wfn.GetString(common.AttributeVersion),
+						Update:          wfn.GetString(common.AttributeUpdate),
+						Edition:         wfn.GetString(common.AttributeEdition),
+						Language:        wfn.GetString(common.AttributeLanguage),
+						SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
+						TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
+						TargetHardware:  wfn.GetString(common.AttributeTargetHw),
+						Other:           wfn.GetString(common.AttributeOther),
+						Deprecated:      deprecated,
+					}
 				}
 			}
 		}

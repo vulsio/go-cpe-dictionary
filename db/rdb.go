@@ -10,6 +10,7 @@ import (
 
 	"github.com/cheggaaa/pb/v3"
 	"github.com/glebarez/sqlite"
+	"github.com/hbollon/go-edlib"
 	"github.com/inconshreveable/log15"
 	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
@@ -256,6 +257,38 @@ func (r *RDBDriver) GetCpesByVendorProduct(vendor, product string) ([]string, []
 	return cpeURIs, deprecated, nil
 }
 
+// GetSimilarCpesByTitle : GetSimilarCpesByTitle
+func (r *RDBDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib.Algorithm) ([]models.FetchedCPE, error) {
+	if query == "" || n <= 0 {
+		return nil, nil
+	}
+
+	var titles []string
+	if err := r.conn.Model(&models.CategorizedCpe{}).Distinct("title").Find(&titles).Error; err != nil {
+		return nil, xerrors.Errorf("Failed to select title. err: %w", err)
+	}
+
+	if len(titles) < n {
+		n = len(titles)
+	}
+
+	ss, err := edlib.FuzzySearchSet(query, titles, n, algorithm)
+	if err != nil {
+		return nil, xerrors.Errorf("Failed to fuzzy search. err: %w", err)
+	}
+
+	ranks := make([]models.FetchedCPE, 0, n)
+	for _, s := range ss {
+		c := models.FetchedCPE{Title: s}
+		if err := r.conn.Model(&models.CategorizedCpe{}).Distinct("cpe_uri").Where("title = ?", s).Find(&c.CPEs).Error; err != nil {
+			return nil, xerrors.Errorf("Failed to select cpe_uri. err: %w", err)
+		}
+		ranks = append(ranks, c)
+	}
+
+	return ranks, nil
+}
+
 // InsertCpes inserts Cpe Information into DB
 func (r *RDBDriver) InsertCpes(fetchType models.FetchType, cpes models.FetchedCPEs) error {
 	return r.deleteAndInsertCpes(r.conn, fetchType, cpes)
@@ -298,7 +331,7 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	log15.Info("Inserting new CPEs")
 	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated))
 	for _, in := range []struct {
-		cpes       []string
+		cpes       []models.FetchedCPE
 		deprecated bool
 	}{
 		{

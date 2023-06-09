@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/go-redis/redis/v8"
 	"golang.org/x/xerrors"
 )
 
@@ -47,6 +46,17 @@ func TestGetCpesByVendorProductRedis(t *testing.T) {
 	testGetCpesByVendorProduct(t, driver)
 }
 
+func TestGetSimilarCpesByTitle(t *testing.T) {
+	t.Parallel()
+	s, driver, err := setupRedis()
+	if err != nil {
+		t.Errorf("Failed to parepare redis: %s", err)
+	}
+	defer teardownRedis(s, driver)
+
+	testGetSimilarCpesByTitle(t, driver)
+}
+
 func TestRedisDriver_IsDeprecated(t *testing.T) {
 	t.Parallel()
 	s, driver, err := setupRedis()
@@ -58,10 +68,6 @@ func TestRedisDriver_IsDeprecated(t *testing.T) {
 		t.Errorf("Inserting CPEs: %s", err)
 	}
 
-	type fields struct {
-		name string
-		conn *redis.Client
-	}
 	type args struct {
 		cpeURI string
 	}
