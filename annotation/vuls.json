@@ -1,0 +1,3039 @@
+[
+    {
+      "title": "Go Programming Language amd64 go1.3rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.3rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.3rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.3rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5beta3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:beta3:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5beta3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:beta3:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7rc3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc3:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7rc3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc3:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7rc4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc4:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7rc4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc4:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7rc5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc5:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7rc5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc5:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7rc6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc6:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7rc6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7:rc6:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8rc3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:rc3:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8rc3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8:rc3:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.2rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.2:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.2rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.2:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11beta3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:beta3:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11beta3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:beta3:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18:beta2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18beta2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18:beta2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19:beta1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19beta1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19:beta1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20:rc1:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20rc1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20:rc1:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20:rc2:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20rc2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20:rc2:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20rc3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20:rc3:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20rc3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20:rc3:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.2.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.2.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.2.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.2.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.3.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.3.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.3.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.3.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.3.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.3.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.3.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.4.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.4.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.4.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.5.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.5.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.5.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.6.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.6.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.6.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.7.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.7.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.7.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.8.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.8.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.8.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.9.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.9.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.9.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.10.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.10.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.10.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.11.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.11.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.11.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.14:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.14:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.15:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.15:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.16",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.16:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.16",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.16:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.12.17",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.17:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.12.17",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.12.17:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.14:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.14:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.13.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.15:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.13.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.13.15:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.14:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.14:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.14.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.15:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.14.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.14.15:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.14:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.14:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.15.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.15:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.15.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.15.15:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.14:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.14",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.14:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.16.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.15:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.16.15",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.16.15:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.11:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.11",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.11:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.12:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.12",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.12:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.17.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.13:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.17.13",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.17.13:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.18.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.18.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.18.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.5:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.6:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.6",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.6:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.7:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.7",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.7:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.8:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.8",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.8:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.9:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.9",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.9:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.0:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.0:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.1:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20.1",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.1:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.2:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20.2",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.2:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.3:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20.3",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.3:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.4:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20.4",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.4:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.19.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.10:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.19.10",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.19.10:*:*:*:*:*:386:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language amd64 go1.20.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.5:*:*:*:*:*:amd64:*"
+      ]
+    },
+    {
+      "title": "Go Programming Language 386 go1.20.5",
+      "cpes": [
+        "cpe:2.3:a:golang:go:1.20.5:*:*:*:*:*:386:*"
+      ]
+    }
+  ]
+  

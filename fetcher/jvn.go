@@ -8,7 +8,6 @@ import (
 	"github.com/inconshreveable/log15"
 	"github.com/knqyf263/go-cpe/naming"
 	"github.com/spf13/viper"
-	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 
 	"github.com/vulsio/go-cpe-dictionary/models"
@@ -39,7 +38,7 @@ func FetchJVN() (models.FetchedCPEs, error) {
 	}
 	urls := makeJvnURLs(years)
 
-	cpeURIs := map[string]struct{}{}
+	cpeURIs := map[string]string{}
 	rdfs, err := fetchJVNFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
 	if err != nil {
 		return models.FetchedCPEs{}, xerrors.Errorf("Failed to get feeds. err: %w", err)
@@ -52,11 +51,18 @@ func FetchJVN() (models.FetchedCPEs, error) {
 					log15.Warn("Failed to unbind", c.Value, err)
 					continue
 				}
-				cpeURIs[c.Value] = struct{}{}
+				cpeURIs[c.Value] = fmt.Sprintf("%s %s", c.Vendor, c.Product)
 			}
 		}
 	}
-	return models.FetchedCPEs{CPEs: maps.Keys(cpeURIs)}, nil
+	var fetched models.FetchedCPEs
+	for c, t := range cpeURIs {
+		fetched.CPEs = append(fetched.CPEs, models.FetchedCPE{
+			Title: t,
+			CPEs:  []string{c},
+		})
+	}
+	return fetched, nil
 }
 
 func makeJvnURLs(years []int) (urls []string) {

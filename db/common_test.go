@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/hbollon/go-edlib"
 	"github.com/spf13/viper"
 
 	"github.com/vulsio/go-cpe-dictionary/models"
@@ -13,21 +14,57 @@ import (
 
 func prepareTestData(driver DB) error {
 	var testCpes = models.FetchedCPEs{
-		CPEs: []string{
-			`cpe:2.3:a:ntp:ntp:4.2.5p48:*:*:*:*:*:*:*`,
-			`cpe:2.3:a:ntp:ntp:4.2.8:p1-beta1:*:*:*:*:*:*`,
-			`cpe:2.3:a:responsive_coming_soon_page_project:responsive_coming_soon_page:1.1.18:*:*:*:*:wordpress:*:*`,
-			`cpe:2.3:a:vendorName1:productName1-1:1.1:*:*:*:*:targetSoftware1:targetHardware1:*`,
-			`cpe:2.3:a:vendorName1:productName1-2:1.2:*:*:*:*:targetSoftware1:targetHardware1:*`,
-			`cpe:2.3:a:vendorName2:productName2:2.0:*:*:*:*:targetSoftware2:targetHardware2:*`,
-			`cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*`,
-			`cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*`,
-			`cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*`,
-			`cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*`,
-			`cpe:2.3:a:mongodb:c\#_driver:1.10.0:-:*:*:*:mongodb:*:*`,
+		CPEs: []models.FetchedCPE{
+			{
+				Title: "NTP NTP 4.2.5p48",
+				CPEs:  []string{`cpe:2.3:a:ntp:ntp:4.2.5p48:*:*:*:*:*:*:*`},
+			},
+			{
+				Title: "NTP NTP 4.2.8 p1-beta1",
+				CPEs:  []string{`cpe:2.3:a:ntp:ntp:4.2.8:p1-beta1:*:*:*:*:*:*`},
+			},
+			{
+				Title: "responsive_coming_soon_page_project responsive_coming_soon_page 1.1.18 wordpress",
+				CPEs:  []string{`cpe:2.3:a:responsive_coming_soon_page_project:responsive_coming_soon_page:1.1.18:*:*:*:*:wordpress:*:*`},
+			},
+			{
+				Title: "vendorName1 productName1-1 1.1 targetSoftware1 targetHardware1",
+				CPEs:  []string{`cpe:2.3:a:vendorName1:productName1-1:1.1:*:*:*:*:targetSoftware1:targetHardware1:*`},
+			},
+			{
+				Title: "vendorName1 productName1-2 1.2 targetSoftware1 targetHardware1",
+				CPEs:  []string{`cpe:2.3:a:vendorName1:productName1-2:1.2:*:*:*:*:targetSoftware1:targetHardware1:*`},
+			},
+			{
+				Title: "vendorName2 productName2 2.0 targetSoftware2 targetHardware2",
+				CPEs:  []string{`cpe:2.3:a:vendorName2:productName2:2.0:*:*:*:*:targetSoftware2:targetHardware2:*`},
+			},
+			{
+				Title: "vendorName3 productName3 3.0 targetSoftware3 targetHardware3",
+				CPEs:  []string{`cpe:2.3:a:vendorName3:productName3:3.0:*:*:*:*:targetSoftware3:targetHardware3:*`},
+			},
+			{
+				Title: "vendorName4 productName4 4.0 targetSoftware4 targetHardware4",
+				CPEs:  []string{`cpe:2.3:a:vendorName4:productName4:4.0:*:*:*:*:targetSoftware4:targetHardware4:*`},
+			},
+			{
+				Title: "vendorName5 productName5 5.0 targetSoftware5 targetHardware5",
+				CPEs:  []string{`cpe:2.3:a:vendorName5:productName5:5.0:*:*:*:*:targetSoftware5:targetHardware5:*`},
+			},
+			{
+				Title: "vendorName6 productName6 6.0 targetSoftware6 targetHardware6",
+				CPEs:  []string{`cpe:2.3:a:vendorName6:productName6:6.0:*:*:*:*:targetSoftware6:targetHardware6:*`},
+			},
+			{
+				Title: "MongoDB C# driver 1.10.0",
+				CPEs:  []string{`cpe:2.3:a:mongodb:c\#_driver:1.10.0:-:*:*:*:mongodb:*:*`},
+			},
 		},
-		Deprecated: []string{
-			`cpe:2.3:a:vendorName6:productName6:6.1:*:*:*:*:targetSoftware6:targetHardware6:*`,
+		Deprecated: []models.FetchedCPE{
+			{
+				Title: "vendorName6 productName6 6.1 targetSoftware6 targetHardware6",
+				CPEs:  []string{`cpe:2.3:a:vendorName6:productName6:6.1:*:*:*:*:targetSoftware6:targetHardware6:*`},
+			},
 		},
 	}
 	viper.Set("threads", 1)
@@ -172,6 +209,53 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 		}
 		if !reflect.DeepEqual(deprecated, tc.Expected.Deprecated) {
 			t.Errorf("actual %#v, expected %#v", deprecated, tc.Expected.Deprecated)
+		}
+	}
+}
+
+func testGetSimilarCpesByTitle(t *testing.T, driver DB) {
+	if err := prepareTestData(driver); err != nil {
+		t.Errorf("Inserting CPEs: %s", err)
+	}
+
+	type expected struct {
+		cpes      []models.FetchedCPE
+		ErrString string
+	}
+
+	cases := map[string]struct {
+		query    string
+		expected expected
+	}{
+		"OK": {
+			query: "mongodb",
+			expected: expected{
+				cpes: []models.FetchedCPE{
+					{
+						Title: "MongoDB C# driver 1.10.0",
+						CPEs:  []string{"cpe:/a:mongodb:c%23_driver:1.10.0:-:~~~mongodb~~"},
+					},
+				},
+			},
+		},
+	}
+
+	for k, tc := range cases {
+		cs, err := driver.GetSimilarCpesByTitle(tc.query, 1, edlib.Jaro)
+		if err != nil {
+			if !strings.Contains(err.Error(), tc.expected.ErrString) {
+				t.Errorf("%s : actual %s, expected %s", k, err, tc.expected.ErrString)
+				continue
+			}
+			if len(tc.expected.ErrString) == 0 {
+				t.Errorf("%s : actual %s, expected %s", k, err, tc.expected.ErrString)
+				continue
+			}
+		} else if 0 < len(tc.expected.ErrString) {
+			t.Errorf("%s : actual %s, expected %s", k, err, tc.expected.ErrString)
+		}
+		if !reflect.DeepEqual(cs, tc.expected.cpes) {
+			t.Errorf("%s: actual %#v, expected %#v", k, cs, tc.expected.cpes)
 		}
 	}
 }

@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/xerrors"
 
+	"github.com/hbollon/go-edlib"
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
@@ -22,6 +23,7 @@ type DB interface {
 
 	GetVendorProducts() ([]models.VendorProduct, []models.VendorProduct, error)
 	GetCpesByVendorProduct(string, string) ([]string, []string, error)
+	GetSimilarCpesByTitle(string, int, edlib.Algorithm) ([]models.FetchedCPE, error)
 	InsertCpes(models.FetchType, models.FetchedCPEs) error
 	IsDeprecated(string) (bool, error)
 }

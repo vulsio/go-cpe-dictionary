@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/hbollon/go-edlib"
 	"github.com/inconshreveable/log15"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -40,6 +41,7 @@ func Start(logToFile bool, logDir string, driver db.DB) error {
 	e.GET("/health", health())
 	e.GET("/products", getVendorProducts(driver))
 	e.GET("/cpes/:vendor/:product", getCpesByVendorProduct(driver))
+	e.POST("/cpes/fuzzysearch", getSimilarCpesByTitle(driver))
 
 	bindURL := fmt.Sprintf("%s:%s", viper.GetString("bind"), viper.GetString("port"))
 	log15.Info("Listening...", "URL", bindURL)
@@ -80,5 +82,56 @@ func getCpesByVendorProduct(driver db.DB) echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, map[string][]string{"cpeURIs": cpeURIs, "deprecated": deprecated})
+	}
+}
+
+// Handler
+func getSimilarCpesByTitle(driver db.DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var d struct {
+			Query     string `json:"query"`
+			N         int    `json:"n"`
+			Algorithm string `json:"algorithm,omitempty"`
+		}
+		if err := c.Bind(&d); err != nil {
+			return err
+		}
+
+		var algo edlib.Algorithm
+		switch d.Algorithm {
+		case "":
+			algo = edlib.Jaro
+		case "Levenshtein":
+			algo = edlib.Levenshtein
+		case "DamerauLevenshtein":
+			algo = edlib.DamerauLevenshtein
+		case "OSADamerauLevenshtein":
+			algo = edlib.OSADamerauLevenshtein
+		case "Lcs":
+			algo = edlib.Lcs
+		case "Jaro":
+			algo = edlib.Jaro
+		case "JaroWinkler":
+			algo = edlib.JaroWinkler
+		case "Cosine":
+			algo = edlib.Cosine
+		case "Jaccard":
+			algo = edlib.Jaccard
+		case "SorensenDice":
+			algo = edlib.SorensenDice
+		case "Qgram":
+			algo = edlib.Qgram
+		default:
+			log15.Error("Failed to GetSimilarCpesByTitle", "err", "invalid algorithm parameter", "accepts", []string{"", "Levenshtein", "DamerauLevenshtein", "OSADamerauLevenshtein", "Lcs", "Jaro", "JaroWinkler", "Cosine", "Jaccard", "SorensenDice", "Qgram"}, "actual", d.Algorithm)
+			return c.JSON(http.StatusInternalServerError, []models.FetchedCPE{})
+		}
+
+		rs, err := driver.GetSimilarCpesByTitle(d.Query, d.N, algo)
+		if err != nil {
+			log15.Error("Failed to GetSimilarCpesByTitle", "err", err)
+			return c.JSON(http.StatusInternalServerError, []models.FetchedCPE{})
+		}
+
+		return c.JSON(http.StatusOK, rs)
 	}
 }
