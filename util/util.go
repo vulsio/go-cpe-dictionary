@@ -15,6 +15,7 @@ import (
 	logger "github.com/inconshreveable/log15"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
+	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 )
 
@@ -140,4 +141,13 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 		return nil, xerrors.Errorf("Failed to Read feedfile. url: %s, err: %w", url, err)
 	}
 	return bytes, nil
+}
+
+// Unique return unique elements
+func Unique[T comparable](s []T) []T {
+	m := map[T]struct{}{}
+	for _, v := range s {
+		m[v] = struct{}{}
+	}
+	return maps.Keys(m)
 }
