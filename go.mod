@@ -17,6 +17,7 @@ require (
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
+	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gorm.io/driver/mysql v1.5.0
 	gorm.io/driver/postgres v1.5.0
