@@ -8,7 +8,7 @@ require (
 	github.com/cheggaaa/pb/v3 v3.1.4
 	github.com/glebarez/sqlite v1.9.0
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/hbollon/go-edlib v1.6.0
 	github.com/inconshreveable/log15 v3.0.0-testing.5+incompatible
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
