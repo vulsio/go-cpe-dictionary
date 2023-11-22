@@ -101,12 +101,18 @@ func fetchCpeDictionary(cpes, deprecated map[string]string) error {
 			log15.Warn("Failed to unbind", item.Name, err)
 			continue
 		}
+
+		var title string
 		for _, t := range item.Titles {
-			if item.Deprecated {
-				deprecated[item.Name] = t.Title
-			} else {
-				cpes[item.Name] = t.Title
+			title = t.Title
+			if t.Lang == "en" {
+				break
 			}
+		}
+		if item.Deprecated {
+			deprecated[item.Name] = title
+		} else {
+			cpes[item.Name] = title
 		}
 	}
 
