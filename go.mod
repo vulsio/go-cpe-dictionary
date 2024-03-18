@@ -6,7 +6,7 @@ require (
 	github.com/alicebob/miniredis/v2 v2.31.1
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cheggaaa/pb/v3 v3.1.5
-	github.com/glebarez/sqlite v1.10.0
+	github.com/glebarez/sqlite v1.11.0
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/go-cmp v0.6.0
 	github.com/hbollon/go-edlib v1.6.0
@@ -21,7 +21,7 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/postgres v1.5.4
-	gorm.io/gorm v1.25.5
+	gorm.io/gorm v1.25.7
 )
 
 require (
