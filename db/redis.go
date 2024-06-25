@@ -21,6 +21,14 @@ import (
 
 /**
 # Redis Data Structure
+- Strings
+  ┌───┬──────────────────┬──────────┬──────────────────────────────────────────────────┐
+  │NO │       KEY        │   VALUE  │                     PURPOSE                      │
+  └───┴──────────────────┴──────────┴──────────────────────────────────────────────────┘
+  ┌───┬──────────────────┬──────────┬──────────────────────────────────────────────────┐
+  │ 1 │ CPE#Cache#Titles │   JSON   │ TO CACHE CPE#Titles                              │
+  └───┴──────────────────┴──────────┴──────────────────────────────────────────────────┘
+
 - Sets
   ┌─────────────────────────────┬───────────────────────┬────────────────────────────────────┐
   │       KEY                   │  MEMBER               │              PURPOSE               │
@@ -44,7 +52,7 @@ import (
   │NO │    KEY         │   FIELD       │  VALUE      │                     PURPOSE                      │
   └───┴────────────────┴───────────────┴─────────────┴──────────────────────────────────────────────────┘
   ┌───┬────────────────┬───────────────┬─────────────┬──────────────────────────────────────────────────┐
-  │ 1 │ CPE#DEP        │    NVD/JVN    │  JSON       │ TO DELETE OUTDATED AND UNNEEDED FIELD AND MEMBER │
+  │ 1 │ CPE#DEP        │  nvd/jvn/vls  │  JSON       │ TO DELETE OUTDATED AND UNNEEDED FIELD AND MEMBER │
   ├───┼────────────────┼───────────────┼─────────────┼──────────────────────────────────────────────────┤
   │ 2 │ CPE#FETCHMETA  │   Revision    │ string      │ GET Go-Cpe-Dictionary Binary Revision            │
   ├───┼────────────────┼───────────────┼─────────────┼──────────────────────────────────────────────────┤
@@ -62,6 +70,7 @@ const (
 	vpSeparator         = "##"
 	deprecatedCPEsKey   = "CPE#DeprecatedCPEs"
 	titleListKey        = "CPE#Titles"
+	titleListCacheKey   = "CPE#Cache#Titles"
 	titleKeyFormat      = "CPE#Title#%s"
 	depKey              = "CPE#DEP"
 	fetchMetaKey        = "CPE#FETCHMETA"
@@ -244,9 +253,20 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 	}
 
 	ctx := context.Background()
-	ts, err := r.conn.SMembers(ctx, titleListKey).Result()
-	if err != nil {
-		return nil, xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
+	var ts []string
+	bs, err := r.conn.Get(ctx, titleListCacheKey).Bytes()
+	if err == nil {
+		if err := json.Unmarshal(bs, &ts); err != nil {
+			return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
+		}
+	} else {
+		if !xerrors.Is(err, redis.Nil) {
+			return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+		}
+		ts, err = r.conn.SMembers(ctx, titleListKey).Result()
+		if err != nil {
+			return nil, xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
+		}
 	}
 
 	if len(ts) < n {
@@ -309,7 +329,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 		return xerrors.Errorf("Failed to unmarshal JSON. err: %w", err)
 	}
 
-	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated))
+	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated) + 1)
 	for _, in := range []struct {
 		cpes       []models.FetchedCPE
 		deprecated bool
@@ -373,6 +393,20 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 			bar.Add(idx.To - idx.From)
 		}
 	}
+
+	ts, err := r.conn.SMembers(ctx, titleListKey).Result()
+	if err != nil {
+		return xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
+	}
+	bs, err := json.Marshal(ts)
+	if err != nil {
+		return xerrors.Errorf("Failed to Marshal JSON. err: %w", err)
+	}
+	if err := r.conn.Set(ctx, titleListCacheKey, string(bs), 0).Err(); err != nil {
+		return xerrors.Errorf("Failed to SET Titles Cache. err: %w", err)
+	}
+	bar.Increment()
+
 	bar.Finish()
 
 	pipe := r.conn.Pipeline()
