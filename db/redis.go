@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -329,7 +331,12 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 		return xerrors.Errorf("Failed to unmarshal JSON. err: %w", err)
 	}
 
-	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated) + 1)
+	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated) + 1).SetWriter(func() io.Writer {
+		if viper.GetBool("log-json") {
+			return io.Discard
+		}
+		return os.Stderr
+	}())
 	for _, in := range []struct {
 		cpes       []models.FetchedCPE
 		deprecated bool

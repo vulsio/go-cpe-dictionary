@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -318,7 +319,12 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 
 	if result.RowsAffected > 0 {
 		log15.Info("Deleting old CPEs")
-		bar := pb.StartNew(len(oldIDs))
+		bar := pb.StartNew(len(oldIDs)).SetWriter(func() io.Writer {
+			if viper.GetBool("log-json") {
+				return io.Discard
+			}
+			return os.Stderr
+		}())
 		for idx := range chunkSlice(len(oldIDs), batchSize) {
 			if err := tx.Where("id IN ?", oldIDs[idx.From:idx.To]).Delete(&models.CategorizedCpe{}).Error; err != nil {
 				return xerrors.Errorf("Failed to delete: %w", err)
@@ -329,7 +335,12 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 	}
 
 	log15.Info("Inserting new CPEs")
-	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated))
+	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated)).SetWriter(func() io.Writer {
+		if viper.GetBool("log-json") {
+			return io.Discard
+		}
+		return os.Stderr
+	}())
 	for _, in := range []struct {
 		cpes       []models.FetchedCPE
 		deprecated bool
