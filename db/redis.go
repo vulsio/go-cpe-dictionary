@@ -257,18 +257,11 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 	ctx := context.Background()
 	var ts []string
 	bs, err := r.conn.Get(ctx, titleListCacheKey).Bytes()
-	if err == nil {
-		if err := json.Unmarshal(bs, &ts); err != nil {
-			return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
-		}
-	} else {
-		if !xerrors.Is(err, redis.Nil) {
-			return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
-		}
-		ts, err = r.conn.SMembers(ctx, titleListKey).Result()
-		if err != nil {
-			return nil, xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
-		}
+	if err != nil {
+		return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+	}
+	if err := json.Unmarshal(bs, &ts); err != nil {
+		return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
 	}
 
 	if len(ts) < n {
