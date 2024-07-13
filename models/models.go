@@ -12,6 +12,7 @@ import (
 )
 
 // LatestSchemaVersion manages the Schema version used in the latest go-cpe-dictionary.
+// can change the schema to 3 if you require to save both cve and cpe dictionary in same db
 const LatestSchemaVersion = 2
 
 // FetchMeta has meta information about fetched data
