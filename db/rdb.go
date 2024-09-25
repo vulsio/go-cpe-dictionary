@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"slices"
 	"time"
 
 	"github.com/cheggaaa/pb/v3"
@@ -163,9 +164,7 @@ func (r *RDBDriver) MigrateDB() error {
 				}
 			}
 		case dialectMysql, dialectPostgreSQL:
-			if err != nil {
-				return xerrors.Errorf("Failed to migrate. err: %w", err)
-			}
+			return xerrors.Errorf("Failed to migrate. err: %w", err)
 		default:
 			return xerrors.Errorf("Not Supported DB dialects. r.name: %s", r.name)
 		}
@@ -325,11 +324,11 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 			}
 			return os.Stderr
 		}())
-		for idx := range chunkSlice(len(oldIDs), batchSize) {
-			if err := tx.Where("id IN ?", oldIDs[idx.From:idx.To]).Delete(&models.CategorizedCpe{}).Error; err != nil {
+		for chunk := range slices.Chunk(oldIDs, batchSize) {
+			if err := tx.Where("id IN ?", chunk).Delete(&models.CategorizedCpe{}).Error; err != nil {
 				return xerrors.Errorf("Failed to delete: %w", err)
 			}
-			bar.Add(idx.To - idx.From)
+			bar.Add(len(chunk))
 		}
 		bar.Finish()
 	}
@@ -354,11 +353,11 @@ func (r *RDBDriver) deleteAndInsertCpes(conn *gorm.DB, fetchType models.FetchTyp
 			deprecated: true,
 		},
 	} {
-		for idx := range chunkSlice(len(in.cpes), batchSize) {
-			if err := tx.Create(models.ConvertToModels(in.cpes[idx.From:idx.To], fetchType, in.deprecated)).Error; err != nil {
+		for chunk := range slices.Chunk(in.cpes, batchSize) {
+			if err := tx.Create(models.ConvertToModels(chunk, fetchType, in.deprecated)).Error; err != nil {
 				return xerrors.Errorf("Failed to insert. err: %w", err)
 			}
-			bar.Add(idx.To - idx.From)
+			bar.Add(len(chunk))
 		}
 	}
 	bar.Finish()
