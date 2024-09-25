@@ -114,7 +114,7 @@ func FetchFeedFile(url string, compressed bool) ([]byte, error) {
 		}
 		return nil
 	}
-	notify := func(err error, t time.Duration) {
+	notify := func(_ error, t time.Duration) {
 		logger.Warn("Failed to HTTP GET", "retrying in", t)
 	}
 	err := backoff.RetryNotify(f, backoff.NewExponentialBackOff(), notify)
