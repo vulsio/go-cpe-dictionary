@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -350,9 +351,9 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 			deprecated: true,
 		},
 	} {
-		for idx := range chunkSlice(len(in.cpes), batchSize) {
+		for chunk := range slices.Chunk(in.cpes, batchSize) {
 			pipe := r.conn.Pipeline()
-			for _, c := range models.ConvertToModels(in.cpes[idx.From:idx.To], fetchType, in.deprecated) {
+			for _, c := range models.ConvertToModels(chunk, fetchType, in.deprecated) {
 				vendorProductStr := fmt.Sprintf("%s%s%s", c.Vendor, vpSeparator, c.Product)
 				if c.Deprecated {
 					_ = pipe.SAdd(ctx, deprecatedCPEsKey, c.CpeURI)
@@ -397,7 +398,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 			if _, err = pipe.Exec(ctx); err != nil {
 				return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
 			}
-			bar.Add(idx.To - idx.From)
+			bar.Add(len(chunk))
 		}
 	}
 

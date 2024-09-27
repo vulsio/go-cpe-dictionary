@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io"
+	"maps"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"time"
 
@@ -15,7 +17,6 @@ import (
 	logger "github.com/inconshreveable/log15"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
-	"golang.org/x/exp/maps"
 	"golang.org/x/xerrors"
 )
 
@@ -149,5 +150,5 @@ func Unique[T comparable](s []T) []T {
 	for _, v := range s {
 		m[v] = struct{}{}
 	}
-	return maps.Keys(m)
+	return slices.Collect(maps.Keys(m))
 }

@@ -17,7 +17,6 @@ require (
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
-	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2
 	gorm.io/driver/mysql v1.5.5
 	gorm.io/driver/postgres v1.5.7
@@ -70,6 +69,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
