@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"slices"
 	"strconv"
@@ -29,7 +30,7 @@ import (
   │NO │       KEY        │   VALUE  │                     PURPOSE                      │
   └───┴──────────────────┴──────────┴──────────────────────────────────────────────────┘
   ┌───┬──────────────────┬──────────┬──────────────────────────────────────────────────┐
-  │ 1 │ CPE#Cache#Titles │   JSON   │ TO CACHE CPE#Titles                              │
+  │ 1 │ CPE#Titles       │   JSON   │ Get ALL Titles                                   │
   └───┴──────────────────┴──────────┴──────────────────────────────────────────────────┘
 
 - Sets
@@ -44,8 +45,6 @@ import (
   │ CPE#VP#${vendor}##${product}│ CPEURI                │ Get CPEURI by vendor and product   │
   ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
   │ CPE#DeprecatedCPEs          │ CPEURI                │ Get DeprecatedCPEs                 │
-  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
-  │ CPE#Titles                  │ Title                 │ Get ALL Titles                     │
   ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
   │ CPE#Title#{title}           │ CPEURI                │ Get CPEURI by title                │
   └─────────────────────────────┴───────────────────────┴────────────────────────────────────┘
@@ -256,20 +255,38 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 	}
 
 	ctx := context.Background()
+	t, err := r.conn.Type(ctx, titleListKey).Result()
+	if err != nil {
+		return nil, xerrors.Errorf("Failed to TYPE CPE#Titles. err: %w", err)
+	}
+
 	var ts []string
-	bs, err := r.conn.Get(ctx, titleListCacheKey).Bytes()
-	if err == nil {
+	switch t {
+	case "string":
+		bs, err := r.conn.Get(ctx, titleListKey).Bytes()
+		if err != nil {
+			return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+		}
 		if err := json.Unmarshal(bs, &ts); err != nil {
 			return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
 		}
-	} else {
-		if !xerrors.Is(err, redis.Nil) {
-			return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+	case "set": // backward compatibility: https://github.com/vulsio/go-cpe-dictionary/pull/186
+		bs, err := r.conn.Get(ctx, titleListCacheKey).Bytes()
+		if err == nil {
+			if err := json.Unmarshal(bs, &ts); err != nil {
+				return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
+			}
+		} else {
+			if !xerrors.Is(err, redis.Nil) {
+				return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+			}
+			ts, err = r.conn.SMembers(ctx, titleListKey).Result()
+			if err != nil {
+				return nil, xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
+			}
 		}
-		ts, err = r.conn.SMembers(ctx, titleListKey).Result()
-		if err != nil {
-			return nil, xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
-		}
+	default:
+		return nil, xerrors.Errorf("unexpected CPE#Titles type. expected: %q, actual: %q", []string{"string", "set"}, t)
 	}
 
 	if len(ts) < n {
@@ -304,32 +321,54 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 		return xerrors.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
 	}
 
-	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedVendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}, "Titles": {"Title": {}}, "Title": {"${CPEURI}": {"Title": {}}}}
+	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedVendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}, "Title": {"Title": {"${CPEURI}": {}}}}
 	newDeps := map[string]map[string]map[string]struct{}{
 		"VP":                       {},
 		"VendorProducts":           {},
 		"DeprecatedVendorProducts": {},
 		"DeprecatedCPEs":           {},
-		"Titles":                   {},
 		"Title":                    {},
 	}
 	oldDepsStr, err := r.conn.HGet(ctx, depKey, string(fetchType)).Result()
 	if err != nil {
 		if !errors.Is(err, redis.Nil) {
-			return xerrors.Errorf("Failed to Get key: %s. err: %w", depKey, err)
+			return xerrors.Errorf("Failed to HGet key: %s, field: %s. err: %w", depKey, string(fetchType), err)
 		}
 		oldDepsStr = `{
 			"VP": {},
 			"VendorProducts": {},
 			"DeprecatedVendorProducts": {},
 			"DeprecatedCPEs": {},
-			"Titles": {},
 			"Title": {}
 		}`
 	}
 	var oldDeps map[string]map[string]map[string]struct{}
 	if err := json.Unmarshal([]byte(oldDepsStr), &oldDeps); err != nil {
 		return xerrors.Errorf("Failed to unmarshal JSON. err: %w", err)
+	}
+
+	titles := make(map[string]struct{})
+	for _, ft := range []models.FetchType{models.NVD, models.JVN, models.Vuls} {
+		if fetchType == ft {
+			continue
+		}
+
+		depsStr, err := r.conn.HGet(ctx, depKey, string(ft)).Result()
+		if err != nil {
+			if errors.Is(err, redis.Nil) {
+				continue
+			}
+			return xerrors.Errorf("Failed to HGet key: %s, field: %s. err: %w", depKey, string(ft), err)
+		}
+
+		var deps map[string]map[string]map[string]struct{}
+		if err := json.Unmarshal([]byte(depsStr), &deps); err != nil {
+			return xerrors.Errorf("Failed to unmarshal JSON. err: %w", err)
+		}
+
+		for t := range deps["Title"] {
+			titles[t] = struct{}{}
+		}
 	}
 
 	bar := pb.StartNew(len(cpes.CPEs) + len(cpes.Deprecated) + 1).SetWriter(func() io.Writer {
@@ -368,6 +407,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 					newDeps["VendorProducts"][vendorProductStr] = map[string]struct{}{}
 					delete(oldDeps["VendorProducts"], vendorProductStr)
 				}
+
 				_ = pipe.SAdd(ctx, fmt.Sprintf(vpKeyFormat, c.Vendor, c.Product), c.CpeURI)
 				if _, ok := newDeps["VP"][vendorProductStr]; !ok {
 					newDeps["VP"][vendorProductStr] = map[string]struct{}{}
@@ -379,9 +419,8 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 						delete(oldDeps["VP"], vendorProductStr)
 					}
 				}
-				_ = pipe.SAdd(ctx, titleListKey, c.Title)
-				newDeps["Titles"][c.Title] = map[string]struct{}{}
-				delete(oldDeps["Titles"], c.Title)
+
+				titles[c.Title] = struct{}{}
 
 				_ = pipe.SAdd(ctx, fmt.Sprintf(titleKeyFormat, c.Title), c.CpeURI)
 				if _, ok := newDeps["Title"][c.Title]; !ok {
@@ -402,16 +441,12 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 		}
 	}
 
-	ts, err := r.conn.SMembers(ctx, titleListKey).Result()
-	if err != nil {
-		return xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
-	}
-	bs, err := json.Marshal(ts)
+	bs, err := json.Marshal(slices.Collect(maps.Keys(titles)))
 	if err != nil {
 		return xerrors.Errorf("Failed to Marshal JSON. err: %w", err)
 	}
-	if err := r.conn.Set(ctx, titleListCacheKey, string(bs), 0).Err(); err != nil {
-		return xerrors.Errorf("Failed to SET Titles Cache. err: %w", err)
+	if err := r.conn.Set(ctx, titleListKey, string(bs), 0).Err(); err != nil {
+		return xerrors.Errorf("Failed to SET Titles. err: %w", err)
 	}
 	bar.Increment()
 
@@ -433,9 +468,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 	for cpeURI := range oldDeps["DeprecatedCPEs"] {
 		_ = pipe.SRem(ctx, deprecatedCPEsKey, cpeURI)
 	}
-	for title := range oldDeps["Titles"] {
-		_ = pipe.SRem(ctx, titleListKey, title)
-	}
+	_ = pipe.Del(ctx, titleListCacheKey)
 	for title, cpeURIs := range oldDeps["Title"] {
 		for cpeURI := range cpeURIs {
 			_ = pipe.SRem(ctx, fmt.Sprintf(titleKeyFormat, title), cpeURI)
