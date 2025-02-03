@@ -25,7 +25,6 @@ func teardownRedis(s *miniredis.Miniredis, driver DB) {
 }
 
 func TestGetVendorProductsRedis(t *testing.T) {
-	t.Parallel()
 	s, driver, err := setupRedis()
 	if err != nil {
 		t.Errorf("Failed to parepare redis: %s", err)
@@ -36,7 +35,6 @@ func TestGetVendorProductsRedis(t *testing.T) {
 }
 
 func TestGetCpesByVendorProductRedis(t *testing.T) {
-	t.Parallel()
 	s, driver, err := setupRedis()
 	if err != nil {
 		t.Errorf("Failed to parepare redis: %s", err)
@@ -47,7 +45,6 @@ func TestGetCpesByVendorProductRedis(t *testing.T) {
 }
 
 func TestGetSimilarCpesByTitle(t *testing.T) {
-	t.Parallel()
 	s, driver, err := setupRedis()
 	if err != nil {
 		t.Errorf("Failed to parepare redis: %s", err)
@@ -58,7 +55,6 @@ func TestGetSimilarCpesByTitle(t *testing.T) {
 }
 
 func TestRedisDriver_IsDeprecated(t *testing.T) {
-	t.Parallel()
 	s, driver, err := setupRedis()
 	if err != nil {
 		t.Errorf("Failed to parepare redis: %s", err)
