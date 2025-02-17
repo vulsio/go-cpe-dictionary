@@ -11,9 +11,11 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/hbollon/go-edlib v1.6.0
 	github.com/inconshreveable/log15 v3.0.0-testing.5+incompatible
+	github.com/klauspost/compress v1.17.2
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/opencontainers/image-spec v1.1.0
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
@@ -21,6 +23,7 @@ require (
 	gorm.io/driver/mysql v1.5.5
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.7
+	oras.land/oras-go/v2 v2.5.0
 )
 
 require (
@@ -50,6 +53,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
