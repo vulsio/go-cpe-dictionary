@@ -2,19 +2,23 @@ package fetcher
 
 import (
 	"archive/tar"
-	"bytes"
-	"compress/gzip"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
+	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/inconshreveable/log15"
+	"github.com/klauspost/compress/zstd"
 	"github.com/knqyf263/go-cpe/common"
 	"github.com/knqyf263/go-cpe/naming"
-	"github.com/parnurzeal/gorequest"
-	"github.com/spf13/viper"
+	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"golang.org/x/xerrors"
+	"oras.land/oras-go/v2"
+	"oras.land/oras-go/v2/registry/remote"
 
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
@@ -61,45 +65,41 @@ func FetchNVD() (models.FetchedCPEs, error) {
 }
 
 func fetchCpeDictionary(cpes, deprecated map[string]string) error {
-	url := "https://github.com/vulsio/vuls-data-raw-nvd-api-cpe/archive/refs/heads/main.tar.gz"
-	log15.Info("Fetching...", "URL", url)
-	resp, bs, errs := gorequest.New().Proxy(viper.GetString("http-proxy")).Get(url).EndBytes()
-	if len(errs) > 0 || resp == nil || resp.StatusCode != 200 {
-		return xerrors.Errorf("HTTP error. errs: %v, url: %s", errs, url)
-	}
+	log15.Info("Fetching vuls-data-raw-nvd-api-cpe ...")
 
-	gr, err := gzip.NewReader(bytes.NewReader(bs))
+	dir, err := os.MkdirTemp("", "go-cpe-dictionary")
 	if err != nil {
-		return xerrors.Errorf("Failed to create gzip reader. url: %s, err: %w", url, err)
+		return xerrors.Errorf("Failed to create temp directory. err: %w", err)
 	}
-	defer gr.Close()
+	defer os.RemoveAll(dir)
 
-	tr := tar.NewReader(gr)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
+	if err := fetch(dir, "vuls-data-raw-nvd-api-cpe"); err != nil {
+		return xerrors.Errorf("Failed to fetch vuls-data-raw-nvd-api-cpe. err: %w", err)
+	}
+
+	if err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return xerrors.Errorf("Failed to next tar reader. err: %w", err)
+			return err
 		}
 
-		if hdr.FileInfo().IsDir() {
-			continue
+		if d.IsDir() || filepath.Ext(path) != ".json" {
+			return nil
 		}
 
-		if filepath.Ext(hdr.Name) != ".json" {
-			continue
+		f, err := os.Open(path)
+		if err != nil {
+			return xerrors.Errorf("Failed to open %s. err: %w", path, err)
 		}
+		defer f.Close()
 
 		var item cpeDictionaryItem
-		if err := json.NewDecoder(tr).Decode(&item); err != nil {
-			return xerrors.Errorf("Failed to decode %s. err: %w", hdr.Name, err)
+		if err := json.NewDecoder(f).Decode(&item); err != nil {
+			return xerrors.Errorf("Failed to decode %s. err: %w", path, err)
 		}
 
 		if _, err := naming.UnbindFS(item.Name); err != nil {
 			log15.Warn("Failed to unbind", item.Name, err)
-			continue
+			return nil
 		}
 
 		var title string
@@ -114,51 +114,51 @@ func fetchCpeDictionary(cpes, deprecated map[string]string) error {
 		} else {
 			cpes[item.Name] = title
 		}
+
+		return nil
+	}); err != nil {
+		return xerrors.Errorf("Failed to walk %s. err: %w", dir, err)
 	}
 
 	return nil
 }
 
 func fetchCpeMatch(cpes map[string]string) error {
-	url := "https://github.com/vulsio/vuls-data-raw-nvd-api-cpematch/archive/refs/heads/main.tar.gz"
-	log15.Info("Fetching...", "URL", url)
-	resp, bs, errs := gorequest.New().Proxy(viper.GetString("http-proxy")).Get(url).EndBytes()
-	if len(errs) > 0 || resp == nil || resp.StatusCode != 200 {
-		return xerrors.Errorf("HTTP error. errs: %v, url: %s", errs, url)
-	}
+	log15.Info("Fetching vuls-data-raw-nvd-api-cpematch ...")
 
-	gr, err := gzip.NewReader(bytes.NewReader(bs))
+	dir, err := os.MkdirTemp("", "go-cpe-dictionary")
 	if err != nil {
-		return xerrors.Errorf("Failed to create gzip reader. url: %s, err: %w", url, err)
+		return xerrors.Errorf("Failed to create temp directory. err: %w", err)
 	}
-	defer gr.Close()
+	defer os.RemoveAll(dir)
 
-	tr := tar.NewReader(gr)
-	for {
-		hdr, err := tr.Next()
-		if err == io.EOF {
-			break
-		}
+	if err := fetch(dir, "vuls-data-raw-nvd-api-cpematch"); err != nil {
+		return xerrors.Errorf("Failed to fetch vuls-data-raw-nvd-api-cpematch. err: %w", err)
+	}
+
+	if err := filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			return xerrors.Errorf("Failed to next tar reader. err: %w", err)
+			return err
 		}
 
-		if hdr.FileInfo().IsDir() {
-			continue
+		if d.IsDir() || filepath.Ext(path) != ".json" {
+			return nil
 		}
 
-		if filepath.Ext(hdr.Name) != ".json" {
-			continue
+		f, err := os.Open(path)
+		if err != nil {
+			return xerrors.Errorf("Failed to open %s. err: %w", path, err)
 		}
+		defer f.Close()
 
 		var cpeMatch cpeMatchElement
-		if err := json.NewDecoder(tr).Decode(&cpeMatch); err != nil {
-			return xerrors.Errorf("Failed to decode %s. err: %w", hdr.Name, err)
+		if err := json.NewDecoder(f).Decode(&cpeMatch); err != nil {
+			return xerrors.Errorf("Failed to decode %s. err: %w", path, err)
 		}
 		wfn, err := naming.UnbindFS(cpeMatch.Criteria)
 		if err != nil {
 			log15.Warn("Failed to unbind", cpeMatch.Criteria, err)
-			continue
+			return nil
 		}
 		if _, ok := cpes[cpeMatch.Criteria]; !ok {
 			title := fmt.Sprintf("%s %s", wfn.GetString(common.AttributeVendor), wfn.GetString(common.AttributeProduct))
@@ -188,6 +188,100 @@ func fetchCpeMatch(cpes map[string]string) error {
 			}
 			cpes[cpeMatch.Criteria] = title
 		}
+
+		return nil
+	}); err != nil {
+		return xerrors.Errorf("Failed to walk %s. err: %w", dir, err)
+	}
+
+	return nil
+}
+
+func fetch(dir, tag string) error {
+	ctx := context.TODO()
+	repo, err := remote.NewRepository(fmt.Sprintf("ghcr.io/vulsio/vuls-data-db:%s", tag))
+	if err != nil {
+		return xerrors.Errorf("Failed to create client for %s. err: %w", fmt.Sprintf("ghcr.io/vulsio/vuls-data-db:%s", tag), err)
+	}
+
+	_, r, err := oras.Fetch(ctx, repo, repo.Reference.Reference, oras.DefaultFetchOptions)
+	if err != nil {
+		return xerrors.Errorf("Failed to fetch manifest. err: %w", err)
+	}
+	defer r.Close()
+
+	var manifest ocispec.Manifest
+	if err := json.NewDecoder(r).Decode(&manifest); err != nil {
+		return xerrors.Errorf("Failed to decode manifest. err: %w", err)
+	}
+
+	l := func() *ocispec.Descriptor {
+		for _, l := range manifest.Layers {
+			if l.MediaType == "application/vnd.vulsio.vuls-data-db.dotgit.layer.v1.tar+zstd" {
+				return &l
+			}
+		}
+		return nil
+	}()
+	if l == nil {
+		return xerrors.Errorf("Failed to find digest and filename from layers, actual layers: %#v", manifest.Layers)
+	}
+
+	r, err = repo.Fetch(ctx, *l)
+	if err != nil {
+		return xerrors.Errorf("Failed to fetch content. err: %w", err)
+	}
+	defer r.Close()
+
+	zr, err := zstd.NewReader(r)
+	if err != nil {
+		return xerrors.Errorf("Failed to new zstd reader. err: %w", err)
+	}
+	defer zr.Close()
+
+	tr := tar.NewReader(zr)
+	for {
+		hdr, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return xerrors.Errorf("Failed to next tar reader. err: %w", err)
+		}
+
+		p := filepath.Join(dir, hdr.Name)
+
+		switch hdr.Typeflag {
+		case tar.TypeDir:
+			if err := os.MkdirAll(p, 0755); err != nil {
+				return xerrors.Errorf("Failed to mkdir %s. err: %w", p, err)
+			}
+		case tar.TypeReg:
+			if err := os.MkdirAll(filepath.Dir(p), 0755); err != nil {
+				return xerrors.Errorf("Failed to mkdir %s. err: %w", p, err)
+			}
+
+			if err := func() error {
+				f, err := os.Create(p)
+				if err != nil {
+					return xerrors.Errorf("Failed to create %s. err: %w", p, err)
+				}
+				defer f.Close()
+
+				if _, err := io.Copy(f, tr); err != nil {
+					return xerrors.Errorf("Failed to copy to %s. err: %w", p, err)
+				}
+
+				return nil
+			}(); err != nil {
+				return xerrors.Errorf("Failed to create %s. err: %w", p, err)
+			}
+		}
+	}
+
+	cmd := exec.Command("git", "-C", filepath.Join(dir, tag), "restore", ".")
+	if err := cmd.Run(); err != nil {
+		return xerrors.Errorf("Failed to exec %q. err: %w", cmd.String(), err)
 	}
 
 	return nil
