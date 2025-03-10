@@ -15,7 +15,7 @@ require (
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/opencontainers/image-spec v1.1.0
+	github.com/opencontainers/image-spec v1.1.1
 	github.com/parnurzeal/gorequest v0.2.16
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.19.0
