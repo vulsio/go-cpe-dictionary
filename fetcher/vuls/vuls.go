@@ -1,16 +1,18 @@
-package fetcher
+package vuls
 
 import (
 	"encoding/json"
 
+	"golang.org/x/xerrors"
+
+	futil "github.com/vulsio/go-cpe-dictionary/fetcher/util"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
-	"golang.org/x/xerrors"
 )
 
 // FetchVuls Vuls Annotation feeds
 func FetchVuls() (models.FetchedCPEs, error) {
-	bs, err := util.FetchFeedFile("https://raw.githubusercontent.com/vulsio/go-cpe-dictionary/master/annotation/vuls.json", false)
+	bs, err := futil.FetchFeedFile("https://raw.githubusercontent.com/vulsio/go-cpe-dictionary/master/annotation/vuls.json", false)
 	if err != nil {
 		return models.FetchedCPEs{}, xerrors.Errorf("Failed to fetch. url: %s, err: %w", "https://raw.githubusercontent.com/vulsio/go-cpe-dictionary/master/annotation/vuls.json", err)
 	}

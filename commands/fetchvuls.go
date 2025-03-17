@@ -8,7 +8,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/vulsio/go-cpe-dictionary/db"
-	"github.com/vulsio/go-cpe-dictionary/fetcher"
+	fetcher "github.com/vulsio/go-cpe-dictionary/fetcher/vuls"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
 )

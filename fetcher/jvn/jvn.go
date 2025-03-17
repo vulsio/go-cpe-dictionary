@@ -1,4 +1,4 @@
-package fetcher
+package jvn
 
 import (
 	"encoding/xml"
@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 	"golang.org/x/xerrors"
 
+	futil "github.com/vulsio/go-cpe-dictionary/fetcher/util"
 	"github.com/vulsio/go-cpe-dictionary/models"
 	"github.com/vulsio/go-cpe-dictionary/util"
 )
@@ -32,11 +33,10 @@ type cpe struct {
 
 // FetchJVN JVN feeds
 func FetchJVN() (models.FetchedCPEs, error) {
-	years, err := util.GetYearsUntilThisYear(2002)
+	urls, err := makeJvnURLs()
 	if err != nil {
-		return models.FetchedCPEs{}, err
+		return models.FetchedCPEs{}, xerrors.Errorf("Failed to make URLs. err: %w", err)
 	}
-	urls := makeJvnURLs(years)
 
 	cpeURIs := map[string]string{}
 	rdfs, err := fetchJVNFeedFileConcurrently(urls, viper.GetInt("threads"), viper.GetInt("wait"))
@@ -65,26 +65,16 @@ func FetchJVN() (models.FetchedCPEs, error) {
 	return fetched, nil
 }
 
-func makeJvnURLs(years []int) (urls []string) {
-	latestFeeds := []string{
+func makeJvnURLs() ([]string, error) {
+	var urls []string
+	for y := 2002; y <= time.Now().Year(); y++ {
+		urls = append(urls, fmt.Sprintf("https://jvndb.jvn.jp/ja/rss/years/jvndb_%d.rdf", y))
+	}
+
+	return append(urls,
 		"https://jvndb.jvn.jp/ja/rss/jvndb_new.rdf",
 		"https://jvndb.jvn.jp/ja/rss/jvndb.rdf",
-	}
-
-	if len(years) == 0 {
-		return latestFeeds
-	}
-
-	urlFormat := "https://jvndb.jvn.jp/ja/rss/years/jvndb_%d.rdf"
-	for _, year := range years {
-		urls = append(urls, fmt.Sprintf(urlFormat, year))
-
-		thisYear := time.Now().Year()
-		if year == thisYear {
-			urls = append(urls, latestFeeds...)
-		}
-	}
-	return
+	), nil
 }
 
 func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []rdf, err error) {
@@ -135,7 +125,7 @@ func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []
 }
 
 func fetchJVNFeedFile(url string) (rdf *rdf, err error) {
-	bytes, err := util.FetchFeedFile(url, false)
+	bytes, err := futil.FetchFeedFile(url, false)
 	if err != nil {
 		return nil, xerrors.Errorf("Failed to fetch. url: %s, err: %w", url, err)
 	}

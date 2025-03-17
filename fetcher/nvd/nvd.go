@@ -1,4 +1,4 @@
-package fetcher
+package nvd
 
 import (
 	"archive/tar"
