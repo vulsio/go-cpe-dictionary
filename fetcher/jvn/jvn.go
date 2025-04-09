@@ -94,15 +94,12 @@ func fetchJVNFeedFileConcurrently(urls []string, concurrency, wait int) (rdfs []
 	tasks := util.GenWorkers(concurrency, wait)
 	for range urls {
 		tasks <- func() {
-			select {
-			case url := <-reqChan:
-				rdf, err := fetchJVNFeedFile(url)
-				if err != nil {
-					errChan <- err
-					return
-				}
-				resChan <- *rdf
+			rdf, err := fetchJVNFeedFile(<-reqChan)
+			if err != nil {
+				errChan <- err
+				return
 			}
+			resChan <- *rdf
 		}
 	}
 

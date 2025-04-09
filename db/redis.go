@@ -277,7 +277,7 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 				return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
 			}
 		} else {
-			if !xerrors.Is(err, redis.Nil) {
+			if !errors.Is(err, redis.Nil) {
 				return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
 			}
 			ts, err = r.conn.SMembers(ctx, titleListKey).Result()

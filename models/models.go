@@ -93,31 +93,29 @@ func ConvertToModels(cpes []FetchedCPE, fetchType FetchType, deprecated bool) []
 	tasks := util.GenWorkers(viper.GetInt("threads"), 0)
 	for range cpes {
 		tasks <- func() {
-			select {
-			case cpe := <-reqChan:
-				for _, c := range cpe.CPEs {
-					wfn, err := unbindFn(c)
-					if err != nil {
-						resChan <- nil
-					}
-					resChan <- &CategorizedCpe{
-						FetchType:       fetchType,
-						Title:           cpe.Title,
-						CpeURI:          naming.BindToURI(wfn),
-						CpeFS:           naming.BindToFS(wfn),
-						Part:            wfn.GetString(common.AttributePart),
-						Vendor:          wfn.GetString(common.AttributeVendor),
-						Product:         wfn.GetString(common.AttributeProduct),
-						Version:         wfn.GetString(common.AttributeVersion),
-						Update:          wfn.GetString(common.AttributeUpdate),
-						Edition:         wfn.GetString(common.AttributeEdition),
-						Language:        wfn.GetString(common.AttributeLanguage),
-						SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
-						TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
-						TargetHardware:  wfn.GetString(common.AttributeTargetHw),
-						Other:           wfn.GetString(common.AttributeOther),
-						Deprecated:      deprecated,
-					}
+			cpe := <-reqChan
+			for _, c := range cpe.CPEs {
+				wfn, err := unbindFn(c)
+				if err != nil {
+					resChan <- nil
+				}
+				resChan <- &CategorizedCpe{
+					FetchType:       fetchType,
+					Title:           cpe.Title,
+					CpeURI:          naming.BindToURI(wfn),
+					CpeFS:           naming.BindToFS(wfn),
+					Part:            wfn.GetString(common.AttributePart),
+					Vendor:          wfn.GetString(common.AttributeVendor),
+					Product:         wfn.GetString(common.AttributeProduct),
+					Version:         wfn.GetString(common.AttributeVersion),
+					Update:          wfn.GetString(common.AttributeUpdate),
+					Edition:         wfn.GetString(common.AttributeEdition),
+					Language:        wfn.GetString(common.AttributeLanguage),
+					SoftwareEdition: wfn.GetString(common.AttributeSwEdition),
+					TargetSoftware:  wfn.GetString(common.AttributeTargetSw),
+					TargetHardware:  wfn.GetString(common.AttributeTargetHw),
+					Other:           wfn.GetString(common.AttributeOther),
+					Deprecated:      deprecated,
 				}
 			}
 		}
@@ -125,11 +123,9 @@ func ConvertToModels(cpes []FetchedCPE, fetchType FetchType, deprecated bool) []
 
 	var converted []CategorizedCpe
 	for range cpes {
-		select {
-		case cpe := <-resChan:
-			if cpe != nil {
-				converted = append(converted, *cpe)
-			}
+		cpe := <-resChan
+		if cpe != nil {
+			converted = append(converted, *cpe)
 		}
 	}
 	return converted
