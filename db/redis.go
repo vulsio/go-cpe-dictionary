@@ -72,7 +72,6 @@ const (
 	vpSeparator         = "##"
 	deprecatedCPEsKey   = "CPE#DeprecatedCPEs"
 	titleListKey        = "CPE#Titles"
-	titleListCacheKey   = "CPE#Cache#Titles"
 	titleKeyFormat      = "CPE#Title#%s"
 	depKey              = "CPE#DEP"
 	fetchMetaKey        = "CPE#FETCHMETA"
@@ -255,38 +254,13 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 	}
 
 	ctx := context.Background()
-	t, err := r.conn.Type(ctx, titleListKey).Result()
-	if err != nil {
-		return nil, xerrors.Errorf("Failed to TYPE CPE#Titles. err: %w", err)
-	}
-
 	var ts []string
-	switch t {
-	case "string":
-		bs, err := r.conn.Get(ctx, titleListKey).Bytes()
-		if err != nil {
-			return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
-		}
-		if err := json.Unmarshal(bs, &ts); err != nil {
-			return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
-		}
-	case "set": // backward compatibility: https://github.com/vulsio/go-cpe-dictionary/pull/186
-		bs, err := r.conn.Get(ctx, titleListCacheKey).Bytes()
-		if err == nil {
-			if err := json.Unmarshal(bs, &ts); err != nil {
-				return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
-			}
-		} else {
-			if !errors.Is(err, redis.Nil) {
-				return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
-			}
-			ts, err = r.conn.SMembers(ctx, titleListKey).Result()
-			if err != nil {
-				return nil, xerrors.Errorf("Failed to SMembers Titles. err: %w", err)
-			}
-		}
-	default:
-		return nil, xerrors.Errorf("unexpected CPE#Titles type. expected: %q, actual: %q", []string{"string", "set"}, t)
+	bs, err := r.conn.Get(ctx, titleListKey).Bytes()
+	if err != nil {
+		return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+	}
+	if err := json.Unmarshal(bs, &ts); err != nil {
+		return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
 	}
 
 	if len(ts) < n {
@@ -468,7 +442,6 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 	for cpeURI := range oldDeps["DeprecatedCPEs"] {
 		_ = pipe.SRem(ctx, deprecatedCPEsKey, cpeURI)
 	}
-	_ = pipe.Del(ctx, titleListCacheKey)
 	for title, cpeURIs := range oldDeps["Title"] {
 		for cpeURI := range cpeURIs {
 			_ = pipe.SRem(ctx, fmt.Sprintf(titleKeyFormat, title), cpeURI)
