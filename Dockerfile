@@ -11,7 +11,7 @@ COPY . $GOPATH/src/$REPOSITORY
 RUN cd $GOPATH/src/$REPOSITORY && make install
 
 
-FROM alpine:3.16
+FROM alpine:3.22
 
 ENV LOGDIR /var/log/go-cpe-dictionary
 ENV WORKDIR /go-cpe-dictionary
