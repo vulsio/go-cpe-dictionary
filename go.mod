@@ -11,7 +11,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/hbollon/go-edlib v1.7.0
 	github.com/inconshreveable/log15 v3.0.0-testing.5+incompatible
-	github.com/klauspost/compress v1.18.0
+	github.com/klauspost/compress v1.18.1
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/mitchellh/go-homedir v1.1.0
