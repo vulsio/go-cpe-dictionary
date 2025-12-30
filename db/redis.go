@@ -31,23 +31,27 @@ import (
   └───┴──────────────────┴──────────┴──────────────────────────────────────────────────┘
   ┌───┬──────────────────┬──────────┬──────────────────────────────────────────────────┐
   │ 1 │ CPE#Titles       │   JSON   │ Get ALL Titles                                   │
+  ├───┼──────────────────┼──────────┼──────────────────────────────────────────────────┤
+  │ 2 │ CPE#SearchTitles │   JSON   │ Get ALL SearchTitles (Vendor + Product)          │
   └───┴──────────────────┴──────────┴──────────────────────────────────────────────────┘
 
 - Sets
-  ┌─────────────────────────────┬───────────────────────┬────────────────────────────────────┐
-  │       KEY                   │  MEMBER               │              PURPOSE               │
-  └─────────────────────────────┴───────────────────────┴────────────────────────────────────┘
-  ┌─────────────────────────────┬───────────────────────┬────────────────────────────────────┐
-  │ CPE#VendorProducts          │ ${vendor}##${product} │ Get ALL Vendor Products            │
-  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
-  │ CPE#DeprecatedVendorProducts│ ${vendor}##${product} │ Get ALL Deprecated Vendor Products │
-  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
-  │ CPE#VP#${vendor}##${product}│ CPEURI                │ Get CPEURI by vendor and product   │
-  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
-  │ CPE#DeprecatedCPEs          │ CPEURI                │ Get DeprecatedCPEs                 │
-  ├─────────────────────────────┼───────────────────────┼────────────────────────────────────┤
-  │ CPE#Title#{title}           │ CPEURI                │ Get CPEURI by title                │
-  └─────────────────────────────┴───────────────────────┴────────────────────────────────────┘
+  ┌─────────────────────────────────────┬───────────────────────┬────────────────────────────────────┐
+  │       KEY                           │  MEMBER               │              PURPOSE               │
+  └─────────────────────────────────────┴───────────────────────┴────────────────────────────────────┘
+  ┌─────────────────────────────────────┬───────────────────────┬────────────────────────────────────┐
+  │ CPE#VendorProducts                  │ ${vendor}##${product} │ Get ALL Vendor Products            │
+  ├─────────────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#DeprecatedVendorProducts        │ ${vendor}##${product} │ Get ALL Deprecated Vendor Products │
+  ├─────────────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#VP#${vendor}##${product}        │ CPEURI                │ Get CPEURI by vendor and product   │
+  ├─────────────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#DeprecatedCPEs                  │ CPEURI                │ Get DeprecatedCPEs                 │
+  ├─────────────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#Title#{title}                   │ CPEURI                │ Get CPEURI by title                │
+  ├─────────────────────────────────────┼───────────────────────┼────────────────────────────────────┤
+  │ CPE#SearchTitle#{searchTitle}       │ CPEURI                │ Get CPEURI by searchTitle          │
+  └─────────────────────────────────────┴───────────────────────┴────────────────────────────────────┘
 
 - Hash
   ┌───┬────────────────┬───────────────┬─────────────┬──────────────────────────────────────────────────┐
@@ -65,16 +69,18 @@ import (
 **/
 
 const (
-	dialectRedis        = "redis"
-	vpKeyFormat         = "CPE#VP#%s##%s"
-	vpListKey           = "CPE#VendorProducts"
-	deprecatedVPListKey = "CPE#DeprecatedVendorProducts"
-	vpSeparator         = "##"
-	deprecatedCPEsKey   = "CPE#DeprecatedCPEs"
-	titleListKey        = "CPE#Titles"
-	titleKeyFormat      = "CPE#Title#%s"
-	depKey              = "CPE#DEP"
-	fetchMetaKey        = "CPE#FETCHMETA"
+	dialectRedis         = "redis"
+	vpKeyFormat          = "CPE#VP#%s##%s"
+	vpListKey            = "CPE#VendorProducts"
+	deprecatedVPListKey  = "CPE#DeprecatedVendorProducts"
+	vpSeparator          = "##"
+	deprecatedCPEsKey    = "CPE#DeprecatedCPEs"
+	titleListKey         = "CPE#Titles"
+	titleKeyFormat       = "CPE#Title#%s"
+	searchTitleListKey   = "CPE#SearchTitles"
+	searchTitleKeyFormat = "CPE#SearchTitle#%s"
+	depKey               = "CPE#DEP"
+	fetchMetaKey         = "CPE#FETCHMETA"
 )
 
 // RedisDriver is Driver for Redis
@@ -255,9 +261,9 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 
 	ctx := context.Background()
 	var ts []string
-	bs, err := r.conn.Get(ctx, titleListKey).Bytes()
+	bs, err := r.conn.Get(ctx, searchTitleListKey).Bytes()
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to Get Titles. err: %w", err)
+		return nil, xerrors.Errorf("Failed to Get SearchTitles. err: %w", err)
 	}
 	if err := json.Unmarshal(bs, &ts); err != nil {
 		return nil, xerrors.Errorf("Failed to Unmarshal JSON. err: %w", err)
@@ -274,9 +280,9 @@ func (r *RedisDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib
 
 	ranks := make([]models.FetchedCPE, 0, n)
 	for _, s := range ss {
-		cs, err := r.conn.SMembers(ctx, fmt.Sprintf(titleKeyFormat, s)).Result()
+		cs, err := r.conn.SMembers(ctx, fmt.Sprintf(searchTitleKeyFormat, s)).Result()
 		if err != nil {
-			return nil, xerrors.Errorf("Failed to SMembers Title. err: %w", err)
+			return nil, xerrors.Errorf("Failed to SMembers SearchTitle. err: %w", err)
 		}
 		ranks = append(ranks, models.FetchedCPE{
 			Title: s,
@@ -295,13 +301,14 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 		return xerrors.Errorf("Failed to set batch-size. err: batch-size option is not set properly")
 	}
 
-	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedVendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}, "Title": {"Title": {"${CPEURI}": {}}}}
+	// newDeps, oldDeps: {"VP": {"${part}#${vendor}": {"CPEURI": {}}}, "VendorProducts": {"${part}#${vendor}": {}}, "DeprecatedVendorProducts": {"${part}#${vendor}": {}}, "DeprecatedCPEs": {"CPEURI": {}}, "Title": {"Title": {"${CPEURI}": {}}}, "SearchTitle": {"SearchTitle": {"${CPEURI}": {}}}}
 	newDeps := map[string]map[string]map[string]struct{}{
 		"VP":                       {},
 		"VendorProducts":           {},
 		"DeprecatedVendorProducts": {},
 		"DeprecatedCPEs":           {},
 		"Title":                    {},
+		"SearchTitle":              {},
 	}
 	oldDepsStr, err := r.conn.HGet(ctx, depKey, string(fetchType)).Result()
 	if err != nil {
@@ -313,7 +320,8 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 			"VendorProducts": {},
 			"DeprecatedVendorProducts": {},
 			"DeprecatedCPEs": {},
-			"Title": {}
+			"Title": {},
+			"SearchTitle": {}
 		}`
 	}
 	var oldDeps map[string]map[string]map[string]struct{}
@@ -322,6 +330,7 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 	}
 
 	titles := make(map[string]struct{})
+	searchTitles := make(map[string]struct{})
 	for _, ft := range []models.FetchType{models.NVD, models.JVN, models.Vuls} {
 		if fetchType == ft {
 			continue
@@ -342,6 +351,9 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 
 		for t := range deps["Title"] {
 			titles[t] = struct{}{}
+		}
+		for st := range deps["SearchTitle"] {
+			searchTitles[st] = struct{}{}
 		}
 	}
 
@@ -407,6 +419,20 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 						delete(oldDeps["Title"], c.Title)
 					}
 				}
+
+				searchTitles[c.SearchTitle] = struct{}{}
+
+				_ = pipe.SAdd(ctx, fmt.Sprintf(searchTitleKeyFormat, c.SearchTitle), c.CpeURI)
+				if _, ok := newDeps["SearchTitle"][c.SearchTitle]; !ok {
+					newDeps["SearchTitle"][c.SearchTitle] = map[string]struct{}{}
+				}
+				newDeps["SearchTitle"][c.SearchTitle][c.CpeURI] = struct{}{}
+				if _, ok := oldDeps["SearchTitle"][c.SearchTitle]; ok {
+					delete(oldDeps["SearchTitle"][c.SearchTitle], c.CpeURI)
+					if len(oldDeps["SearchTitle"][c.SearchTitle]) == 0 {
+						delete(oldDeps["SearchTitle"], c.SearchTitle)
+					}
+				}
 			}
 			if _, err = pipe.Exec(ctx); err != nil {
 				return xerrors.Errorf("Failed to exec pipeline. err: %w", err)
@@ -421,6 +447,14 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 	}
 	if err := r.conn.Set(ctx, titleListKey, string(bs), 0).Err(); err != nil {
 		return xerrors.Errorf("Failed to SET Titles. err: %w", err)
+	}
+
+	sbs, err := json.Marshal(slices.Collect(maps.Keys(searchTitles)))
+	if err != nil {
+		return xerrors.Errorf("Failed to Marshal JSON. err: %w", err)
+	}
+	if err := r.conn.Set(ctx, searchTitleListKey, string(sbs), 0).Err(); err != nil {
+		return xerrors.Errorf("Failed to SET SearchTitles. err: %w", err)
 	}
 	bar.Increment()
 
@@ -445,6 +479,11 @@ func (r *RedisDriver) InsertCpes(fetchType models.FetchType, cpes models.Fetched
 	for title, cpeURIs := range oldDeps["Title"] {
 		for cpeURI := range cpeURIs {
 			_ = pipe.SRem(ctx, fmt.Sprintf(titleKeyFormat, title), cpeURI)
+		}
+	}
+	for searchTitle, cpeURIs := range oldDeps["SearchTitle"] {
+		for cpeURI := range cpeURIs {
+			_ = pipe.SRem(ctx, fmt.Sprintf(searchTitleKeyFormat, searchTitle), cpeURI)
 		}
 	}
 

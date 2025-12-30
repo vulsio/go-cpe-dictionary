@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/knqyf263/go-cpe/common"
@@ -12,7 +13,7 @@ import (
 )
 
 // LatestSchemaVersion manages the Schema version used in the latest go-cpe-dictionary.
-const LatestSchemaVersion = 2
+const LatestSchemaVersion = 3
 
 // FetchMeta has meta information about fetched data
 type FetchMeta struct {
@@ -57,6 +58,7 @@ type CategorizedCpe struct {
 	ID              int64     `json:"-"`
 	FetchType       FetchType `gorm:"type:varchar(3)"`
 	Title           string    `gorm:"type:text;index:idx_categorized_cpe_title,length:255"`
+	SearchTitle     string    `gorm:"type:varchar(255);index:idx_categorized_cpe_search_title"`
 	CpeURI          string    `gorm:"type:varchar(255);index:idx_categorized_cpe_cpe_uri"`
 	CpeFS           string    `gorm:"type:varchar(255)"`
 	Part            string    `gorm:"type:varchar(255)"`
@@ -99,14 +101,17 @@ func ConvertToModels(cpes []FetchedCPE, fetchType FetchType, deprecated bool) []
 				if err != nil {
 					resChan <- nil
 				}
+				vendor := wfn.GetString(common.AttributeVendor)
+				product := wfn.GetString(common.AttributeProduct)
 				resChan <- &CategorizedCpe{
 					FetchType:       fetchType,
 					Title:           cpe.Title,
+					SearchTitle:     fmt.Sprintf("%s %s", vendor, product),
 					CpeURI:          naming.BindToURI(wfn),
 					CpeFS:           naming.BindToFS(wfn),
 					Part:            wfn.GetString(common.AttributePart),
-					Vendor:          wfn.GetString(common.AttributeVendor),
-					Product:         wfn.GetString(common.AttributeProduct),
+					Vendor:          vendor,
+					Product:         product,
 					Version:         wfn.GetString(common.AttributeVersion),
 					Update:          wfn.GetString(common.AttributeUpdate),
 					Edition:         wfn.GetString(common.AttributeEdition),
