@@ -23,12 +23,16 @@ func requestLogger(output io.Writer) echo.MiddlewareFunc {
 	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:   true,
 		LogURI:      true,
-		LogError:    true,
 		LogMethod:   true,
 		LogLatency:  true,
 		LogRemoteIP: true,
+		LogError:    true,
 		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
-			_, err := fmt.Fprintf(output, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
+			errMsg := ""
+			if v.Error != nil {
+				errMsg = fmt.Sprintf(" error=%v", v.Error)
+			}
+			_, err := fmt.Fprintf(output, "%s %s %s %d %v%s\n", v.RemoteIP, v.Method, v.URI, v.Status, v.Latency, errMsg)
 			return err
 		},
 	})
