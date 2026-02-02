@@ -28,8 +28,8 @@ func requestLogger(output io.Writer) echo.MiddlewareFunc {
 		LogLatency:  true,
 		LogRemoteIP: true,
 		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
-			_, _ = fmt.Fprintf(output, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
-			return nil
+			_, err := fmt.Fprintf(output, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
+			return err
 		},
 	})
 }
