@@ -23,7 +23,18 @@ func Start(logToFile bool, logDir string, driver db.DB) error {
 	e.Debug = viper.GetBool("debug")
 
 	// Middleware
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: os.Stderr}))
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus:   true,
+		LogURI:      true,
+		LogError:    true,
+		LogMethod:   true,
+		LogLatency:  true,
+		LogRemoteIP: true,
+		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
+			_, _ = fmt.Fprintf(os.Stderr, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
+			return nil
+		},
+	}))
 	e.Use(middleware.Recover())
 
 	// setup access logger
@@ -34,7 +45,18 @@ func Start(logToFile bool, logDir string, driver db.DB) error {
 			return xerrors.Errorf("Failed to open a log file: %s", err)
 		}
 		defer f.Close()
-		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{Output: f}))
+		e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+			LogStatus:   true,
+			LogURI:      true,
+			LogError:    true,
+			LogMethod:   true,
+			LogLatency:  true,
+			LogRemoteIP: true,
+			LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
+				_, _ = fmt.Fprintf(f, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
+				return nil
+			},
+		}))
 	}
 
 	// Routes
