@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,13 +18,9 @@ import (
 	"github.com/vulsio/go-cpe-dictionary/models"
 )
 
-// Start starts CVE dictionary HTTP Server.
-func Start(logToFile bool, logDir string, driver db.DB) error {
-	e := echo.New()
-	e.Debug = viper.GetBool("debug")
-
-	// Middleware
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+// requestLogger creates a request logger middleware with the given output writer
+func requestLogger(output io.Writer) echo.MiddlewareFunc {
+	return middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
 		LogStatus:   true,
 		LogURI:      true,
 		LogError:    true,
@@ -31,10 +28,19 @@ func Start(logToFile bool, logDir string, driver db.DB) error {
 		LogLatency:  true,
 		LogRemoteIP: true,
 		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
-			_, _ = fmt.Fprintf(os.Stderr, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
+			_, _ = fmt.Fprintf(output, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
 			return nil
 		},
-	}))
+	})
+}
+
+// Start starts CVE dictionary HTTP Server.
+func Start(logToFile bool, logDir string, driver db.DB) error {
+	e := echo.New()
+	e.Debug = viper.GetBool("debug")
+
+	// Middleware
+	e.Use(requestLogger(os.Stderr))
 	e.Use(middleware.Recover())
 
 	// setup access logger
@@ -45,18 +51,7 @@ func Start(logToFile bool, logDir string, driver db.DB) error {
 			return xerrors.Errorf("Failed to open a log file: %s", err)
 		}
 		defer f.Close()
-		e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-			LogStatus:   true,
-			LogURI:      true,
-			LogError:    true,
-			LogMethod:   true,
-			LogLatency:  true,
-			LogRemoteIP: true,
-			LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
-				_, _ = fmt.Fprintf(f, "%s %s %d %v\n", v.Method, v.URI, v.Status, v.Latency)
-				return nil
-			},
-		}))
+		e.Use(requestLogger(f))
 	}
 
 	// Routes
