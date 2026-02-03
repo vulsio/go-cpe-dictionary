@@ -67,18 +67,13 @@ func newRequestLoggerConfig(writer io.Writer) middleware.RequestLoggerConfig {
 		LogResponseSize:  true,
 
 		LogValuesFunc: func(_ echo.Context, v middleware.RequestLoggerValues) error {
-			errStr := ""
-			if v.Error != nil {
-				errStr = v.Error.Error()
-			}
-
 			type logFormat struct {
 				Time         string `json:"time"`
+				ID           string `json:"id"`
 				RemoteIP     string `json:"remote_ip"`
 				Host         string `json:"host"`
 				Method       string `json:"method"`
 				URI          string `json:"uri"`
-				ID           string `json:"id"`
 				UserAgent    string `json:"user_agent"`
 				Status       int    `json:"status"`
 				Error        string `json:"error"`
@@ -89,15 +84,20 @@ func newRequestLoggerConfig(writer io.Writer) middleware.RequestLoggerConfig {
 			}
 
 			return json.NewEncoder(writer).Encode(logFormat{
-				Time:         v.StartTime.Format(time.RFC3339Nano),
-				RemoteIP:     v.RemoteIP,
-				Host:         v.Host,
-				Method:       v.Method,
-				URI:          v.URI,
-				ID:           v.RequestID,
-				UserAgent:    v.UserAgent,
-				Status:       v.Status,
-				Error:        errStr,
+				Time:      v.StartTime.Format(time.RFC3339Nano),
+				ID:        v.RequestID,
+				RemoteIP:  v.RemoteIP,
+				Host:      v.Host,
+				Method:    v.Method,
+				URI:       v.URI,
+				UserAgent: v.UserAgent,
+				Status:    v.Status,
+				Error: func() string {
+					if v.Error != nil {
+						return v.Error.Error()
+					}
+					return ""
+				}(),
 				Latency:      v.Latency.Nanoseconds(),
 				LatencyHuman: v.Latency.String(),
 				BytesIn: func() int64 {
