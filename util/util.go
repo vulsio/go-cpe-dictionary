@@ -61,7 +61,7 @@ func SetLogger(logToFile bool, logDir string, debug, logJSON bool) error {
 			}
 		}
 
-		logPath := filepath.Join(logDir, "gost.log")
+		logPath := filepath.Join(logDir, "go-cpe-dictionary.log")
 		if _, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644); err != nil {
 			return xerrors.Errorf("Failed to open a log file. err: %w", err)
 		}
