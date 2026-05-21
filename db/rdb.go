@@ -263,16 +263,16 @@ func (r *RDBDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib.A
 		return nil, nil
 	}
 
-	var titles []string
-	if err := r.conn.Model(&models.CategorizedCpe{}).Distinct("title").Find(&titles).Error; err != nil {
-		return nil, xerrors.Errorf("Failed to select title. err: %w", err)
+	var searchTitles []string
+	if err := r.conn.Model(&models.CategorizedCpe{}).Distinct("search_title").Find(&searchTitles).Error; err != nil {
+		return nil, xerrors.Errorf("Failed to select search_title. err: %w", err)
 	}
 
-	if len(titles) < n {
-		n = len(titles)
+	if len(searchTitles) < n {
+		n = len(searchTitles)
 	}
 
-	ss, err := edlib.FuzzySearchSet(query, titles, n, algorithm)
+	ss, err := edlib.FuzzySearchSet(query, searchTitles, n, algorithm)
 	if err != nil {
 		return nil, xerrors.Errorf("Failed to fuzzy search. err: %w", err)
 	}
@@ -280,7 +280,7 @@ func (r *RDBDriver) GetSimilarCpesByTitle(query string, n int, algorithm edlib.A
 	ranks := make([]models.FetchedCPE, 0, n)
 	for _, s := range ss {
 		c := models.FetchedCPE{Title: s}
-		if err := r.conn.Model(&models.CategorizedCpe{}).Distinct("cpe_uri").Where("title = ?", s).Find(&c.CPEs).Error; err != nil {
+		if err := r.conn.Model(&models.CategorizedCpe{}).Distinct("cpe_uri").Where("search_title = ?", s).Find(&c.CPEs).Error; err != nil {
 			return nil, xerrors.Errorf("Failed to select cpe_uri. err: %w", err)
 		}
 		ranks = append(ranks, c)

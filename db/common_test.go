@@ -232,7 +232,7 @@ func testGetSimilarCpesByTitle(t *testing.T, driver DB) {
 			expected: expected{
 				cpes: []models.FetchedCPE{
 					{
-						Title: "MongoDB C# driver 1.10.0",
+						Title: "mongodb c\\#_driver",
 						CPEs:  []string{"cpe:/a:mongodb:c%23_driver:1.10.0:-:~~~mongodb~~"},
 					},
 				},
