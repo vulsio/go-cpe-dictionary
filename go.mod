@@ -3,7 +3,7 @@ module github.com/vulsio/go-cpe-dictionary
 go 1.25.0
 
 require (
-	github.com/alicebob/miniredis/v2 v2.37.0
+	github.com/alicebob/miniredis/v2 v2.38.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cheggaaa/pb/v3 v3.1.7
 	github.com/glebarez/sqlite v1.11.0
@@ -13,7 +13,7 @@ require (
 	github.com/inconshreveable/log15 v3.0.0-testing.5+incompatible
 	github.com/klauspost/compress v1.18.6
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
-	github.com/labstack/echo/v4 v4.15.2
+	github.com/labstack/echo/v4 v4.15.3
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/spf13/cobra v1.10.2
@@ -22,7 +22,7 @@ require (
 	gorm.io/driver/mysql v1.5.5
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.7
-	oras.land/oras-go/v2 v2.6.0
+	oras.land/oras-go/v2 v2.6.1
 )
 
 require (
