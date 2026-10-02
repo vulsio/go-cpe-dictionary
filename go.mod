@@ -13,7 +13,7 @@ require (
 	github.com/inconshreveable/log15 v3.0.0-testing.5+incompatible
 	github.com/klauspost/compress v1.18.6
 	github.com/knqyf263/go-cpe v0.0.0-20201213041631-54f6ab28673f
-	github.com/labstack/echo/v4 v4.15.2
+	github.com/labstack/echo/v4 v4.15.3
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/opencontainers/image-spec v1.1.1
 	github.com/spf13/cobra v1.10.2
