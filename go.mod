@@ -3,7 +3,7 @@ module github.com/vulsio/go-cpe-dictionary
 go 1.27
 
 require (
-	github.com/alicebob/miniredis/v2 v2.39.0
+	github.com/alicebob/miniredis/v2 v2.40.0
 	github.com/cenkalti/backoff v2.2.1+incompatible
 	github.com/cheggaaa/pb/v3 v3.2.1
 	github.com/glebarez/sqlite v1.11.0
