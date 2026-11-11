@@ -227,18 +227,29 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 	if vendor == "" || product == "" {
 		return nil, nil, nil
 	}
-	result, err := r.conn.SMembers(context.Background(), fmt.Sprintf(vpKeyFormat, vendor, product)).Result()
+	ctx := context.Background()
+	result, err := r.conn.SMembers(ctx, fmt.Sprintf(vpKeyFormat, vendor, product)).Result()
 	if err != nil {
 		return nil, nil, xerrors.Errorf("Failed to SMembers CPE. err: %w", err)
 	}
 
 	cpeURIs, deprecated := []string{}, []string{}
-	for _, cpeURI := range result {
-		ok, err := r.IsDeprecated(cpeURI)
-		if err != nil {
-			return nil, nil, xerrors.Errorf("Failed to get deprecated CPE. err :%s", err)
-		}
-		if ok {
+	if len(result) == 0 {
+		return cpeURIs, deprecated, nil
+	}
+	members := make([]interface{}, len(result))
+	for i, cpeURI := range result {
+		members[i] = cpeURI
+	}
+	isDeprecated, err := r.conn.SMIsMember(ctx, deprecatedCPEsKey, members...).Result()
+	if err != nil {
+		return nil, nil, xerrors.Errorf("Failed to get deprecated CPE. err: %w", err)
+	}
+	if len(isDeprecated) != len(result) {
+		return nil, nil, xerrors.Errorf("Failed to get deprecated CPE. err: unexpected SMIsMember response length: got %d, want %d", len(isDeprecated), len(result))
+	}
+	for i, cpeURI := range result {
+		if isDeprecated[i] {
 			deprecated = append(deprecated, cpeURI)
 		} else {
 			cpeURIs = append(cpeURIs, cpeURI)

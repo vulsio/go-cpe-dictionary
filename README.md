@@ -21,6 +21,7 @@ go-cpe-dictionary requires the following packages.
 - gcc
 - go v1.7 or later
     - https://golang.org/doc/install
+- Redis 6.2 or later (only when using `--dbtype redis`)
 
 ```bash
 $ sudo yum -y install sqlite git gcc
