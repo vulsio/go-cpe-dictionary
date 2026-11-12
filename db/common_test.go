@@ -188,6 +188,14 @@ func testGetCpesByVendorProduct(t *testing.T, driver DB) {
 				},
 			},
 		},
+		"not found": {
+			Vendor:  "vendorName9",
+			Product: "productName9",
+			Expected: Expected{
+				CpeURIs:    []string{},
+				Deprecated: []string{},
+			},
+		},
 	}
 
 	for k, tc := range cases {
