@@ -243,7 +243,7 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 	}
 	deprecatedFlags, err := r.conn.SMIsMember(ctx, deprecatedCPEsKey, members...).Result()
 	if err != nil {
-		return nil, nil, xerrors.Errorf("Failed to get deprecated CPE. err: %w", err)
+		return nil, nil, xerrors.Errorf("Failed to SMIsMember %s. err: %w", deprecatedCPEsKey, err)
 	}
 	for i, cpeURI := range result {
 		if deprecatedFlags[i] {
