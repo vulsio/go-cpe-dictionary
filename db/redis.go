@@ -227,18 +227,26 @@ func (r *RedisDriver) GetCpesByVendorProduct(vendor, product string) ([]string, 
 	if vendor == "" || product == "" {
 		return nil, nil, nil
 	}
-	result, err := r.conn.SMembers(context.Background(), fmt.Sprintf(vpKeyFormat, vendor, product)).Result()
+	ctx := context.Background()
+	result, err := r.conn.SMembers(ctx, fmt.Sprintf(vpKeyFormat, vendor, product)).Result()
 	if err != nil {
 		return nil, nil, xerrors.Errorf("Failed to SMembers CPE. err: %w", err)
 	}
 
 	cpeURIs, deprecated := []string{}, []string{}
-	for _, cpeURI := range result {
-		ok, err := r.IsDeprecated(cpeURI)
-		if err != nil {
-			return nil, nil, xerrors.Errorf("Failed to get deprecated CPE. err :%s", err)
-		}
-		if ok {
+	if len(result) == 0 {
+		return cpeURIs, deprecated, nil
+	}
+	members := make([]interface{}, len(result))
+	for i, cpeURI := range result {
+		members[i] = cpeURI
+	}
+	deprecatedFlags, err := r.conn.SMIsMember(ctx, deprecatedCPEsKey, members...).Result()
+	if err != nil {
+		return nil, nil, xerrors.Errorf("Failed to SMIsMember %s. err: %w", deprecatedCPEsKey, err)
+	}
+	for i, cpeURI := range result {
+		if deprecatedFlags[i] {
 			deprecated = append(deprecated, cpeURI)
 		} else {
 			cpeURIs = append(cpeURIs, cpeURI)
